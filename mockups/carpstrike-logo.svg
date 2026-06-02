@@ -1,0 +1,7 @@
+<svg width="540" height="130" viewBox="0 0 540 130" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="CarpStrike">
+  <!-- Ligne d'électrocardiogramme -->
+  <path d="M10 70 L 70 70 L 80 70 L 88 54 L 98 90 L 108 70 L 150 70 L 165 70 L 178 38 L 192 104 L 206 70 L 250 70 L 262 70 L 275 14 L 290 120 L 305 70 L 330 70 L 345 70 L 356 50 L 367 88 L 377 70 L 430 70 L 445 70 L 456 56 L 466 84 L 476 70 L 530 70"
+        stroke="#e8212b" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Texte CARPSTRIKE (fond clair : CARP noir, STRIKE rouge, contour blanc) -->
+  <text x="270" y="84" font-family="'Barlow Condensed', Arial, sans-serif" font-size="56" font-weight="900" font-style="italic" fill="#0a0908" text-anchor="middle" stroke="#f4f0eb" stroke-width="7" paint-order="stroke">CARP<tspan fill="#e8212b">STRIKE</tspan></text>
+</svg>

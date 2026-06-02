@@ -1,0 +1,297 @@
+// CarpStrike — schéma de données
+// Source de vérité : SPEC.md section 3
+// Doc : https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─────────────────────────────────────────────
+// Enums
+// ─────────────────────────────────────────────
+
+enum Role {
+  ORGANIZER
+  FISHERMAN
+}
+
+enum EnduroStatus {
+  DRAFT
+  PUBLISHED
+  LIVE
+  FINISHED
+  CANCELLED
+}
+
+enum EnduroMode {
+  MANAGED_ONLY // 20 € — gestion seule
+  WITH_REGISTRATION // 50 € — inscriptions en ligne
+}
+
+enum TeamStatus {
+  PENDING
+  CONFIRMED
+  WAITLIST
+  REJECTED
+}
+
+enum TeamPaymentStatus {
+  NONE
+  AWAITING
+  PAID
+  REFUNDED
+}
+
+enum RegistrationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  PAID
+  EXPIRED
+}
+
+enum Species {
+  COMMUNE
+  MIROIR
+  CUIR
+  KOI
+  AMOUR_BLANC
+}
+
+enum CatchStatus {
+  VALID
+  CONTESTED
+  CANCELLED
+}
+
+enum PaymentType {
+  ORGANIZER_FEE
+  REGISTRATION_FEE
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  REFUNDED
+}
+
+enum CommunicationPriority {
+  LOW
+  NORMAL
+  HIGH
+}
+
+enum CommunicationRecipients {
+  ALL
+  CONFIRMED
+  WAITLIST
+  PENDING
+}
+
+enum CommunicationChannel {
+  EMAIL
+  NOTIF
+  SMS
+}
+
+// ─────────────────────────────────────────────
+// Modèles
+// ─────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String? // géré par Supabase Auth ; nullable côté app
+  role         Role
+  firstName    String
+  lastName     String
+  phone        String?
+  avatarUrl    String?
+  createdAt    DateTime @default(now())
+
+  enduros             Enduro[]        @relation("OrganizerEnduros")
+  teamMemberships     TeamMember[]
+  payments            Payment[]
+  communicationsSent  Communication[] @relation("CommunicationSentBy")
+
+  @@index([role])
+}
+
+model Enduro {
+  id                String       @id @default(cuid())
+  organizerId       String
+  organizer         User         @relation("OrganizerEnduros", fields: [organizerId], references: [id])
+  name              String
+  slug              String       @unique
+  description       String?
+  status            EnduroStatus @default(DRAFT)
+  mode              EnduroMode
+  startAt           DateTime
+  endAt             DateTime
+  durationHours     Int
+  locationName      String
+  address           String?
+  postalCode        String?
+  lat               Float?
+  lng               Float?
+  maxTeams          Int
+  maxFishersPerTeam Int          @default(2)
+  registrationFee   Int          @default(0) // frais pêcheurs, en centimes
+  prizePool         Int? // en centimes
+  theme             String?
+  rulesText         String?
+  minWeightKg       Float        @default(3.0) // maille minimum
+  createdAt         DateTime     @default(now())
+
+  sectors              Sector[]
+  teams                Team[]
+  catches              Catch[]
+  commissaires         Commissaire[]
+  registrationRequests RegistrationRequest[]
+  payments             Payment[]
+  communications       Communication[]
+
+  @@index([organizerId])
+  @@index([status])
+}
+
+model Sector {
+  id       String  @id @default(cuid())
+  enduroId String
+  enduro   Enduro  @relation(fields: [enduroId], references: [id], onDelete: Cascade)
+  name     String // A, B, C, D...
+  color    String?
+
+  teams Team[]
+
+  @@index([enduroId])
+}
+
+model Team {
+  id            String            @id @default(cuid())
+  enduroId      String
+  enduro        Enduro            @relation(fields: [enduroId], references: [id], onDelete: Cascade)
+  name          String
+  sectorId      String?
+  sector        Sector?           @relation(fields: [sectorId], references: [id])
+  pegNumber     Int? // numéro de poste, nullable jusqu'à attribution
+  status        TeamStatus        @default(PENDING)
+  paymentStatus TeamPaymentStatus @default(NONE)
+  createdAt     DateTime          @default(now())
+
+  members  TeamMember[]
+  catches  Catch[]
+  payments Payment[]
+
+  @@index([enduroId])
+  @@index([sectorId])
+}
+
+model TeamMember {
+  id        String  @id @default(cuid())
+  teamId    String
+  team      Team    @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  userId    String?
+  user      User?   @relation(fields: [userId], references: [id])
+  firstName String
+  lastName  String
+  email     String?
+  isCaptain Boolean @default(false)
+
+  @@index([teamId])
+  @@index([userId])
+}
+
+model RegistrationRequest {
+  id              String             @id @default(cuid())
+  enduroId        String
+  enduro          Enduro             @relation(fields: [enduroId], references: [id], onDelete: Cascade)
+  teamName        String
+  status          RegistrationStatus @default(PENDING)
+  members         Json // liste { firstName, lastName, email }
+  requestedAt     DateTime           @default(now())
+  decidedAt       DateTime?
+  paymentDeadline DateTime? // decidedAt + 7 jours
+  rejectionReason String?
+
+  @@index([enduroId])
+  @@index([status])
+}
+
+model Catch {
+  id            String      @id @default(cuid())
+  enduroId      String
+  enduro        Enduro      @relation(fields: [enduroId], references: [id], onDelete: Cascade)
+  teamId        String
+  team          Team        @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  commissaireId String
+  commissaire   Commissaire @relation(fields: [commissaireId], references: [id])
+  weightKg      Float
+  species       Species
+  photoUrl      String
+  caughtAt      DateTime    @default(now())
+  status        CatchStatus @default(VALID)
+  note          String?
+
+  @@index([enduroId])
+  @@index([teamId])
+  @@index([commissaireId])
+}
+
+model Commissaire {
+  id           String   @id @default(cuid())
+  enduroId     String
+  enduro       Enduro   @relation(fields: [enduroId], references: [id], onDelete: Cascade)
+  username     String   @unique // auto : initiale+nom.slug-enduro
+  passwordHash String
+  displayName  String
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  catches Catch[]
+
+  @@index([enduroId])
+}
+
+model Payment {
+  id              String        @id @default(cuid())
+  type            PaymentType
+  enduroId        String
+  enduro          Enduro        @relation(fields: [enduroId], references: [id], onDelete: Cascade)
+  teamId          String?
+  team            Team?         @relation(fields: [teamId], references: [id])
+  userId          String
+  user            User          @relation(fields: [userId], references: [id])
+  amountCents     Int
+  currency        String        @default("EUR")
+  stripeSessionId String?
+  status          PaymentStatus @default(PENDING)
+  paidAt          DateTime?
+  createdAt       DateTime      @default(now())
+
+  @@index([enduroId])
+  @@index([teamId])
+  @@index([userId])
+}
+
+model Communication {
+  id         String                  @id @default(cuid())
+  enduroId   String
+  enduro     Enduro                  @relation(fields: [enduroId], references: [id], onDelete: Cascade)
+  subject    String
+  body       String
+  priority   CommunicationPriority   @default(NORMAL)
+  recipients CommunicationRecipients @default(ALL)
+  channels   CommunicationChannel[]
+  sentAt     DateTime?
+  sentById   String
+  sentBy     User                    @relation("CommunicationSentBy", fields: [sentById], references: [id])
+  createdAt  DateTime                @default(now())
+
+  @@index([enduroId])
+}

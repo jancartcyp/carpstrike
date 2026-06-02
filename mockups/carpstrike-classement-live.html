@@ -1,0 +1,1632 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Classement Live — Grand Enduro du Lac Bleu</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,900;1,700;1,900&family=Barlow:wght@300;400;500;600;700&family=Rajdhani:wght@500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #e8212b;
+    --red-bright: #ff2d3a;
+    --red-dim: rgba(232,33,43,0.15);
+    --red-glow: rgba(232,33,43,0.4);
+    --white: #f4f0eb;
+    --off: #c8c0b4;
+    --dim: rgba(244,240,235,0.6);
+    --dim2: rgba(244,240,235,0.3);
+    --dark: #0a0908;
+    --darker: #050403;
+    --panel: #141310;
+    --panel-2: #1a1814;
+    --line: rgba(244,240,235,0.07);
+    --line-bright: rgba(244,240,235,0.15);
+    --gold: #f0a500;
+    --silver: #c0c0c0;
+    --bronze: #cd7f32;
+    --green: #00c850;
+    --blue: #4a9eff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--darker);
+    font-family: 'Barlow', sans-serif;
+    color: var(--white);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ═══ ATMOSPHERE ═══ */
+  .bg-atmosphere {
+    position: fixed; inset: 0; z-index: -2;
+    background:
+      radial-gradient(ellipse 60% 50% at 0% 0%, rgba(232,33,43,0.1) 0%, transparent 50%),
+      radial-gradient(ellipse 60% 60% at 100% 100%, rgba(20, 60, 80, 0.15) 0%, transparent 50%),
+      linear-gradient(180deg, #0a0908 0%, #060504 100%);
+  }
+
+  .bg-grid {
+    position: fixed; inset: 0; z-index: -1;
+    background-image:
+      linear-gradient(rgba(244,240,235,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(244,240,235,0.02) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, #000 0%, transparent 80%);
+  }
+
+  /* ═══ HEADER ═══ */
+  .header {
+    background: rgba(10,9,8,0.9);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--line);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .header-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .logo { display: flex; align-items: center; cursor: pointer; }
+  .logo-carp { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-style: italic; font-size: 1.4rem; color: var(--white); letter-spacing: 1px; line-height: 1; }
+  .logo-strike { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-style: italic; font-size: 1.4rem; color: var(--red); letter-spacing: 1px; line-height: 1; text-shadow: 0 0 15px var(--red-glow); }
+  .logo-slash { width: 3px; height: 18px; background: var(--red); transform: skewX(-10deg); margin: 0 7px; box-shadow: 0 0 8px var(--red-glow); }
+
+  .header-enduro {
+    flex: 1;
+    text-align: center;
+    min-width: 200px;
+  }
+
+  .header-enduro-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+    color: var(--white);
+  }
+
+  .header-enduro-sub {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-top: 2px;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .live-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--red);
+    color: #fff;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 0.78rem;
+    letter-spacing: 2px;
+    padding: 5px 12px;
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+    box-shadow: 0 0 12px var(--red-glow);
+  }
+
+  .live-pill .dot {
+    width: 7px; height: 7px;
+    background: #fff;
+    border-radius: 50%;
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  .share-btn {
+    background: transparent;
+    border: 1px solid var(--line-bright);
+    color: var(--white);
+    padding: 7px 14px;
+    cursor: pointer;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  }
+
+  .share-btn:hover {
+    border-color: var(--red);
+    color: var(--red);
+  }
+
+  /* ═══ TICKER ═══ */
+  .ticker-wrap {
+    background: var(--red);
+    overflow: hidden;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    height: 32px;
+    display: flex;
+    align-items: center;
+    position: relative;
+  }
+
+  .ticker-label {
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    padding: 0 14px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    z-index: 2;
+    flex-shrink: 0;
+  }
+
+  .ticker-label::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 6px #fff;
+    animation: blink 1s step-end infinite;
+  }
+
+  .ticker {
+    display: flex;
+    animation: scroll 50s linear infinite;
+    white-space: nowrap;
+    flex: 1;
+  }
+
+  .ticker-item {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 1.5px;
+    color: rgba(255,255,255,0.95);
+    padding: 0 22px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .ticker-item::after {
+    content: '◆';
+    font-size: 0.4rem;
+    opacity: 0.6;
+    margin-left: 14px;
+  }
+
+  .ticker-item .new {
+    background: rgba(0,0,0,0.4);
+    padding: 2px 6px;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+  }
+
+  @keyframes scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* ═══ HERO STATS ═══ */
+  .hero-section {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 28px 24px 0;
+  }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+
+  /* TIME REMAINING */
+  .time-card {
+    background: linear-gradient(140deg, var(--panel) 0%, var(--panel-2) 100%);
+    border: 1px solid var(--line-bright);
+    padding: 18px 22px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .time-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100px; height: 2px;
+    background: var(--red);
+    box-shadow: 0 0 12px var(--red-glow);
+  }
+
+  .time-card::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; bottom: 0;
+    width: 50%;
+    background: radial-gradient(ellipse at right, var(--red-dim) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .time-eyebrow {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.65rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .time-eyebrow .pulse {
+    width: 6px; height: 6px;
+    background: var(--red);
+    border-radius: 50%;
+    box-shadow: 0 0 6px var(--red);
+    animation: blink 1s step-end infinite;
+  }
+
+  .time-display {
+    display: flex;
+    gap: 12px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .time-block {
+    text-align: center;
+  }
+
+  .time-num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 2.6rem;
+    line-height: 1;
+    color: var(--white);
+    text-shadow: 0 0 25px var(--red-glow);
+    min-width: 50px;
+  }
+
+  .time-unit {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.62rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-top: 4px;
+  }
+
+  .time-sep {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 2.4rem;
+    color: var(--red);
+    line-height: 1;
+    animation: blink 1s step-end infinite;
+  }
+
+  /* STAT CARDS */
+  .stat-card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 14px 16px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  .stat-card.red::before { background: var(--red); }
+  .stat-card.gold::before { background: var(--gold); }
+  .stat-card.blue::before { background: var(--blue); }
+  .stat-card.green::before { background: var(--green); }
+
+  .stat-icon {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.62rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 8px;
+  }
+
+  .stat-value {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 1.9rem;
+    line-height: 1;
+    color: var(--white);
+  }
+
+  .stat-value .unit {
+    font-size: 0.85rem;
+    color: var(--dim);
+    font-weight: 400;
+  }
+
+  .stat-card.red .stat-value { color: var(--red); text-shadow: 0 0 15px var(--red-glow); }
+  .stat-card.gold .stat-value { color: var(--gold); text-shadow: 0 0 15px rgba(240,165,0,0.4); }
+
+  .stat-trend {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+    color: var(--green);
+    margin-top: 4px;
+  }
+
+  /* ═══ PODIUM ═══ */
+  .podium-section {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px 24px;
+  }
+
+  .section-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--white);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-title::before {
+    content: '';
+    width: 30px; height: 1px;
+    background: var(--red);
+    box-shadow: 0 0 6px var(--red);
+  }
+
+  .podium-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr 1fr;
+    gap: 12px;
+    align-items: end;
+  }
+
+  .podium-card {
+    background: linear-gradient(180deg, var(--panel) 0%, var(--panel-2) 100%);
+    border: 1px solid var(--line);
+    padding: 22px 18px 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s;
+  }
+
+  .podium-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+
+  .podium-card.first {
+    background: linear-gradient(180deg, rgba(240,165,0,0.1) 0%, var(--panel-2) 100%);
+    border-color: rgba(240,165,0,0.4);
+    padding-top: 30px;
+    padding-bottom: 28px;
+    transform: translateY(-12px);
+  }
+
+  .podium-card.first::before { background: var(--gold); box-shadow: 0 0 15px rgba(240,165,0,0.5); height: 4px; }
+  .podium-card.second::before { background: var(--silver); }
+  .podium-card.third::before { background: var(--bronze); }
+
+  .podium-rank {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 3.5rem;
+    line-height: 0.9;
+    margin-bottom: 6px;
+    color: var(--dim2);
+  }
+
+  .podium-card.first .podium-rank {
+    color: var(--gold);
+    text-shadow: 0 0 25px rgba(240,165,0,0.5);
+    font-size: 4.5rem;
+  }
+
+  .podium-card.second .podium-rank { color: var(--silver); }
+  .podium-card.third .podium-rank { color: var(--bronze); }
+
+  .podium-trophy {
+    font-size: 1.5rem;
+    margin-bottom: 4px;
+  }
+
+  .podium-card.first .podium-trophy { font-size: 2rem; }
+
+  .podium-team {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 1.1rem;
+    letter-spacing: 0.3px;
+    line-height: 1.2;
+    margin-bottom: 8px;
+    color: var(--white);
+  }
+
+  .podium-card.first .podium-team {
+    font-size: 1.4rem;
+  }
+
+  .podium-members {
+    font-size: 0.7rem;
+    color: var(--dim);
+    margin-bottom: 14px;
+  }
+
+  .podium-score {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 2rem;
+    line-height: 1;
+    color: var(--white);
+  }
+
+  .podium-card.first .podium-score {
+    font-size: 2.6rem;
+    color: var(--gold);
+    text-shadow: 0 0 20px rgba(240,165,0,0.4);
+  }
+
+  .podium-score .unit {
+    font-size: 0.9rem;
+    color: var(--dim);
+    font-weight: 400;
+  }
+
+  .podium-detail {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-top: 6px;
+  }
+
+  /* ═══ FILTERS ═══ */
+  .filters-bar {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 8px 24px 14px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .filters {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .filter-chip {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.72rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 7px 14px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: var(--dim);
+    cursor: pointer;
+    transition: all 0.2s;
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  }
+
+  .filter-chip:hover {
+    color: var(--white);
+    border-color: var(--line-bright);
+  }
+
+  .filter-chip.active {
+    background: var(--red-dim);
+    color: var(--red);
+    border-color: var(--red);
+    box-shadow: 0 0 10px rgba(232,33,43,0.2);
+  }
+
+  .last-update {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.7rem;
+    color: var(--dim);
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .last-update::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+    box-shadow: 0 0 4px var(--green);
+    animation: blink 2s ease-in-out infinite;
+  }
+
+  /* ═══ SECTOR STATS ═══ */
+  .sector-stats-section {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px 24px;
+  }
+
+  .sector-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+  }
+
+  .sector-stat-card {
+    background: linear-gradient(140deg, var(--panel) 0%, var(--panel-2) 100%);
+    border: 1px solid var(--line);
+    padding: 16px 18px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s;
+  }
+
+  .sector-stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent, var(--red));
+  }
+
+  .sector-stat-card.general {
+    background: linear-gradient(140deg, rgba(232,33,43,0.12) 0%, rgba(232,33,43,0.04) 100%);
+    border-color: rgba(232,33,43,0.4);
+  }
+
+  .sector-stat-card.general::before {
+    background: var(--red);
+    box-shadow: 0 0 12px var(--red-glow);
+    height: 3px;
+  }
+
+  .sector-stat-card.A { --accent: #4a9eff; }
+  .sector-stat-card.B { --accent: #00c850; }
+  .sector-stat-card.C { --accent: #f0a500; }
+  .sector-stat-card.D { --accent: #b87de8; }
+
+  .sector-stat-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .sector-stat-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--dim);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .sector-stat-card.general .sector-stat-title {
+    color: var(--red);
+  }
+
+  .sector-stat-letter {
+    width: 22px; height: 22px;
+    background: var(--accent, var(--red));
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 0.85rem;
+    clip-path: polygon(4px 0%, 100% 0%, calc(100% - 4px) 100%, 0% 100%);
+  }
+
+  .sector-stat-card.general .sector-stat-letter {
+    background: var(--red);
+    box-shadow: 0 0 8px var(--red-glow);
+  }
+
+  .sector-stat-teams {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+    color: var(--dim);
+    background: rgba(0,0,0,0.4);
+    padding: 2px 7px;
+  }
+
+  .sector-stat-total {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 1.6rem;
+    line-height: 1;
+    margin-bottom: 8px;
+    color: var(--white);
+  }
+
+  .sector-stat-card.general .sector-stat-total {
+    color: var(--red);
+    text-shadow: 0 0 15px var(--red-glow);
+    font-size: 1.8rem;
+  }
+
+  .sector-stat-total .unit {
+    font-size: 0.78rem;
+    color: var(--dim);
+    font-weight: 400;
+  }
+
+  .sector-stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 0;
+    font-size: 0.72rem;
+    color: var(--dim);
+    border-top: 1px solid var(--line);
+  }
+
+  .sector-stat-row:first-of-type {
+    border-top: 1px solid var(--line);
+    padding-top: 8px;
+    margin-top: 4px;
+  }
+
+  .sector-stat-row .label {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .sector-stat-row .val {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    color: var(--white);
+    font-size: 0.82rem;
+  }
+
+  .sector-stat-leader {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.72rem;
+    color: var(--off);
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .sector-stat-leader .crown {
+    color: var(--gold);
+    font-size: 0.9rem;
+  }
+
+  .sector-stat-leader-name {
+    color: var(--white);
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ═══ RANKING TABLE ═══ */
+  .ranking-section {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px 60px;
+  }
+
+  .ranking-table {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    overflow: hidden;
+  }
+
+  .table-head {
+    display: grid;
+    grid-template-columns: 60px 1.8fr 1.2fr 90px 90px 110px 100px;
+    padding: 13px 22px;
+    background: rgba(0,0,0,0.4);
+    border-bottom: 1px solid var(--line);
+    align-items: center;
+    gap: 10px;
+  }
+
+  .table-head .th {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.62rem;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+
+  .table-head .th.center { text-align: center; }
+  .table-head .th.right { text-align: right; }
+
+  .rank-row {
+    display: grid;
+    grid-template-columns: 60px 1.8fr 1.2fr 90px 90px 110px 100px;
+    padding: 16px 22px;
+    border-bottom: 1px solid var(--line);
+    align-items: center;
+    transition: background 0.2s;
+    gap: 10px;
+    position: relative;
+  }
+
+  .rank-row:last-child { border-bottom: none; }
+
+  .rank-row:hover {
+    background: rgba(232,33,43,0.04);
+  }
+
+  .rank-row.top1 {
+    background: linear-gradient(90deg, rgba(240,165,0,0.06) 0%, transparent 80%);
+  }
+
+  .rank-row.top1::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 2px;
+    background: var(--gold);
+    box-shadow: 0 0 8px rgba(240,165,0,0.5);
+  }
+
+  .rank-row.just-updated {
+    animation: rowUpdate 1.5s ease;
+  }
+
+  @keyframes rowUpdate {
+    0% { background: rgba(0,200,80,0.2); }
+    100% { background: transparent; }
+  }
+
+  .rank-pos {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 1.7rem;
+    color: var(--dim);
+    line-height: 1;
+  }
+
+  .rank-row.top1 .rank-pos { color: var(--gold); text-shadow: 0 0 12px rgba(240,165,0,0.4); }
+  .rank-row.top2 .rank-pos { color: var(--silver); }
+  .rank-row.top3 .rank-pos { color: var(--bronze); }
+
+  .rank-team-block { }
+
+  .rank-team-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 1.1rem;
+    letter-spacing: 0.3px;
+    color: var(--white);
+    margin-bottom: 2px;
+  }
+
+  .rank-team-members {
+    font-size: 0.76rem;
+    color: var(--dim);
+  }
+
+  .rank-sector-block { display: flex; align-items: center; gap: 8px; }
+
+  .sector-badge {
+    display: inline-flex;
+    align-items: center;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.78rem;
+    letter-spacing: 1px;
+    padding: 4px 10px;
+    background: var(--red-dim);
+    border: 1px solid rgba(232,33,43,0.4);
+    color: var(--red);
+    clip-path: polygon(5px 0%, 100% 0%, calc(100% - 5px) 100%, 0% 100%);
+  }
+
+  .poste-text {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.78rem;
+    color: var(--dim);
+    letter-spacing: 0.5px;
+  }
+
+  .poste-text strong {
+    color: var(--white);
+    font-weight: 700;
+  }
+
+  .rank-catches {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 1.2rem;
+    color: var(--white);
+    text-align: center;
+  }
+
+  .rank-biggest {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 1rem;
+    color: var(--off);
+    text-align: center;
+  }
+
+  .rank-biggest .unit {
+    font-size: 0.7rem;
+    color: var(--dim);
+    font-weight: 400;
+  }
+
+  .rank-trend {
+    text-align: center;
+  }
+
+  .trend-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.72rem;
+    letter-spacing: 1px;
+    padding: 3px 8px;
+    clip-path: polygon(4px 0%, 100% 0%, calc(100% - 4px) 100%, 0% 100%);
+  }
+
+  .trend-pill.up {
+    background: rgba(0,200,80,0.12);
+    border: 1px solid rgba(0,200,80,0.4);
+    color: var(--green);
+  }
+
+  .trend-pill.down {
+    background: var(--red-dim);
+    border: 1px solid rgba(232,33,43,0.4);
+    color: var(--red);
+  }
+
+  .trend-pill.same {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--line);
+    color: var(--dim);
+  }
+
+  .rank-total {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 1.5rem;
+    color: var(--white);
+    text-align: right;
+    line-height: 1;
+  }
+
+  .rank-row.top1 .rank-total {
+    color: var(--gold);
+    text-shadow: 0 0 12px rgba(240,165,0,0.3);
+    font-size: 1.7rem;
+  }
+
+  .rank-total .unit {
+    font-size: 0.78rem;
+    color: var(--dim);
+    font-weight: 400;
+  }
+
+  /* ═══ LAST UPDATE FOOTER ═══ */
+  .footer-info {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.78rem;
+    color: var(--dim);
+    line-height: 1.6;
+  }
+
+  .footer-info strong { color: var(--white); }
+
+  /* ═══ MOBILE ═══ */
+  @media (max-width: 1100px) {
+    .stats-row {
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .time-card { grid-column: 1 / -1; }
+    .sector-stats-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (max-width: 800px) {
+    .header-inner { padding: 12px 16px; gap: 10px; }
+    .header-enduro { order: 3; flex-basis: 100%; }
+    .hero-section, .podium-section, .ranking-section, .filters-bar, .sector-stats-section { padding-left: 16px; padding-right: 16px; }
+    .sector-stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .podium-grid {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    .podium-card.first { transform: none; }
+    .table-head, .rank-row {
+      grid-template-columns: 40px 1fr 90px;
+      grid-template-areas:
+        "pos team total"
+        "pos sector total"
+        "pos catches total";
+      padding: 12px 14px;
+      gap: 4px;
+    }
+    .table-head .th:nth-child(4),
+    .table-head .th:nth-child(5),
+    .table-head .th:nth-child(6) { display: none; }
+    .rank-row > div:nth-child(4),
+    .rank-row > div:nth-child(5),
+    .rank-row > div:nth-child(6) { display: none; }
+    .rank-pos { font-size: 1.4rem; }
+    .rank-team-name { font-size: 1rem; }
+    .time-num { font-size: 2rem; min-width: 40px; }
+    .time-sep { font-size: 1.8rem; }
+  }
+
+  @media (max-width: 500px) {
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .sector-stats-grid { grid-template-columns: 1fr; }
+    .podium-card { padding: 16px 12px 14px; }
+    .podium-card.first .podium-rank { font-size: 3.5rem; }
+    .podium-card.first .podium-team { font-size: 1.2rem; }
+    .podium-card.first .podium-score { font-size: 2rem; }
+  }
+
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--line-bright); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--dim2); }
+</style>
+</head>
+<body>
+
+<div class="bg-atmosphere"></div>
+<div class="bg-grid"></div>
+
+<!-- ═══ HEADER ═══ -->
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <a href="carpstrike-index.html" style="display:inline-block;text-decoration:none" title="Accueil du prototype"><svg class="cs-logo" width="125" height="30" viewBox="0 0 540 130" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="CarpStrike" style="display:block">
+<path d="M10 70 L 70 70 L 80 70 L 88 54 L 98 90 L 108 70 L 150 70 L 165 70 L 178 38 L 192 104 L 206 70 L 250 70 L 262 70 L 275 14 L 290 120 L 305 70 L 330 70 L 345 70 L 356 50 L 367 88 L 377 70 L 430 70 L 445 70 L 456 56 L 466 84 L 476 70 L 530 70" stroke="#e8212b" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="270" y="84" font-family="'Barlow Condensed', sans-serif" font-size="56" font-weight="900" font-style="italic" fill="#f4f0eb" text-anchor="middle" stroke="#0a0908" stroke-width="7" paint-order="stroke">CARP<tspan fill="#e8212b">STRIKE</tspan></text>
+</svg></a>
+    </div>
+    <div class="header-enduro">
+      <div class="header-enduro-name">Grand Enduro du Lac Bleu</div>
+      <div class="header-enduro-sub">28 — 30 mai 2026 · Étang de Tournay</div>
+    </div>
+    <div class="header-actions">
+      <div class="live-pill">
+        <div class="dot"></div>
+        LIVE
+      </div>
+      <button class="share-btn">↗ Partager</button>
+    </div>
+  </div>
+</header>
+
+<!-- ═══ TICKER ═══ -->
+<div class="ticker-wrap">
+  <div class="ticker-label">Dernières prises</div>
+  <div class="ticker">
+    <div class="ticker-item"><span class="new">🏆 RECORD</span> Martin & Dupont — Carpe miroir <strong>14.2 kg</strong></div>
+    <div class="ticker-item">▲ Leroy & Bernard montent en 2e position</div>
+    <div class="ticker-item">Fontaine & Roux — Carpe commune <strong>11.8 kg</strong></div>
+    <div class="ticker-item">Simon & Garcia — Carpe cuir <strong>9.4 kg</strong></div>
+    <div class="ticker-item">Carpe Hunters 65 — Amour blanc <strong>13.6 kg</strong></div>
+    <div class="ticker-item">▲ Bonnet & Vidal gagnent 3 places</div>
+    <div class="ticker-item">Petit & Moreau — Carpe miroir <strong>10.2 kg</strong></div>
+    <!-- Duplicate for seamless loop -->
+    <div class="ticker-item"><span class="new">🏆 RECORD</span> Martin & Dupont — Carpe miroir <strong>14.2 kg</strong></div>
+    <div class="ticker-item">▲ Leroy & Bernard montent en 2e position</div>
+    <div class="ticker-item">Fontaine & Roux — Carpe commune <strong>11.8 kg</strong></div>
+    <div class="ticker-item">Simon & Garcia — Carpe cuir <strong>9.4 kg</strong></div>
+    <div class="ticker-item">Carpe Hunters 65 — Amour blanc <strong>13.6 kg</strong></div>
+    <div class="ticker-item">▲ Bonnet & Vidal gagnent 3 places</div>
+    <div class="ticker-item">Petit & Moreau — Carpe miroir <strong>10.2 kg</strong></div>
+  </div>
+</div>
+
+<!-- ═══ HERO STATS ═══ -->
+<section class="hero-section">
+  <div class="stats-row">
+
+    <!-- TIME REMAINING -->
+    <div class="time-card">
+      <div class="time-eyebrow">
+        <div class="pulse"></div>
+        Temps restant
+      </div>
+      <div class="time-display">
+        <div class="time-block">
+          <div class="time-num" id="time-days">01</div>
+          <div class="time-unit">Jours</div>
+        </div>
+        <div class="time-sep">:</div>
+        <div class="time-block">
+          <div class="time-num" id="time-hours">12</div>
+          <div class="time-unit">Heures</div>
+        </div>
+        <div class="time-sep">:</div>
+        <div class="time-block">
+          <div class="time-num" id="time-mins">14</div>
+          <div class="time-unit">Minutes</div>
+        </div>
+        <div class="time-sep">:</div>
+        <div class="time-block">
+          <div class="time-num" id="time-secs">37</div>
+          <div class="time-unit">Secondes</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stat-card red">
+      <div class="stat-icon">Équipes</div>
+      <div class="stat-value">24</div>
+      <div class="stat-trend">en compétition</div>
+    </div>
+
+    <div class="stat-card blue">
+      <div class="stat-icon">Prises</div>
+      <div class="stat-value">187</div>
+      <div class="stat-trend">▲ +12 / dernière heure</div>
+    </div>
+
+    <div class="stat-card green">
+      <div class="stat-icon">Poids total</div>
+      <div class="stat-value">847<span class="unit">.3 kg</span></div>
+      <div class="stat-trend">▲ +28.5 kg / heure</div>
+    </div>
+
+    <div class="stat-card gold">
+      <div class="stat-icon">🏆 Record</div>
+      <div class="stat-value">14.2<span class="unit"> kg</span></div>
+      <div class="stat-trend" style="color: var(--gold);">Martin & Dupont</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══ PODIUM ═══ -->
+<section class="podium-section">
+  <h2 class="section-title">Le podium en direct</h2>
+  <div class="podium-grid" id="podium-grid">
+    <!-- Populated by JS -->
+  </div>
+</section>
+
+<!-- ═══ FILTERS ═══ -->
+<div class="filters-bar">
+  <div class="filters">
+    <div class="filter-chip active" onclick="filterRanking(this, 'all')">Classement général</div>
+    <div class="filter-chip" onclick="filterRanking(this, 'A')">Secteur A</div>
+    <div class="filter-chip" onclick="filterRanking(this, 'B')">Secteur B</div>
+    <div class="filter-chip" onclick="filterRanking(this, 'C')">Secteur C</div>
+    <div class="filter-chip" onclick="filterRanking(this, 'D')">Secteur D</div>
+  </div>
+  <div class="last-update">
+    Mis à jour il y a <strong id="update-time">12 secondes</strong>
+  </div>
+</div>
+
+<!-- ═══ SECTOR STATS ═══ -->
+<section class="sector-stats-section">
+  <h2 class="section-title">Performances par secteur</h2>
+  <div class="sector-stats-grid" id="sector-stats-grid">
+    <!-- Populated by JS -->
+  </div>
+</section>
+
+<!-- ═══ RANKING TABLE ═══ -->
+<section class="ranking-section">
+  <div class="ranking-table">
+    <div class="table-head">
+      <div class="th">Rang</div>
+      <div class="th">Équipe</div>
+      <div class="th">Secteur · Poste</div>
+      <div class="th center">Prises</div>
+      <div class="th center">Plus grosse</div>
+      <div class="th center">Évolution</div>
+      <div class="th right">Total</div>
+    </div>
+
+    <div id="ranking-list">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+
+  <div class="footer-info">
+    Classement officiel mis à jour en temps réel par les commissaires de l'enduro.<br>
+    En cas d'égalité de poids total, c'est la <strong>plus grosse prise</strong> qui départage les équipes.<br>
+    Propulsé par <strong>CarpStrike</strong>
+  </div>
+</section>
+
+<script>
+  // ═════════════════════════════════════════
+  // DATA - Live ranking
+  // Note: chaque équipe a son rang BRUT par poids
+  // mais le "displayRank" est calculé par rotation de secteurs
+  // ═════════════════════════════════════════
+  const rankingData = [
+    { team: 'Martin & Dupont', members: 'Jean Martin · Pierre Dupont', sector: 'A', poste: '07', catches: 8, biggest: 14.2, total: 42.6 },
+    { team: 'Leroy & Bernard', members: 'Sébastien Leroy · François Bernard', sector: 'B', poste: '12', catches: 7, biggest: 12.4, total: 38.2 },
+    { team: 'Petit & Moreau', members: 'Antoine Petit · Julien Moreau', sector: 'A', poste: '03', catches: 6, biggest: 10.2, total: 35.9 },
+    { team: 'Simon & Garcia', members: 'David Simon · Rafael Garcia', sector: 'C', poste: '08', catches: 6, biggest: 9.4, total: 31.4 },
+    { team: 'Fontaine & Roux', members: 'Paul Fontaine · Marc Roux', sector: 'B', poste: '05', catches: 5, biggest: 11.8, total: 28.7 },
+    { team: 'Carpe Hunters 65', members: 'Vincent Caron · Olivier Duval', sector: 'C', poste: '11', catches: 5, biggest: 13.6, total: 27.1 },
+    { team: 'Lambert & Faure', members: 'Thomas Lambert · Eric Faure', sector: 'D', poste: '02', catches: 5, biggest: 8.9, total: 26.1 },
+    { team: 'Bonnet & Vidal', members: 'Lucas Bonnet · Nicolas Vidal', sector: 'D', poste: '06', catches: 4, biggest: 9.7, total: 24.3 },
+    { team: 'Big Carp Crew', members: 'Rémi Gauthier · Steve Perez', sector: 'A', poste: '14', catches: 4, biggest: 8.4, total: 22.6 },
+    { team: 'Team Aquaviva', members: 'Damien Roche · Florent Henry', sector: 'B', poste: '08', catches: 4, biggest: 7.8, total: 21.2 },
+    { team: 'Les Karpistes', members: 'Alex Morel · Cédric Blanc', sector: 'C', poste: '04', catches: 3, biggest: 9.1, total: 19.8 },
+    { team: 'Pyrénées Carpe Club', members: 'Mickaël Jacquot · Yann Picard', sector: 'D', poste: '10', catches: 3, biggest: 7.2, total: 18.4 },
+    { team: 'Carp & Co', members: 'Jérôme Cazaux · Baptiste Lefèvre', sector: 'A', poste: '02', catches: 3, biggest: 6.8, total: 16.9 },
+    { team: 'Les Frères Carp', members: 'Quentin Carrère · Hugo Carrère', sector: 'B', poste: '15', catches: 3, biggest: 6.5, total: 15.7 },
+    { team: 'Bigfish Team', members: 'Xavier Mendes · Anthony Léger', sector: 'C', poste: '06', catches: 2, biggest: 8.2, total: 13.4 },
+    { team: 'Carpodrome 31', members: 'Fabien Thomas · Sylvain Durand', sector: 'D', poste: '09', catches: 2, biggest: 6.9, total: 12.1 }
+  ];
+
+  // ═════════════════════════════════════════
+  // CLASSEMENT GÉNÉRAL avec rotation de secteurs
+  //
+  // Algorithme :
+  // 1. Trier toutes les équipes par poids (descendant) — c'est leur "rang brut" intra-secteur
+  // 2. Pour chaque secteur, classer les équipes (1er du secteur, 2e du secteur, etc.)
+  // 3. Construire le classement général en alternant :
+  //    - 1er général = meilleur 1er de secteur (tous secteurs confondus)
+  //    - Puis on prend les autres "1er de secteur" classés par poids
+  //    - Quand tous les "1er" sont placés, on passe aux "2e de secteur"
+  //    - Et ainsi de suite
+  //
+  // Au final : les 1ers de chaque secteur occupent les premières places,
+  // puis les 2èmes de chaque secteur, etc.
+  // En cas d'égalité de poids, la plus grosse prise départage.
+  // ═════════════════════════════════════════
+  function buildGeneralRanking(teams) {
+    // 1. Classer par poids dans chaque secteur
+    const bySector = {};
+    teams.forEach(t => {
+      if (!bySector[t.sector]) bySector[t.sector] = [];
+      bySector[t.sector].push(t);
+    });
+
+    Object.keys(bySector).forEach(s => {
+      bySector[s].sort((a, b) => {
+        if (b.total !== a.total) return b.total - a.total;
+        return b.biggest - a.biggest;
+      });
+      // Assigner rang intra-secteur
+      bySector[s].forEach((t, i) => t.sectorRank = i + 1);
+    });
+
+    // 2. Construire le classement final par "tours"
+    // Tour 1 : tous les 1ers de secteur, classés par poids
+    // Tour 2 : tous les 2èmes de secteur, classés par poids
+    // etc.
+    const maxRank = Math.max(...Object.values(bySector).map(s => s.length));
+    const finalRanking = [];
+
+    for (let tour = 1; tour <= maxRank; tour++) {
+      const thisTour = teams
+        .filter(t => t.sectorRank === tour)
+        .sort((a, b) => {
+          if (b.total !== a.total) return b.total - a.total;
+          return b.biggest - a.biggest;
+        });
+      finalRanking.push(...thisTour);
+    }
+
+    // Assigner rang général + calcul d'évolution simulée
+    finalRanking.forEach((t, i) => {
+      t.rank = i + 1;
+      // Évolution simulée (par rapport à un état précédent)
+      // En vrai ça viendrait du backend
+    });
+
+    return finalRanking;
+  }
+
+  // Évolutions simulées (statiques pour la démo)
+  const trends = {
+    'Martin & Dupont': { trend: 'same' },
+    'Leroy & Bernard': { trend: 'up', trendVal: 2 },
+    'Petit & Moreau': { trend: 'same' },
+    'Simon & Garcia': { trend: 'down', trendVal: 1 },
+    'Fontaine & Roux': { trend: 'up', trendVal: 3 },
+    'Carpe Hunters 65': { trend: 'up', trendVal: 1 },
+    'Lambert & Faure': { trend: 'down', trendVal: 2 },
+    'Bonnet & Vidal': { trend: 'up', trendVal: 3 },
+    'Big Carp Crew': { trend: 'same' },
+    'Team Aquaviva': { trend: 'down', trendVal: 1 },
+    'Les Karpistes': { trend: 'up', trendVal: 1 },
+    'Pyrénées Carpe Club': { trend: 'same' },
+    'Carp & Co': { trend: 'down', trendVal: 2 },
+    'Les Frères Carp': { trend: 'up', trendVal: 1 },
+    'Bigfish Team': { trend: 'same' },
+    'Carpodrome 31': { trend: 'down', trendVal: 1 }
+  };
+
+  // Build initial ranking
+  let ranking = buildGeneralRanking([...rankingData]);
+
+  // ═════════════════════════════════════════
+  // SECTOR STATS - calcul stats général + par secteur
+  // ═════════════════════════════════════════
+  function renderSectorStats() {
+    const grid = document.getElementById('sector-stats-grid');
+    const sectors = ['A', 'B', 'C', 'D'];
+
+    // Stats générales
+    const totalKg = rankingData.reduce((s, t) => s + t.total, 0);
+    const totalCatches = rankingData.reduce((s, t) => s + t.catches, 0);
+    const biggestEntry = rankingData.reduce((max, t) => t.biggest > (max?.biggest || 0) ? t : max, null);
+    const generalLeader = ranking[0]; // après rotation
+
+    let html = `
+      <div class="sector-stat-card general">
+        <div class="sector-stat-head">
+          <div class="sector-stat-title">
+            <span>★</span> Général
+          </div>
+          <div class="sector-stat-teams">${rankingData.length} équipes</div>
+        </div>
+        <div class="sector-stat-total">${totalKg.toFixed(1)}<span class="unit"> kg</span></div>
+        <div class="sector-stat-row">
+          <span class="label">Prises</span>
+          <span class="val">${totalCatches}</span>
+        </div>
+        <div class="sector-stat-row">
+          <span class="label">Plus grosse</span>
+          <span class="val">${biggestEntry.biggest.toFixed(1)} kg</span>
+        </div>
+        <div class="sector-stat-leader">
+          <span class="crown">🏆</span>
+          <span class="sector-stat-leader-name">${generalLeader.team}</span>
+        </div>
+      </div>
+    `;
+
+    sectors.forEach(s => {
+      const teamsInSector = rankingData.filter(t => t.sector === s);
+      const sectorTotal = teamsInSector.reduce((sum, t) => sum + t.total, 0);
+      const sectorCatches = teamsInSector.reduce((sum, t) => sum + t.catches, 0);
+      const sectorBiggest = teamsInSector.reduce((max, t) => t.biggest > (max?.biggest || 0) ? t : max, null);
+      const sectorLeader = [...teamsInSector].sort((a, b) => {
+        if (b.total !== a.total) return b.total - a.total;
+        return b.biggest - a.biggest;
+      })[0];
+
+      html += `
+        <div class="sector-stat-card ${s}" onclick="filterByClick('${s}')" style="cursor: pointer;">
+          <div class="sector-stat-head">
+            <div class="sector-stat-title">
+              <span class="sector-stat-letter">${s}</span> Secteur ${s}
+            </div>
+            <div class="sector-stat-teams">${teamsInSector.length}</div>
+          </div>
+          <div class="sector-stat-total">${sectorTotal.toFixed(1)}<span class="unit"> kg</span></div>
+          <div class="sector-stat-row">
+            <span class="label">Prises</span>
+            <span class="val">${sectorCatches}</span>
+          </div>
+          <div class="sector-stat-row">
+            <span class="label">Plus grosse</span>
+            <span class="val">${sectorBiggest ? sectorBiggest.biggest.toFixed(1) + ' kg' : '—'}</span>
+          </div>
+          <div class="sector-stat-leader">
+            <span class="crown">🏆</span>
+            <span class="sector-stat-leader-name">${sectorLeader ? sectorLeader.team : '—'}</span>
+          </div>
+        </div>
+      `;
+    });
+
+    grid.innerHTML = html;
+  }
+
+  function filterByClick(sector) {
+    // Programmatically click the corresponding chip
+    const chip = [...document.querySelectorAll('.filter-chip')].find(c => c.textContent.includes(`Secteur ${sector}`));
+    if (chip) filterRanking(chip, sector);
+  }
+
+  // ═════════════════════════════════════════
+  // RENDER PODIUM (top 3 du classement actuel)
+  // ═════════════════════════════════════════
+  function renderPodium() {
+    const grid = document.getElementById('podium-grid');
+    let top3;
+
+    if (currentFilter === 'all') {
+      top3 = ranking.slice(0, 3);
+    } else {
+      top3 = [...rankingData]
+        .filter(r => r.sector === currentFilter)
+        .sort((a, b) => {
+          if (b.total !== a.total) return b.total - a.total;
+          return b.biggest - a.biggest;
+        })
+        .slice(0, 3);
+    }
+
+    if (top3.length === 0) {
+      grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--dim);">Aucune équipe classée pour l\'instant</div>';
+      return;
+    }
+
+    // Ordre visuel : 2e à gauche, 1er au centre, 3e à droite
+    const order = top3.length === 1 ? [0]
+                 : top3.length === 2 ? [1, 0]
+                 : [1, 0, 2];
+
+    grid.innerHTML = order.map(i => {
+      const team = top3[i];
+      if (!team) return '';
+      const rank = i + 1;
+      const classes = ['podium-card'];
+      let trophy = '';
+      if (rank === 1) { classes.push('first'); trophy = '🏆'; }
+      else if (rank === 2) { classes.push('second'); trophy = '🥈'; }
+      else if (rank === 3) { classes.push('third'); trophy = '🥉'; }
+
+      return `
+        <div class="${classes.join(' ')}">
+          <div class="podium-rank">${String(rank).padStart(2, '0')}</div>
+          <div class="podium-trophy">${trophy}</div>
+          <div class="podium-team">${team.team}</div>
+          <div class="podium-members">${team.members}</div>
+          <div class="podium-score">${team.total.toFixed(1)}<span class="unit"> kg</span></div>
+          <div class="podium-detail">${team.catches} prises · Secteur ${team.sector} · Poste ${team.poste}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ═════════════════════════════════════════
+  // RENDER
+  // ═════════════════════════════════════════
+  let currentFilter = 'all';
+
+  function renderRanking() {
+    const list = document.getElementById('ranking-list');
+    let displayList;
+
+    if (currentFilter === 'all') {
+      // Classement général avec rotation de secteurs
+      displayList = ranking;
+    } else {
+      // Classement par secteur : tri simple par poids
+      displayList = [...rankingData]
+        .filter(r => r.sector === currentFilter)
+        .sort((a, b) => {
+          if (b.total !== a.total) return b.total - a.total;
+          return b.biggest - a.biggest;
+        });
+    }
+
+    let html = '';
+    displayList.forEach((row, idx) => {
+      const displayRank = idx + 1;
+      const topClass = displayRank === 1 ? 'top1' : (displayRank === 2 ? 'top2' : (displayRank === 3 ? 'top3' : ''));
+
+      const trendInfo = trends[row.team] || { trend: 'same' };
+      let trendHtml = '';
+      if (trendInfo.trend === 'up') {
+        trendHtml = `<span class="trend-pill up">▲ ${trendInfo.trendVal}</span>`;
+      } else if (trendInfo.trend === 'down') {
+        trendHtml = `<span class="trend-pill down">▼ ${trendInfo.trendVal}</span>`;
+      } else {
+        trendHtml = `<span class="trend-pill same">— stable</span>`;
+      }
+
+      html += `
+        <div class="rank-row ${topClass}">
+          <div class="rank-pos">${String(displayRank).padStart(2, '0')}</div>
+          <div class="rank-team-block">
+            <div class="rank-team-name">${row.team}</div>
+            <div class="rank-team-members">${row.members}</div>
+          </div>
+          <div class="rank-sector-block">
+            <span class="sector-badge">${row.sector}</span>
+            <span class="poste-text">Poste <strong>${row.poste}</strong></span>
+          </div>
+          <div class="rank-catches">${row.catches}</div>
+          <div class="rank-biggest">${row.biggest.toFixed(1)}<span class="unit"> kg</span></div>
+          <div class="rank-trend">${trendHtml}</div>
+          <div class="rank-total">${row.total.toFixed(1)}<span class="unit"> kg</span></div>
+        </div>
+      `;
+    });
+
+    list.innerHTML = html;
+  }
+
+  function filterRanking(el, sector) {
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    currentFilter = sector;
+    renderPodium();
+    renderRanking();
+  }
+
+  // ═════════════════════════════════════════
+  // COUNTDOWN - to end of enduro
+  // ═════════════════════════════════════════
+  function updateCountdown() {
+    // Target end: 30 may 2026 at 20:00 (mock end)
+    const target = new Date('2026-05-30T20:00:00');
+    const now = new Date();
+    let diff = target - now;
+
+    if (diff <= 0) {
+      document.getElementById('time-days').textContent = '00';
+      document.getElementById('time-hours').textContent = '00';
+      document.getElementById('time-mins').textContent = '00';
+      document.getElementById('time-secs').textContent = '00';
+      return;
+    }
+
+    const days = Math.floor(diff / 86400000);
+    const hours = Math.floor((diff % 86400000) / 3600000);
+    const mins = Math.floor((diff % 3600000) / 60000);
+    const secs = Math.floor((diff % 60000) / 1000);
+
+    document.getElementById('time-days').textContent = String(days).padStart(2, '0');
+    document.getElementById('time-hours').textContent = String(hours).padStart(2, '0');
+    document.getElementById('time-mins').textContent = String(mins).padStart(2, '0');
+    document.getElementById('time-secs').textContent = String(secs).padStart(2, '0');
+  }
+
+  // ═════════════════════════════════════════
+  // LAST UPDATE TIMER
+  // ═════════════════════════════════════════
+  let lastUpdate = Date.now();
+
+  function updateLastUpdateTime() {
+    const elapsed = Math.floor((Date.now() - lastUpdate) / 1000);
+    const el = document.getElementById('update-time');
+    if (elapsed < 60) {
+      el.textContent = elapsed + ' secondes';
+    } else if (elapsed < 3600) {
+      el.textContent = Math.floor(elapsed / 60) + ' min ' + (elapsed % 60) + 's';
+    } else {
+      el.textContent = Math.floor(elapsed / 3600) + 'h';
+    }
+  }
+
+  // ═════════════════════════════════════════
+  // SIMULATE LIVE UPDATES (demo)
+  // ═════════════════════════════════════════
+  function simulateUpdate() {
+    // Randomly add a small weight to a team and flash the row
+    const idx = Math.floor(Math.random() * ranking.length);
+    const weight = (Math.random() * 6 + 3).toFixed(1);
+    ranking[idx].total = parseFloat((ranking[idx].total + parseFloat(weight)).toFixed(1));
+    ranking[idx].catches += 1;
+    if (parseFloat(weight) > ranking[idx].biggest) {
+      ranking[idx].biggest = parseFloat(weight);
+    }
+
+    // Re-sort
+    ranking.sort((a, b) => {
+      if (b.total !== a.total) return b.total - a.total;
+      return b.biggest - a.biggest;
+    });
+    ranking.forEach((r, i) => r.rank = i + 1);
+
+    renderRanking();
+    lastUpdate = Date.now();
+
+    // Flash updated row
+    const teamName = ranking.find(r => r.catches === ranking[idx].catches)?.team;
+    setTimeout(() => {
+      document.querySelectorAll('.rank-row').forEach(row => {
+        const name = row.querySelector('.rank-team-name');
+        if (name && name.textContent === ranking[idx].team) {
+          row.classList.add('just-updated');
+          setTimeout(() => row.classList.remove('just-updated'), 1500);
+        }
+      });
+    }, 50);
+  }
+
+  // Init
+  renderSectorStats();
+  renderPodium();
+  renderRanking();
+  updateCountdown();
+  updateLastUpdateTime();
+
+  setInterval(updateCountdown, 1000);
+  setInterval(updateLastUpdateTime, 1000);
+  // Optional: simulate a live update every 20s for demo purposes
+  // setInterval(simulateUpdate, 20000);
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,2131 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Commissaire — CarpStrike</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,900;1,700;1,900&family=Barlow:wght@300;400;500;600;700&family=Rajdhani:wght@500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #e8212b;
+    --red-bright: #ff2d3a;
+    --red-dim: rgba(232,33,43,0.15);
+    --red-glow: rgba(232,33,43,0.4);
+    --white: #f4f0eb;
+    --off: #c8c0b4;
+    --dim: rgba(244,240,235,0.6);
+    --dim2: rgba(244,240,235,0.3);
+    --dark: #0a0908;
+    --darker: #050403;
+    --panel: #141310;
+    --panel-2: #1a1814;
+    --line: rgba(244,240,235,0.07);
+    --line-bright: rgba(244,240,235,0.15);
+    --gold: #f0a500;
+    --green: #00c850;
+    --blue: #4a9eff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--darker);
+    font-family: 'Barlow', sans-serif;
+    color: var(--white);
+    min-height: 100vh;
+    overscroll-behavior: none;
+    overflow-x: hidden;
+  }
+
+  .bg-atmosphere {
+    position: fixed; inset: 0; z-index: -2;
+    background:
+      radial-gradient(ellipse 60% 40% at 0% 0%, rgba(232,33,43,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse 60% 60% at 100% 100%, rgba(232,33,43,0.05) 0%, transparent 50%),
+      linear-gradient(180deg, #0a0908 0%, #060504 100%);
+  }
+
+  /* ═══════════════════════════════════════
+     MOBILE FRAME (simulation phone)
+     ═══════════════════════════════════════ */
+  .phone-wrap {
+    max-width: 420px;
+    margin: 0 auto;
+    min-height: 100vh;
+    position: relative;
+    background: var(--darker);
+    border-left: 1px solid var(--line);
+    border-right: 1px solid var(--line);
+  }
+
+  /* ═══════════════════════════════════════
+     STATUS BAR (top mobile)
+     ═══════════════════════════════════════ */
+  .status-bar {
+    background: rgba(10,9,8,0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--line);
+    padding: 12px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .status-bar-left { display: flex; align-items: center; gap: 8px; }
+
+  .logo-mini {
+    display: flex; align-items: center;
+  }
+
+  .logo-carp { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-style: italic; font-size: 1.1rem; color: var(--white); letter-spacing: 1px; line-height: 1; }
+  .logo-strike { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-style: italic; font-size: 1.1rem; color: var(--red); letter-spacing: 1px; line-height: 1; text-shadow: 0 0 12px var(--red-glow); }
+  .logo-slash { width: 2px; height: 14px; background: var(--red); transform: skewX(-10deg); margin: 0 5px; box-shadow: 0 0 5px var(--red-glow); }
+
+  .status-bar-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.62rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--dim);
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--line);
+    padding: 4px 9px;
+  }
+
+  .status-bar-info .icon {
+    width: 6px; height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+    box-shadow: 0 0 4px var(--green);
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  .status-bar-right { display: flex; align-items: center; gap: 8px; }
+
+  .icon-btn-mini {
+    width: 32px; height: 32px;
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--dim);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.95rem;
+    position: relative;
+  }
+
+  .icon-btn-mini:active {
+    background: var(--red-dim);
+    color: var(--red);
+    border-color: var(--red);
+  }
+
+  .icon-btn-mini .notif-dot {
+    position: absolute;
+    top: 5px; right: 5px;
+    width: 7px; height: 7px;
+    background: var(--red);
+    border-radius: 50%;
+    box-shadow: 0 0 4px var(--red);
+  }
+
+  /* ═══════════════════════════════════════
+     SCREEN
+     ═══════════════════════════════════════ */
+  .screen { display: none; min-height: calc(100vh - 60px); padding-bottom: 90px; width: 100%; }
+  .screen.active { display: block !important; }
+
+  /* ═══════════════════════════════════════
+     LOGIN SCREEN
+     ═══════════════════════════════════════ */
+  .login-wrap {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 32px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .login-wrap::before {
+    content: 'COMMISSAIRE';
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 6rem;
+    color: rgba(244,240,235,0.025);
+    letter-spacing: -3px;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  .login-logo {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+
+  .logo-big-carp { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-style: italic; font-size: 2.5rem; color: var(--white); letter-spacing: 1px; line-height: 1; }
+  .logo-big-strike { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-style: italic; font-size: 2.5rem; color: var(--red); letter-spacing: 1px; line-height: 1; text-shadow: 0 0 20px var(--red-glow); }
+  .logo-big-slash { width: 4px; height: 32px; background: var(--red); transform: skewX(-10deg); margin: 0 10px; box-shadow: 0 0 10px var(--red-glow); align-self: center; }
+
+  .login-eyebrow {
+    text-align: center;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 8px;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+
+  .login-eyebrow::before,
+  .login-eyebrow::after {
+    content: '';
+    width: 30px;
+    height: 1px;
+    background: var(--red);
+  }
+
+  .login-title {
+    text-align: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 1.8rem;
+    line-height: 1.1;
+    margin-bottom: 6px;
+    letter-spacing: -0.5px;
+  }
+
+  .login-title .accent { color: var(--red); }
+
+  .login-sub {
+    text-align: center;
+    color: var(--dim);
+    font-size: 0.88rem;
+    margin-bottom: 32px;
+    line-height: 1.5;
+  }
+
+  .login-card {
+    background: linear-gradient(140deg, var(--panel) 0%, var(--panel-2) 100%);
+    border: 1px solid var(--line-bright);
+    padding: 26px 22px;
+    position: relative;
+    clip-path: polygon(16px 0%, 100% 0%, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0% 100%, 0% 16px);
+  }
+
+  .login-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 80px; height: 2px;
+    background: var(--red);
+    box-shadow: 0 0 12px var(--red-glow);
+  }
+
+  .field { display: flex; flex-direction: column; margin-bottom: 14px; }
+  .field:last-of-type { margin-bottom: 0; }
+
+  .field label {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.68rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 6px;
+  }
+
+  .field input, .field select, .field textarea {
+    width: 100%;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid var(--line);
+    padding: 14px 14px;
+    color: var(--white);
+    font-family: 'Barlow', sans-serif;
+    font-size: 1rem;
+    transition: all 0.2s;
+    outline: none;
+  }
+
+  .field input:focus, .field select:focus, .field textarea:focus {
+    border-color: var(--red);
+    background: rgba(0,0,0,0.6);
+    box-shadow: 0 0 0 3px var(--red-dim);
+  }
+
+  .field input::placeholder { color: var(--dim2); }
+
+  .field select {
+    cursor: pointer;
+    appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23e8212b' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 40px;
+  }
+
+  .password-wrap {
+    position: relative;
+  }
+
+  .password-wrap input {
+    padding-right: 50px;
+  }
+
+  .password-toggle {
+    position: absolute;
+    right: 12px; top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: var(--dim);
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 6px;
+  }
+
+  .password-toggle:active { color: var(--red); }
+
+  /* BUTTONS */
+  .btn {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-style: italic;
+    font-size: 0.95rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 14px 22px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: inherit;
+    background: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .btn-primary {
+    background: var(--red);
+    color: #fff;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    box-shadow: 0 0 15px var(--red-glow);
+  }
+
+  .btn-primary:active {
+    background: var(--red-bright);
+    box-shadow: 0 0 25px var(--red-glow);
+    transform: scale(0.98);
+  }
+
+  .btn-primary:disabled {
+    background: var(--line);
+    box-shadow: none;
+    color: var(--dim2);
+  }
+
+  .btn-ghost {
+    color: var(--white);
+    border: 1px solid var(--line-bright);
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  }
+
+  .btn-ghost:active {
+    border-color: var(--red);
+    color: var(--red);
+    background: var(--red-dim);
+  }
+
+  .btn-block {
+    margin-top: 18px;
+  }
+
+  .login-footer {
+    text-align: center;
+    margin-top: 22px;
+    font-size: 0.78rem;
+    color: var(--dim);
+  }
+
+  .login-footer a {
+    color: var(--red);
+    text-decoration: none;
+    font-weight: 700;
+  }
+
+  .login-error {
+    background: rgba(232,33,43,0.1);
+    border: 1px solid rgba(232,33,43,0.4);
+    border-left: 3px solid var(--red);
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    font-size: 0.85rem;
+    color: var(--red);
+    display: none;
+  }
+
+  .login-error.show { display: block; }
+
+  /* ═══════════════════════════════════════
+     HOME SCREEN
+     ═══════════════════════════════════════ */
+  .home-header {
+    padding: 18px 18px 14px;
+    background: linear-gradient(140deg, var(--panel) 0%, var(--panel-2) 100%);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .home-greet {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    font-size: 0.78rem;
+    color: var(--dim);
+    letter-spacing: 1px;
+  }
+
+  .home-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 1.6rem;
+    line-height: 1.1;
+    margin-top: 2px;
+    margin-bottom: 8px;
+  }
+
+  .home-name .accent { color: var(--red); }
+
+  .home-enduro-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--red);
+    background: var(--red-dim);
+    border: 1px solid rgba(232,33,43,0.4);
+    padding: 3px 8px;
+    clip-path: polygon(5px 0%, 100% 0%, calc(100% - 5px) 100%, 0% 100%);
+  }
+
+  /* QUICK STATS */
+  .quick-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    padding: 14px 18px;
+    background: rgba(0,0,0,0.3);
+  }
+
+  .quick-stat {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 10px 8px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .quick-stat::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: var(--red);
+  }
+
+  .quick-stat-val {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 1.5rem;
+    line-height: 1;
+    color: var(--white);
+  }
+
+  .quick-stat-val.accent { color: var(--red); }
+
+  .quick-stat-lbl {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.55rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-top: 3px;
+  }
+
+  /* CTA MAIN */
+  .cta-main {
+    margin: 18px 18px 0;
+    background: linear-gradient(140deg, var(--red) 0%, #8a1820 100%);
+    color: #fff;
+    padding: 22px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    clip-path: polygon(14px 0%, 100% 0%, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0% 100%, 0% 14px);
+    box-shadow: 0 8px 24px var(--red-glow);
+    transition: transform 0.15s;
+  }
+
+  .cta-main:active { transform: scale(0.98); }
+
+  .cta-main::before {
+    content: '';
+    position: absolute;
+    top: -20px; right: -20px;
+    width: 120px; height: 120px;
+    background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .cta-main::after {
+    content: '🐟';
+    position: absolute;
+    right: -10px; bottom: -10px;
+    font-size: 5rem;
+    opacity: 0.15;
+    pointer-events: none;
+  }
+
+  .cta-main-eyebrow {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.65rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    opacity: 0.85;
+    margin-bottom: 6px;
+  }
+
+  .cta-main-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 1.5rem;
+    line-height: 1.1;
+    margin-bottom: 4px;
+    letter-spacing: -0.5px;
+  }
+
+  .cta-main-sub {
+    font-size: 0.85rem;
+    opacity: 0.9;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .cta-main-sub::after {
+    content: '→';
+    font-size: 1.3rem;
+    margin-left: auto;
+  }
+
+  /* SECTION */
+  .section {
+    margin: 22px 18px 0;
+  }
+
+  .section-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.78rem;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--white);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-title .bar {
+    width: 3px; height: 14px;
+    background: var(--red);
+    box-shadow: 0 0 6px var(--red-glow);
+  }
+
+  .section-title .count {
+    margin-left: auto;
+    background: var(--red);
+    color: #fff;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-style: italic;
+    font-size: 0.78rem;
+    padding: 1px 7px;
+  }
+
+  /* PENDING LIST */
+  .pending-list { display: flex; flex-direction: column; gap: 6px; }
+
+  .pending-item {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--gold);
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .pending-item:active {
+    background: var(--panel-2);
+    border-color: var(--gold);
+  }
+
+  .pending-icon {
+    width: 36px; height: 36px;
+    background: rgba(240,165,0,0.12);
+    color: var(--gold);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+    clip-path: polygon(7px 0%, 100% 0%, calc(100% - 7px) 100%, 0% 100%);
+  }
+
+  .pending-info { flex: 1; min-width: 0; }
+
+  .pending-team {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.92rem;
+    color: var(--white);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .pending-meta {
+    font-size: 0.72rem;
+    color: var(--dim);
+    margin-top: 1px;
+  }
+
+  .pending-time {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.7rem;
+    color: var(--gold);
+    letter-spacing: 1px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  /* RECENT LIST */
+  .recent-item {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 6px;
+  }
+
+  .recent-icon {
+    width: 32px; height: 32px;
+    background: rgba(0,200,80,0.1);
+    color: var(--green);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  }
+
+  .recent-info { flex: 1; min-width: 0; }
+
+  .recent-team {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.88rem;
+    color: var(--white);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .recent-meta {
+    font-size: 0.72rem;
+    color: var(--dim);
+    margin-top: 1px;
+  }
+
+  .recent-weight {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 1rem;
+    color: var(--red);
+    flex-shrink: 0;
+  }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(10,9,8,0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--line);
+    padding: 8px 0 12px;
+    display: flex;
+    justify-content: space-around;
+    z-index: 50;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+
+  .bottom-nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 6px 4px;
+    color: var(--dim);
+    cursor: pointer;
+    border: none;
+    background: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: color 0.15s;
+  }
+
+  .bottom-nav-item.active {
+    color: var(--red);
+  }
+
+  .bottom-nav-item .icon {
+    font-size: 1.3rem;
+  }
+
+  .bottom-nav-item .lbl {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.6rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  .bottom-nav-item.active .icon {
+    filter: drop-shadow(0 0 6px var(--red-glow));
+  }
+
+  /* FAB (floating action button) */
+  .fab {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    background: var(--red);
+    color: #fff;
+    border: none;
+    box-shadow: 0 6px 20px var(--red-glow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    cursor: pointer;
+    z-index: 40;
+    clip-path: polygon(12px 0%, 100% 0%, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0% 100%, 0% 12px);
+    transition: transform 0.15s;
+  }
+
+  .fab:active { transform: scale(0.95); background: var(--red-bright); }
+
+  /* ═══════════════════════════════════════
+     TEAM SELECTION SCREEN
+     ═══════════════════════════════════════ */
+  .screen-head {
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(140deg, var(--panel) 0%, var(--panel-2) 100%);
+    display: flex; align-items: center; gap: 12px;
+  }
+
+  .back-btn {
+    width: 36px; height: 36px;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid var(--line-bright);
+    color: var(--white);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .back-btn:active {
+    background: var(--red-dim);
+    border-color: var(--red);
+    color: var(--red);
+  }
+
+  .screen-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 1.2rem;
+    letter-spacing: 0.5px;
+    flex: 1;
+  }
+
+  .screen-step {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--red);
+    padding: 3px 8px;
+    border: 1px solid rgba(232,33,43,0.4);
+    background: var(--red-dim);
+  }
+
+  .search-bar {
+    padding: 12px 18px;
+    background: rgba(0,0,0,0.3);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .search-bar-input {
+    position: relative;
+  }
+
+  .search-bar input {
+    width: 100%;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 12px 14px 12px 38px;
+    color: var(--white);
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.95rem;
+    outline: none;
+  }
+
+  .search-bar input:focus {
+    border-color: var(--red);
+    box-shadow: 0 0 0 2px var(--red-dim);
+  }
+
+  .search-bar::before {
+    content: '⌕';
+    position: absolute;
+    left: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--dim);
+    font-size: 1.2rem;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .team-card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 14px 16px;
+    margin: 8px 18px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .team-card:active {
+    background: var(--red-dim);
+    border-color: var(--red);
+  }
+
+  .team-card-poste {
+    width: 42px; height: 42px;
+    background: var(--red-dim);
+    border: 1px solid var(--red);
+    color: var(--red);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 1rem;
+    flex-shrink: 0;
+    clip-path: polygon(7px 0%, 100% 0%, calc(100% - 7px) 100%, 0% 100%);
+    line-height: 1;
+  }
+
+  .team-card-info { flex: 1; min-width: 0; }
+
+  .team-card-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--white);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .team-card-meta {
+    font-size: 0.72rem;
+    color: var(--dim);
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .team-card-stats {
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .team-card-catches {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--white);
+    line-height: 1;
+  }
+
+  .team-card-catches-label {
+    font-size: 0.65rem;
+    color: var(--dim);
+    letter-spacing: 1px;
+    margin-top: 2px;
+    text-transform: uppercase;
+  }
+
+  /* ═══════════════════════════════════════
+     CATCH FORM
+     ═══════════════════════════════════════ */
+  .catch-form {
+    padding: 18px;
+  }
+
+  .selected-team {
+    background: linear-gradient(140deg, var(--panel) 0%, var(--panel-2) 100%);
+    border: 1px solid var(--line-bright);
+    border-left: 3px solid var(--red);
+    padding: 14px 16px;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .selected-team-poste {
+    width: 38px; height: 38px;
+    background: var(--red);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+    clip-path: polygon(7px 0%, 100% 0%, calc(100% - 7px) 100%, 0% 100%);
+    box-shadow: 0 0 10px var(--red-glow);
+    line-height: 1;
+  }
+
+  .selected-team-info { flex: 1; }
+
+  .selected-team-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 1.15rem;
+    letter-spacing: 0.5px;
+    line-height: 1;
+  }
+
+  .selected-team-meta {
+    font-size: 0.72rem;
+    color: var(--dim);
+    margin-top: 4px;
+  }
+
+  /* WEIGHT INPUT (big) */
+  .weight-card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 22px 18px;
+    margin-bottom: 14px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .weight-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--red);
+    box-shadow: 0 0 8px var(--red-glow);
+  }
+
+  .weight-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 8px;
+  }
+
+  .weight-input-wrap {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .weight-input-wrap input {
+    background: transparent;
+    border: none;
+    color: var(--white);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 4rem;
+    line-height: 1;
+    width: 180px;
+    text-align: center;
+    outline: none;
+    text-shadow: 0 0 20px var(--red-glow);
+    padding: 0;
+    -moz-appearance: textfield;
+  }
+
+  .weight-input-wrap input::-webkit-outer-spin-button,
+  .weight-input-wrap input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+  .weight-input-wrap input::placeholder {
+    color: var(--dim2);
+    text-shadow: none;
+  }
+
+  .weight-unit {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--red);
+    letter-spacing: 2px;
+  }
+
+  .weight-helper {
+    font-size: 0.78rem;
+    color: var(--dim);
+    margin-top: 4px;
+  }
+
+  .weight-helper.warning {
+    color: var(--gold);
+  }
+
+  .weight-helper.ok {
+    color: var(--green);
+  }
+
+  /* QUICK WEIGHT BUTTONS */
+  .quick-weights {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin-top: 12px;
+  }
+
+  .quick-weight {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--line);
+    padding: 8px 4px;
+    color: var(--dim);
+    cursor: pointer;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 0.85rem;
+    transition: all 0.15s;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .quick-weight:active {
+    background: var(--red-dim);
+    color: var(--red);
+    border-color: var(--red);
+  }
+
+  /* SPECIES SELECT */
+  .species-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+
+  .species-pill {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--line);
+    padding: 14px 4px;
+    color: var(--dim);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .species-pill:active,
+  .species-pill.active {
+    background: var(--red-dim);
+    border-color: var(--red);
+    color: var(--red);
+  }
+
+  .species-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.78rem;
+    letter-spacing: 0.5px;
+  }
+
+  /* PHOTO UPLOAD */
+  .photo-upload {
+    position: relative;
+    border: 2px dashed var(--line-bright);
+    background: rgba(0,0,0,0.3);
+    padding: 22px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-bottom: 14px;
+  }
+
+  .photo-upload:active {
+    border-color: var(--red);
+    background: rgba(232,33,43,0.04);
+  }
+
+  .photo-upload.has-photo {
+    border-style: solid;
+    border-color: var(--red);
+    background: rgba(232,33,43,0.06);
+    padding: 12px 14px;
+    text-align: left;
+  }
+
+  .photo-upload input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .photo-empty .upload-icon {
+    width: 44px; height: 44px;
+    background: var(--red-dim);
+    color: var(--red);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    margin-bottom: 10px;
+    clip-path: polygon(7px 0%, 100% 0%, calc(100% - 7px) 100%, 0% 100%);
+  }
+
+  .photo-empty-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+    color: var(--white);
+  }
+
+  .photo-empty-sub {
+    font-size: 0.78rem;
+    color: var(--dim);
+    margin-top: 4px;
+  }
+
+  .photo-preview {
+    display: none;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .photo-upload.has-photo .photo-preview { display: flex; }
+  .photo-upload.has-photo .photo-empty { display: none; }
+
+  .photo-thumb {
+    width: 50px; height: 50px;
+    background: var(--panel);
+    border: 1px solid var(--line-bright);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--red);
+    font-size: 1.3rem;
+    flex-shrink: 0;
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  }
+
+  .photo-info { flex: 1; min-width: 0; }
+
+  .photo-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--white);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .photo-size {
+    font-size: 0.72rem;
+    color: var(--dim);
+    margin-top: 2px;
+  }
+
+  .photo-remove {
+    background: transparent;
+    border: 1px solid var(--line-bright);
+    color: var(--dim);
+    padding: 6px 10px;
+    font-size: 0.7rem;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    z-index: 2;
+    position: relative;
+  }
+
+  .photo-remove:active {
+    color: var(--red);
+    border-color: var(--red);
+  }
+
+  /* NOTE FIELD */
+  .field textarea {
+    min-height: 60px;
+    resize: vertical;
+    font-family: 'Barlow', sans-serif;
+  }
+
+  /* SUBMIT */
+  .submit-actions {
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* ═══════════════════════════════════════
+     SUCCESS SCREEN
+     ═══════════════════════════════════════ */
+  .success-screen {
+    padding: 32px 24px;
+    text-align: center;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .success-icon {
+    width: 90px; height: 90px;
+    background: var(--green);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    margin: 0 auto 22px;
+    box-shadow: 0 0 40px rgba(0,200,80,0.5);
+    clip-path: polygon(16px 0%, 100% 0%, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0% 100%, 0% 16px);
+    animation: bounceIn 0.5s ease;
+  }
+
+  @keyframes bounceIn {
+    0% { transform: scale(0.3); opacity: 0; }
+    60% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .success-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 2rem;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .success-title .accent { color: var(--green); }
+
+  .success-desc {
+    color: var(--dim);
+    font-size: 0.95rem;
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+
+  .success-summary {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--green);
+    padding: 18px 20px;
+    margin-bottom: 24px;
+    text-align: left;
+  }
+
+  .success-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    font-size: 0.88rem;
+  }
+
+  .success-row .label {
+    color: var(--dim);
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .success-row .value {
+    color: var(--white);
+    font-weight: 700;
+  }
+
+  .success-row .value.accent {
+    color: var(--red);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-style: italic;
+  }
+
+  .success-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* HISTORY SCREEN */
+  .history-list { padding: 12px 18px 0; }
+
+  .history-item {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .history-icon {
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+    clip-path: polygon(7px 0%, 100% 0%, calc(100% - 7px) 100%, 0% 100%);
+  }
+
+  .history-icon.validated {
+    background: rgba(0,200,80,0.12);
+    color: var(--green);
+  }
+
+  .history-icon.rejected {
+    background: rgba(232,33,43,0.12);
+    color: var(--red);
+  }
+
+  .history-info { flex: 1; min-width: 0; }
+
+  .history-team {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--white);
+  }
+
+  .history-meta {
+    font-size: 0.7rem;
+    color: var(--dim);
+    margin-top: 2px;
+  }
+
+  .history-weight {
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .history-weight-val {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--white);
+    line-height: 1;
+  }
+
+  .history-weight-time {
+    font-size: 0.68rem;
+    color: var(--dim);
+    margin-top: 2px;
+  }
+
+  /* RESPONSIVE - bigger screens just center the phone */
+  @media (min-width: 421px) {
+    body {
+      background: var(--darker);
+      padding: 0;
+    }
+    .phone-wrap {
+      box-shadow: 0 0 40px rgba(0,0,0,0.5);
+    }
+  }
+
+  ::-webkit-scrollbar { width: 0; }
+</style>
+</head>
+<body>
+
+<div class="bg-atmosphere"></div>
+
+<div class="phone-wrap">
+
+  <!-- ═══════════════════════════════════════
+       SCREEN 1: LOGIN
+       ═══════════════════════════════════════ -->
+  <div class="screen active" id="screen-login">
+    <div class="login-wrap">
+      <div class="login-logo">
+        <span class="logo-big-carp">CARP</span>
+        <div class="logo-big-slash"></div>
+        <span class="logo-big-strike">STRIKE</span>
+      </div>
+
+      <div class="login-eyebrow">Espace Commissaire</div>
+      <h1 class="login-title">Validation des <span class="accent">prises</span></h1>
+      <p class="login-sub">Connectez-vous avec les identifiants fournis par l'organisateur de l'enduro.</p>
+
+      <div class="login-card">
+        <div class="login-error" id="login-error">
+          ⚠ Identifiant ou mot de passe incorrect
+        </div>
+
+        <div class="field">
+          <label>Identifiant</label>
+          <input type="text" id="login-username" placeholder="pmartin.lacbleu26" autocomplete="username">
+        </div>
+
+        <div class="field">
+          <label>Mot de passe</label>
+          <div class="password-wrap">
+            <input type="password" id="login-password" placeholder="••••-••••-••••" autocomplete="current-password">
+            <button class="password-toggle" onclick="togglePassword()" type="button">👁</button>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-block" onclick="login()">Se connecter →</button>
+      </div>
+
+      <div class="login-footer">
+        Identifiants oubliés ? <a href="#">Contacter l'organisateur</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       SCREEN 2: HOME
+       ═══════════════════════════════════════ -->
+  <div class="screen" id="screen-home">
+    <!-- Top status bar -->
+    <div class="status-bar">
+      <div class="status-bar-left">
+        <div class="logo-mini">
+          <a href="carpstrike-index.html" style="display:inline-block;text-decoration:none" title="Accueil du prototype"><svg class="cs-logo" width="108" height="26" viewBox="0 0 540 130" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="CarpStrike" style="display:block">
+<path d="M10 70 L 70 70 L 80 70 L 88 54 L 98 90 L 108 70 L 150 70 L 165 70 L 178 38 L 192 104 L 206 70 L 250 70 L 262 70 L 275 14 L 290 120 L 305 70 L 330 70 L 345 70 L 356 50 L 367 88 L 377 70 L 430 70 L 445 70 L 456 56 L 466 84 L 476 70 L 530 70" stroke="#e8212b" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="270" y="84" font-family="'Barlow Condensed', sans-serif" font-size="56" font-weight="900" font-style="italic" fill="#f4f0eb" text-anchor="middle" stroke="#0a0908" stroke-width="7" paint-order="stroke">CARP<tspan fill="#e8212b">STRIKE</tspan></text>
+</svg></a>
+        </div>
+        <div class="status-bar-info">
+          <div class="icon"></div>
+          ENDURO LIVE
+        </div>
+      </div>
+      <div class="status-bar-right">
+        <button class="icon-btn-mini" title="Notifications">
+          🔔
+        </button>
+      </div>
+    </div>
+
+    <!-- Header -->
+    <div class="home-header">
+      <div class="home-greet">Bonjour,</div>
+      <h2 class="home-name">Pierre <span class="accent">Martin</span></h2>
+      <div class="home-enduro-tag">📍 Secteur A · Grand Enduro du Lac Bleu</div>
+    </div>
+
+    <!-- Stats -->
+    <div class="quick-stats">
+      <div class="quick-stat">
+        <div class="quick-stat-val accent">52</div>
+        <div class="quick-stat-lbl">Validées</div>
+      </div>
+      <div class="quick-stat">
+        <div class="quick-stat-val">218<span style="font-size:0.7rem;color:var(--dim);">kg</span></div>
+        <div class="quick-stat-lbl">Total</div>
+      </div>
+      <div class="quick-stat">
+        <div class="quick-stat-val">14.2<span style="font-size:0.7rem;color:var(--dim);">kg</span></div>
+        <div class="quick-stat-lbl">Record</div>
+      </div>
+    </div>
+
+    <!-- Main CTA -->
+    <div class="cta-main" onclick="showScreen('screen-teams')">
+      <div class="cta-main-eyebrow">Action principale</div>
+      <div class="cta-main-title">Enregistrer<br>une nouvelle prise</div>
+      <div class="cta-main-sub">Sélectionner une équipe</div>
+    </div>
+
+    <!-- Recent -->
+    <div class="section">
+      <div class="section-title">
+        <div class="bar"></div>
+        Mes dernières validations
+      </div>
+      <div class="recent-item">
+        <div class="recent-icon">✓</div>
+        <div class="recent-info">
+          <div class="recent-team">Martin & Dupont · Poste 07</div>
+          <div class="recent-meta">Carpe commune · il y a 22 min</div>
+        </div>
+        <div class="recent-weight">12.8 kg</div>
+      </div>
+      <div class="recent-item">
+        <div class="recent-icon">✓</div>
+        <div class="recent-info">
+          <div class="recent-team">Petit & Moreau · Poste 03</div>
+          <div class="recent-meta">Carpe miroir · il y a 38 min</div>
+        </div>
+        <div class="recent-weight">8.5 kg</div>
+      </div>
+      <div class="recent-item">
+        <div class="recent-icon">✓</div>
+        <div class="recent-info">
+          <div class="recent-team">Carpe Hunters 65 · Poste 11</div>
+          <div class="recent-meta">Carpe commune · il y a 1h</div>
+        </div>
+        <div class="recent-weight">6.2 kg</div>
+      </div>
+    </div>
+
+    <!-- FAB -->
+    <button class="fab" onclick="showScreen('screen-teams')">＋</button>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       SCREEN 3: TEAM SELECTION
+       ═══════════════════════════════════════ -->
+  <div class="screen" id="screen-teams">
+    <div class="status-bar">
+      <div class="status-bar-left">
+        <div class="logo-mini">
+          <a href="carpstrike-index.html" style="display:inline-block;text-decoration:none" title="Accueil du prototype"><svg class="cs-logo" width="108" height="26" viewBox="0 0 540 130" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="CarpStrike" style="display:block">
+<path d="M10 70 L 70 70 L 80 70 L 88 54 L 98 90 L 108 70 L 150 70 L 165 70 L 178 38 L 192 104 L 206 70 L 250 70 L 262 70 L 275 14 L 290 120 L 305 70 L 330 70 L 345 70 L 356 50 L 367 88 L 377 70 L 430 70 L 445 70 L 456 56 L 466 84 L 476 70 L 530 70" stroke="#e8212b" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="270" y="84" font-family="'Barlow Condensed', sans-serif" font-size="56" font-weight="900" font-style="italic" fill="#f4f0eb" text-anchor="middle" stroke="#0a0908" stroke-width="7" paint-order="stroke">CARP<tspan fill="#e8212b">STRIKE</tspan></text>
+</svg></a>
+        </div>
+        <div class="status-bar-info">
+          <div class="icon"></div>
+          ENDURO LIVE
+        </div>
+      </div>
+    </div>
+
+    <div class="screen-head">
+      <button class="back-btn" onclick="showScreen('screen-home')">←</button>
+      <div class="screen-title">Sélectionner l'équipe</div>
+      <div class="screen-step">1/2</div>
+    </div>
+
+    <div class="search-bar">
+      <div class="search-bar-input">
+        <input type="text" placeholder="Rechercher équipe ou poste..." oninput="filterTeams(this.value)">
+      </div>
+    </div>
+
+    <div id="teams-list">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       SCREEN 4: CATCH FORM
+       ═══════════════════════════════════════ -->
+  <div class="screen" id="screen-catch">
+    <div class="status-bar">
+      <div class="status-bar-left">
+        <div class="logo-mini">
+          <a href="carpstrike-index.html" style="display:inline-block;text-decoration:none" title="Accueil du prototype"><svg class="cs-logo" width="108" height="26" viewBox="0 0 540 130" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="CarpStrike" style="display:block">
+<path d="M10 70 L 70 70 L 80 70 L 88 54 L 98 90 L 108 70 L 150 70 L 165 70 L 178 38 L 192 104 L 206 70 L 250 70 L 262 70 L 275 14 L 290 120 L 305 70 L 330 70 L 345 70 L 356 50 L 367 88 L 377 70 L 430 70 L 445 70 L 456 56 L 466 84 L 476 70 L 530 70" stroke="#e8212b" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="270" y="84" font-family="'Barlow Condensed', sans-serif" font-size="56" font-weight="900" font-style="italic" fill="#f4f0eb" text-anchor="middle" stroke="#0a0908" stroke-width="7" paint-order="stroke">CARP<tspan fill="#e8212b">STRIKE</tspan></text>
+</svg></a>
+        </div>
+        <div class="status-bar-info">
+          <div class="icon"></div>
+          ENDURO LIVE
+        </div>
+      </div>
+    </div>
+
+    <div class="screen-head">
+      <button class="back-btn" onclick="showScreen('screen-teams')">←</button>
+      <div class="screen-title">Saisir la prise</div>
+      <div class="screen-step">2/2</div>
+    </div>
+
+    <div class="catch-form">
+      <!-- Selected team -->
+      <div class="selected-team">
+        <div class="selected-team-poste" id="catch-poste">07</div>
+        <div class="selected-team-info">
+          <div class="selected-team-name" id="catch-team-name">Martin & Dupont</div>
+          <div class="selected-team-meta" id="catch-team-meta">Secteur A · 8 prises validées</div>
+        </div>
+      </div>
+
+      <!-- Weight (big) -->
+      <div class="weight-card">
+        <div class="weight-label">Poids de la prise</div>
+        <div class="weight-input-wrap">
+          <input type="number" id="catch-weight" placeholder="0.0" step="0.1" min="0" inputmode="decimal" oninput="checkWeight()">
+          <span class="weight-unit">kg</span>
+        </div>
+        <div class="weight-helper" id="weight-helper">Minimum 3 kg pour être comptabilisé</div>
+
+        <div class="quick-weights">
+          <button class="quick-weight" onclick="addWeight(5)">5 kg</button>
+          <button class="quick-weight" onclick="addWeight(7.5)">7.5</button>
+          <button class="quick-weight" onclick="addWeight(10)">10</button>
+          <button class="quick-weight" onclick="addWeight(12.5)">12.5</button>
+        </div>
+      </div>
+
+      <!-- Species -->
+      <div class="field">
+        <label>Espèce</label>
+        <div class="species-row">
+          <div class="species-pill active" onclick="selectSpecies(this, 'commune')">
+            <div class="species-name">Commune</div>
+          </div>
+          <div class="species-pill" onclick="selectSpecies(this, 'miroir')">
+            <div class="species-name">Miroir</div>
+          </div>
+          <div class="species-pill" onclick="selectSpecies(this, 'cuir')">
+            <div class="species-name">Cuir</div>
+          </div>
+          <div class="species-pill" onclick="selectSpecies(this, 'koi')">
+            <div class="species-name">Koï</div>
+          </div>
+          <div class="species-pill" onclick="selectSpecies(this, 'amour')">
+            <div class="species-name">Amour blanc</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Photo -->
+      <div class="field">
+        <label>Photo de la prise <span style="color: var(--red);">*</span></label>
+        <div class="photo-upload" id="photo-upload">
+          <input type="file" accept="image/*" capture="environment" onchange="handlePhoto(this)">
+          <div class="photo-empty">
+            <div class="upload-icon">📷</div>
+            <div class="photo-empty-title">Prendre la photo</div>
+            <div class="photo-empty-sub">Tapis humidifié, poisson visible</div>
+          </div>
+          <div class="photo-preview">
+            <div class="photo-thumb">🐟</div>
+            <div class="photo-info">
+              <div class="photo-name" id="photo-name">photo.jpg</div>
+              <div class="photo-size" id="photo-size">—</div>
+            </div>
+            <button class="photo-remove" onclick="removePhoto(event)">Supprimer</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Note -->
+      <div class="field">
+        <label>Commentaire <span style="color: var(--dim2); font-weight: 500; text-transform: none; letter-spacing: 1px;">facultatif</span></label>
+        <textarea id="catch-note" placeholder="Remarques particulières..."></textarea>
+      </div>
+
+      <!-- Submit -->
+      <div class="submit-actions">
+        <button class="btn btn-primary" id="submit-btn" onclick="submitCatch()">✓ Valider la prise</button>
+        <button class="btn btn-ghost" onclick="showScreen('screen-teams')">Annuler</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       SCREEN 5: SUCCESS
+       ═══════════════════════════════════════ -->
+  <div class="screen" id="screen-success">
+    <div class="success-screen">
+      <div class="success-icon">✓</div>
+      <h2 class="success-title">Prise <span class="accent">validée</span> !</h2>
+      <p class="success-desc">La prise a été enregistrée et apparaît instantanément dans le classement live de l'enduro.</p>
+
+      <div class="success-summary">
+        <div class="success-row">
+          <div class="label">Équipe</div>
+          <div class="value" id="success-team">Martin & Dupont</div>
+        </div>
+        <div class="success-row">
+          <div class="label">Poste</div>
+          <div class="value" id="success-poste">A · 07</div>
+        </div>
+        <div class="success-row">
+          <div class="label">Espèce</div>
+          <div class="value" id="success-species">Carpe commune</div>
+        </div>
+        <div class="success-row">
+          <div class="label">Poids</div>
+          <div class="value accent" id="success-weight">12.8 kg</div>
+        </div>
+        <div class="success-row">
+          <div class="label">Heure</div>
+          <div class="value" id="success-time">14h32</div>
+        </div>
+        <div class="success-row">
+          <div class="label">Validé par</div>
+          <div class="value">Pierre M.</div>
+        </div>
+      </div>
+
+      <div class="success-actions">
+        <button class="btn btn-primary" onclick="showScreen('screen-teams'); resetForm();">＋ Nouvelle prise</button>
+        <button class="btn btn-ghost" onclick="showScreen('screen-home'); resetForm();">Retour à l'accueil</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       SCREEN 6: HISTORY
+       ═══════════════════════════════════════ -->
+  <div class="screen" id="screen-history">
+    <div class="status-bar">
+      <div class="status-bar-left">
+        <div class="logo-mini">
+          <a href="carpstrike-index.html" style="display:inline-block;text-decoration:none" title="Accueil du prototype"><svg class="cs-logo" width="108" height="26" viewBox="0 0 540 130" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="CarpStrike" style="display:block">
+<path d="M10 70 L 70 70 L 80 70 L 88 54 L 98 90 L 108 70 L 150 70 L 165 70 L 178 38 L 192 104 L 206 70 L 250 70 L 262 70 L 275 14 L 290 120 L 305 70 L 330 70 L 345 70 L 356 50 L 367 88 L 377 70 L 430 70 L 445 70 L 456 56 L 466 84 L 476 70 L 530 70" stroke="#e8212b" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="270" y="84" font-family="'Barlow Condensed', sans-serif" font-size="56" font-weight="900" font-style="italic" fill="#f4f0eb" text-anchor="middle" stroke="#0a0908" stroke-width="7" paint-order="stroke">CARP<tspan fill="#e8212b">STRIKE</tspan></text>
+</svg></a>
+        </div>
+        <div class="status-bar-info">
+          <div class="icon"></div>
+          ENDURO LIVE
+        </div>
+      </div>
+    </div>
+
+    <div class="screen-head">
+      <button class="back-btn" onclick="showScreen('screen-home')">←</button>
+      <div class="screen-title">Mon historique</div>
+    </div>
+
+    <div class="quick-stats">
+      <div class="quick-stat">
+        <div class="quick-stat-val accent">52</div>
+        <div class="quick-stat-lbl">Validées</div>
+      </div>
+      <div class="quick-stat">
+        <div class="quick-stat-val">2</div>
+        <div class="quick-stat-lbl">Hors maille</div>
+      </div>
+      <div class="quick-stat">
+        <div class="quick-stat-val">218<span style="font-size:0.7rem;color:var(--dim);">kg</span></div>
+        <div class="quick-stat-lbl">Total</div>
+      </div>
+    </div>
+
+    <div class="history-list">
+      <div class="history-item">
+        <div class="history-icon validated">✓</div>
+        <div class="history-info">
+          <div class="history-team">Martin & Dupont</div>
+          <div class="history-meta">Carpe commune · Poste 07</div>
+        </div>
+        <div class="history-weight">
+          <div class="history-weight-val">12.8 kg</div>
+          <div class="history-weight-time">14h32</div>
+        </div>
+      </div>
+      <div class="history-item">
+        <div class="history-icon validated">✓</div>
+        <div class="history-info">
+          <div class="history-team">Petit & Moreau</div>
+          <div class="history-meta">Carpe miroir · Poste 03</div>
+        </div>
+        <div class="history-weight">
+          <div class="history-weight-val">8.5 kg</div>
+          <div class="history-weight-time">14h16</div>
+        </div>
+      </div>
+      <div class="history-item">
+        <div class="history-icon validated">✓</div>
+        <div class="history-info">
+          <div class="history-team">Carpe Hunters 65</div>
+          <div class="history-meta">Carpe commune · Poste 11</div>
+        </div>
+        <div class="history-weight">
+          <div class="history-weight-val">6.2 kg</div>
+          <div class="history-weight-time">13h48</div>
+        </div>
+      </div>
+      <div class="history-item">
+        <div class="history-icon rejected">✕</div>
+        <div class="history-info">
+          <div class="history-team">Martin & Dupont</div>
+          <div class="history-meta">Sous taille minimale</div>
+        </div>
+        <div class="history-weight">
+          <div class="history-weight-val" style="color: var(--red);">2.1 kg</div>
+          <div class="history-weight-time">13h22</div>
+        </div>
+      </div>
+      <div class="history-item">
+        <div class="history-icon validated">✓</div>
+        <div class="history-info">
+          <div class="history-team">Fontaine & Roux</div>
+          <div class="history-meta">Carpe cuir · Poste 05</div>
+        </div>
+        <div class="history-weight">
+          <div class="history-weight-val">11.4 kg</div>
+          <div class="history-weight-time">12h58</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       BOTTOM NAV (only shows on home, history)
+       ═══════════════════════════════════════ -->
+  <div class="bottom-nav" id="bottom-nav" style="display: none;">
+    <button class="bottom-nav-item active" onclick="showScreen('screen-home')" data-screen="home">
+      <div class="icon">⊞</div>
+      <div class="lbl">Accueil</div>
+    </button>
+    <button class="bottom-nav-item" onclick="showScreen('screen-teams')" data-screen="teams">
+      <div class="icon">＋</div>
+      <div class="lbl">Saisir</div>
+    </button>
+    <button class="bottom-nav-item" onclick="showScreen('screen-history')" data-screen="history">
+      <div class="icon">📋</div>
+      <div class="lbl">Historique</div>
+    </button>
+    <button class="bottom-nav-item" onclick="logout()" data-screen="logout">
+      <div class="icon">⏻</div>
+      <div class="lbl">Quitter</div>
+    </button>
+  </div>
+
+</div>
+
+<script>
+  // ═════════════════════════════════════════
+  // STATE
+  // ═════════════════════════════════════════
+  const MAILLE_MIN = 3; // kg minimum
+
+  // Teams data (would come from backend, here filtered for sector A)
+  const teams = [
+    { id: 1, name: "Martin & Dupont", poste: "07", sector: "A", catches: 8 },
+    { id: 2, name: "Petit & Moreau", poste: "03", sector: "A", catches: 6 },
+    { id: 3, name: "Carpe Hunters 65", poste: "11", sector: "A", catches: 5 },
+    { id: 4, name: "Bonnet & Vidal", poste: "15", sector: "A", catches: 4 },
+    { id: 5, name: "Les Karpistes", poste: "09", sector: "A", catches: 3 },
+    { id: 6, name: "Team Aquaviva", poste: "04", sector: "A", catches: 2 }
+  ];
+
+  let currentCatch = {
+    team: null,
+    weight: null,
+    species: 'commune',
+    photo: null,
+    note: ''
+  };
+
+  // ═════════════════════════════════════════
+  // SCREEN NAVIGATION
+  // ═════════════════════════════════════════
+  function showScreen(id) {
+    // Cache tous les écrans
+    document.querySelectorAll('.screen').forEach(s => {
+      s.classList.remove('active');
+      s.style.display = 'none';
+    });
+
+    // Affiche le bon écran
+    const target = document.getElementById(id);
+    if (!target) {
+      console.error('Screen not found:', id);
+      return;
+    }
+    target.classList.add('active');
+    target.style.display = 'block';
+
+    // Bottom nav visibility
+    const navVisible = ['screen-home', 'screen-teams', 'screen-history'].includes(id);
+    document.getElementById('bottom-nav').style.display = navVisible ? 'flex' : 'none';
+
+    // Update active nav item
+    if (navVisible) {
+      const navKey = id.replace('screen-', '');
+      document.querySelectorAll('.bottom-nav-item').forEach(item => {
+        item.classList.toggle('active', item.dataset.screen === navKey);
+      });
+    }
+
+    // Specific actions per screen
+    if (id === 'screen-teams') {
+      renderTeams();
+      const searchInput = document.querySelector('#screen-teams .search-bar input');
+      if (searchInput) searchInput.value = '';
+    }
+
+    // Scroll to top
+    window.scrollTo(0, 0);
+  }
+
+  // ═════════════════════════════════════════
+  // LOGIN
+  // ═════════════════════════════════════════
+  function togglePassword() {
+    const input = document.getElementById('login-password');
+    input.type = input.type === 'password' ? 'text' : 'password';
+  }
+
+  function login() {
+    const username = document.getElementById('login-username').value.trim();
+    const password = document.getElementById('login-password').value.trim();
+    const errorEl = document.getElementById('login-error');
+
+    if (!username || !password) {
+      errorEl.textContent = '⚠ Renseignez votre identifiant et mot de passe';
+      errorEl.classList.add('show');
+      return;
+    }
+
+    // Simulate validation (in real app, would check against backend)
+    // For demo: any login works
+    errorEl.classList.remove('show');
+    showScreen('screen-home');
+  }
+
+  function logout() {
+    if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
+      document.getElementById('login-username').value = '';
+      document.getElementById('login-password').value = '';
+      showScreen('screen-login');
+      document.getElementById('bottom-nav').style.display = 'none';
+    }
+  }
+
+  // ═════════════════════════════════════════
+  // TEAMS LIST
+  // ═════════════════════════════════════════
+  function renderTeams() {
+    const list = document.getElementById('teams-list');
+    list.innerHTML = teams.map(team => `
+      <div class="team-card" onclick="selectTeam(${team.id})" data-team-name="${team.name.toLowerCase()}" data-team-poste="${team.poste}">
+        <div class="team-card-poste">${team.poste}</div>
+        <div class="team-card-info">
+          <div class="team-card-name">${team.name}</div>
+          <div class="team-card-meta">Secteur ${team.sector} · Poste ${team.poste}</div>
+        </div>
+        <div class="team-card-stats">
+          <div class="team-card-catches">${team.catches}</div>
+          <div class="team-card-catches-label">prises</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function filterTeams(query) {
+    const q = query.toLowerCase();
+    document.querySelectorAll('.team-card').forEach(card => {
+      const name = card.dataset.teamName;
+      const poste = card.dataset.teamPoste;
+      const match = name.includes(q) || poste.includes(q);
+      card.style.display = match ? 'flex' : 'none';
+    });
+  }
+
+  function selectTeam(id) {
+    const team = teams.find(t => t.id === id);
+    if (!team) return;
+    currentCatch.team = team;
+    document.getElementById('catch-poste').textContent = team.poste;
+    document.getElementById('catch-team-name').textContent = team.name;
+    document.getElementById('catch-team-meta').textContent = `Secteur ${team.sector} · ${team.catches} prises validées`;
+    showScreen('screen-catch');
+    setTimeout(() => document.getElementById('catch-weight').focus(), 200);
+  }
+
+  // ═════════════════════════════════════════
+  // CATCH FORM
+  // ═════════════════════════════════════════
+  function checkWeight() {
+    const w = parseFloat(document.getElementById('catch-weight').value);
+    const helper = document.getElementById('weight-helper');
+    if (isNaN(w) || w === 0) {
+      helper.textContent = `Minimum ${MAILLE_MIN} kg pour être comptabilisé`;
+      helper.className = 'weight-helper';
+    } else if (w < MAILLE_MIN) {
+      helper.textContent = `⚠ Sous la maille minimale (${MAILLE_MIN} kg) — Sera enregistré mais non comptabilisé`;
+      helper.className = 'weight-helper warning';
+    } else if (w >= 15) {
+      helper.textContent = `🏆 Belle prise ! ${w} kg`;
+      helper.className = 'weight-helper ok';
+    } else {
+      helper.textContent = `✓ Prise valide (≥ ${MAILLE_MIN} kg)`;
+      helper.className = 'weight-helper ok';
+    }
+    currentCatch.weight = w;
+  }
+
+  function addWeight(val) {
+    document.getElementById('catch-weight').value = val;
+    checkWeight();
+  }
+
+  function selectSpecies(el, species) {
+    document.querySelectorAll('.species-pill').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    currentCatch.species = species;
+  }
+
+  function handlePhoto(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const container = document.getElementById('photo-upload');
+    document.getElementById('photo-name').textContent = file.name;
+    document.getElementById('photo-size').textContent = formatSize(file.size);
+    container.classList.add('has-photo');
+    currentCatch.photo = file;
+  }
+
+  function removePhoto(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const container = document.getElementById('photo-upload');
+    const input = container.querySelector('input[type="file"]');
+    input.value = '';
+    container.classList.remove('has-photo');
+    currentCatch.photo = null;
+  }
+
+  function formatSize(bytes) {
+    if (bytes < 1024) return bytes + ' o';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' Ko';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' Mo';
+  }
+
+  function submitCatch() {
+    if (!currentCatch.team) {
+      alert('Sélectionnez une équipe');
+      return;
+    }
+    if (!currentCatch.weight || currentCatch.weight <= 0) {
+      alert('Renseignez un poids valide');
+      return;
+    }
+    if (!currentCatch.photo) {
+      if (!confirm('Aucune photo n\'a été ajoutée. Valider quand même la prise ?')) {
+        return;
+      }
+    }
+    currentCatch.note = document.getElementById('catch-note').value.trim();
+
+    // Update success screen
+    document.getElementById('success-team').textContent = currentCatch.team.name;
+    document.getElementById('success-poste').textContent = `${currentCatch.team.sector} · ${currentCatch.team.poste}`;
+    const speciesLabels = { commune: 'Carpe commune', miroir: 'Carpe miroir', cuir: 'Carpe cuir', koi: 'Carpe Koï', amour: 'Amour blanc' };
+    document.getElementById('success-species').textContent = speciesLabels[currentCatch.species];
+    document.getElementById('success-weight').textContent = currentCatch.weight.toFixed(1) + ' kg';
+    const now = new Date();
+    document.getElementById('success-time').textContent = `${String(now.getHours()).padStart(2,'0')}h${String(now.getMinutes()).padStart(2,'0')}`;
+
+    showScreen('screen-success');
+  }
+
+  function resetForm() {
+    document.getElementById('catch-weight').value = '';
+    document.getElementById('catch-note').value = '';
+    document.getElementById('photo-upload').classList.remove('has-photo');
+    const input = document.getElementById('photo-upload').querySelector('input[type="file"]');
+    if (input) input.value = '';
+    document.querySelectorAll('.species-pill').forEach((p, i) => {
+      p.classList.toggle('active', i === 0);
+    });
+    currentCatch = { team: null, weight: null, species: 'commune', photo: null, note: '' };
+    checkWeight();
+  }
+
+  // Enter key on login fields
+  document.getElementById('login-username').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('login-password').focus();
+  });
+  document.getElementById('login-password').addEventListener('keydown', e => {
+    if (e.key === 'Enter') login();
+  });
+</script>
+
+</body>
+</html>

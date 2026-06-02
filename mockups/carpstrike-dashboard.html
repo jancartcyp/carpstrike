@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CarpStrike — Tableau de bord organisateur</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,900;1,700;1,900&family=Barlow:wght@300;400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #e8212b;
+    --red-bright: #ff2d3a;
+    --red-dim: rgba(232,33,43,0.15);
+    --red-glow: rgba(232,33,43,0.4);
+    --white: #f4f0eb;
+    --off: #c8c0b4;
+    --dim: rgba(244,240,235,0.5);
+    --dim2: rgba(244,240,235,0.25);
+    --dark: #0a0908;
+    --darker: #060504;
+    --panel: #141310;
+    --panel-2: #1a1814;
+    --line: rgba(244,240,235,0.07);
+    --line-bright: rgba(244,240,235,0.15);
+    --gold: #f0a500;
+    --green: #00c850;
+    --blue: #4a9eff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--darker);
+    font-family: 'Barlow', sans-serif;
+    color: var(--white);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .bg-atmosphere {
+    position: fixed; inset: 0; z-index: -2;
+    background:
+      radial-gradient(ellipse 60% 40% at 0% 0%, rgba(232,33,43,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse 60% 60% at 100% 100%, rgba(232,33,43,0.05) 0%, transparent 50%),
+      linear-gradient(180deg, #0a0908 0%, #060504 100%);
+  }
+
+  .bg-grid {
+    position: fixed; inset: 0; z-index: -1;
+    background-image:
+      linear-gradient(rgba(244,240,235,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(244,240,235,0.02) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, #000 0%, transparent 80%);
+  }
+
+  /* ─── LAYOUT ─── */
+  .app {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    min-height: 100vh;
+  }
+
+  /* ─── SIDEBAR ─── */
+  .sidebar {
+    background: var(--dark);
+    border-right: 1px solid var(--line);
+    padding: 24px 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar-logo {
+    display: flex;
+    align-items: center;
+    padding: 0 22px 24px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 18px;
+  }
+
+  .logo-carp {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 1.4rem;
+    color: var(--white);
+    letter-spacing: 1px;
+    line-height: 1;
+  }
+
+  .logo-strike {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 1.4rem;
+    color: var(--red);
+    letter-spacing: 1px;
+    line-height: 1;
+    text-shadow: 0 0 15px var(--red-glow);
+  }
+
+  .logo-slash {
+    width: 3px; height: 18px;
+    background: var(--red);
+    transform: skewX(-10deg);
+    margin: 0 7px;
+    box-shadow: 0 0 8px var(--red-glow);
+  }
+
+  .nav-section {
+    padding: 0 14px 18px;
+  }
+
+  .nav-section-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.62rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--dim2);
+    padding: 0 10px 8px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 10px 12px;
+    color: var(--dim);
+    text-decoration: none;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    font-size: 0.88rem;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+    cursor: pointer;
+    position: relative;
+    margin-bottom: 2px;
+  }
+
+  .nav-item:hover {
+    color: var(--white);
+    background: rgba(244,240,235,0.03);
+  }
+
+  .nav-item.active {
+    color: var(--white);
+    background: var(--red-dim);
+  }
+
+  .nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 6px; bottom: 6px;
+    width: 2px;
+    background: var(--red);
+    box-shadow: 0 0 8px var(--red-glow);
+  }
+
+  .nav-item .icon {
+    width: 18px; height: 18px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .nav-item .badge {
+    margin-left: auto;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.65rem;
+    background: var(--red);
+    color: #fff;
+    padding: 1px 6px;
+    letter-spacing: 1px;
+  }
+
+  .sidebar-user {
+    margin-top: auto;
+    padding: 14px 14px 0;
+    border-top: 1px solid var(--line);
+    margin: auto 14px 0;
+  }
+
+  .user-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .user-card:hover {
+    border-color: var(--line-bright);
+  }
+
+  .user-avatar {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--red) 0%, #8a1820 100%);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+  }
+
+  .user-info { flex: 1; min-width: 0; }
+
+  .user-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.82rem;
+    color: var(--white);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .user-role {
+    font-size: 0.68rem;
+    color: var(--dim);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* ─── MAIN ─── */
+  .main {
+    padding: 28px 36px 50px;
+    max-width: 1400px;
+  }
+
+  /* Top bar */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    gap: 20px;
+  }
+
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.78rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+
+  .breadcrumb a {
+    color: var(--dim);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .breadcrumb a:hover { color: var(--white); }
+
+  .breadcrumb .sep { color: var(--dim2); }
+  .breadcrumb .current { color: var(--white); }
+
+  .topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .icon-btn {
+    width: 36px; height: 36px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: var(--dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .icon-btn:hover {
+    color: var(--white);
+    border-color: var(--line-bright);
+  }
+
+  .icon-btn .dot {
+    position: absolute;
+    top: 8px; right: 8px;
+    width: 7px; height: 7px;
+    background: var(--red);
+    border-radius: 50%;
+    box-shadow: 0 0 6px var(--red);
+  }
+
+  .btn {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 10px 22px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: inherit;
+    background: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-primary {
+    background: var(--red);
+    color: #fff;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    box-shadow: 0 0 15px var(--red-glow);
+  }
+
+  .btn-primary:hover {
+    background: var(--red-bright);
+    box-shadow: 0 0 25px var(--red-glow);
+  }
+
+  .btn-ghost {
+    color: var(--white);
+    border: 1px solid var(--line-bright);
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  }
+
+  .btn-ghost:hover {
+    border-color: var(--white);
+    background: rgba(244,240,235,0.05);
+  }
+
+  /* ─── ENDURO HEADER ─── */
+  .enduro-header {
+    position: relative;
+    background: linear-gradient(140deg, var(--panel) 0%, var(--panel-2) 100%);
+    border: 1px solid var(--line-bright);
+    border-left: 3px solid var(--red);
+    padding: 24px 28px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+
+  .enduro-header::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 300px; height: 100%;
+    background: radial-gradient(ellipse at right, rgba(232,33,43,0.1) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .enduro-header-content {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 24px;
+    align-items: center;
+  }
+
+  .enduro-meta-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--red);
+    color: #fff;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 0.78rem;
+    letter-spacing: 2px;
+    padding: 4px 12px;
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  }
+
+  .status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #fff;
+    animation: pulse 1.2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .enduro-cat {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--dim);
+    border: 1px solid var(--line-bright);
+    padding: 3px 9px;
+  }
+
+  .enduro-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 2rem;
+    line-height: 1;
+    margin-bottom: 6px;
+    letter-spacing: -0.5px;
+  }
+
+  .enduro-info-row {
+    display: flex;
+    gap: 18px;
+    color: var(--dim);
+    font-size: 0.85rem;
+    flex-wrap: wrap;
+  }
+
+  .enduro-info-row span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .enduro-timer {
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .timer-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 4px;
+  }
+
+  .timer-value {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 2.5rem;
+    color: var(--white);
+    line-height: 1;
+    letter-spacing: -1px;
+  }
+
+  .timer-value span {
+    color: var(--red);
+  }
+
+  /* ─── KPI CARDS ─── */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .kpi {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 16px 18px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s;
+  }
+
+  .kpi:hover {
+    border-color: var(--line-bright);
+    transform: translateY(-2px);
+  }
+
+  .kpi::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--red);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s;
+  }
+
+  .kpi:hover::before { transform: scaleX(1); }
+
+  .kpi-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .kpi-icon {
+    width: 32px; height: 32px;
+    background: var(--red-dim);
+    color: var(--red);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  }
+
+  .kpi-trend {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+  }
+
+  .kpi-trend.up { color: var(--green); }
+  .kpi-trend.down { color: var(--red); }
+  .kpi-trend.neutral { color: var(--dim); }
+
+  .kpi-value {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 2rem;
+    line-height: 1;
+    color: var(--white);
+    margin-bottom: 4px;
+  }
+
+  .kpi-value .unit {
+    font-size: 0.95rem;
+    color: var(--dim);
+    font-weight: 400;
+  }
+
+  .kpi-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+
+  /* ─── GRID LAYOUT ─── */
+  .grid-2col {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  /* ─── CARD ─── */
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    overflow: hidden;
+  }
+
+  .card-head {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .card-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 1.05rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .card-title-accent {
+    width: 4px; height: 18px;
+    background: var(--red);
+    box-shadow: 0 0 8px var(--red-glow);
+  }
+
+  .card-action {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.72rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--red);
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .card-action:hover { color: var(--red-bright); }
+
+  .card-body {
+    padding: 18px 20px;
+  }
+
+  .card-body.no-pad { padding: 0; }
+
+  /* ─── RANKING TABLE ─── */
+  .rank-row {
+    display: grid;
+    grid-template-columns: 36px 1fr 80px 80px 90px;
+    padding: 11px 20px;
+    border-bottom: 1px solid var(--line);
+    align-items: center;
+    transition: background 0.2s;
+  }
+
+  .rank-row:last-child { border-bottom: none; }
+  .rank-row:hover { background: rgba(232,33,43,0.04); }
+
+  .rank-row.top1 { background: rgba(232,33,43,0.06); }
+  .rank-row.top1:hover { background: rgba(232,33,43,0.1); }
+
+  .rank-num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--dim);
+  }
+
+  .rank-row.top1 .rank-num { color: var(--red); }
+  .rank-row.top2 .rank-num { color: var(--white); }
+  .rank-row.top3 .rank-num { color: var(--gold); }
+
+  .rank-team {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.92rem;
+    color: var(--white);
+  }
+
+  .rank-team .sector {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 500;
+    font-size: 0.7rem;
+    color: var(--dim);
+    margin-top: 1px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .rank-fish {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.85rem;
+    color: var(--dim);
+    text-align: center;
+  }
+
+  .rank-delta {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.72rem;
+    text-align: center;
+  }
+
+  .rank-delta.up { color: var(--green); }
+  .rank-delta.down { color: var(--red); }
+  .rank-delta.same { color: var(--dim2); }
+
+  .rank-score {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--white);
+    text-align: right;
+  }
+
+  .rank-score .kg {
+    font-size: 0.75rem;
+    color: var(--dim);
+    font-weight: 400;
+  }
+
+  /* ─── ACTIVITY FEED ─── */
+  .activity-list {
+    max-height: 480px;
+    overflow-y: auto;
+  }
+
+  .activity-item {
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .activity-item:last-child { border-bottom: none; }
+
+  .activity-icon {
+    width: 30px; height: 30px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  }
+
+  .activity-icon.catch { background: var(--red-dim); color: var(--red); }
+  .activity-icon.validation { background: rgba(0,200,80,0.12); color: var(--green); }
+  .activity-icon.alert { background: rgba(240,165,0,0.12); color: var(--gold); }
+  .activity-icon.info { background: rgba(74,158,255,0.12); color: var(--blue); }
+
+  .activity-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .activity-text {
+    font-size: 0.85rem;
+    color: var(--white);
+    line-height: 1.35;
+  }
+
+  .activity-text strong {
+    color: var(--white);
+    font-weight: 600;
+  }
+
+  .activity-text .highlight {
+    color: var(--red);
+    font-weight: 600;
+  }
+
+  .activity-time {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.7rem;
+    color: var(--dim);
+    margin-top: 2px;
+    letter-spacing: 1px;
+  }
+
+  /* ─── QUICK ACTIONS ─── */
+  .quick-actions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    padding: 14px 14px 8px;
+  }
+
+  .quick-action {
+    padding: 14px 12px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--line);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+  }
+
+  .quick-action:hover {
+    border-color: var(--red);
+    background: var(--red-dim);
+  }
+
+  .quick-action-icon {
+    color: var(--red);
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+  }
+
+  .quick-action-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: var(--white);
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+  }
+
+  .quick-action-desc {
+    font-size: 0.7rem;
+    color: var(--dim);
+    line-height: 1.3;
+  }
+
+  /* ─── SECTORS ─── */
+  .sectors-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 16px 20px;
+  }
+
+  .sector-card {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--line);
+    padding: 12px 14px;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+
+  .sector-card:hover {
+    border-color: var(--line-bright);
+  }
+
+  .sector-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+
+  .sector-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 1.05rem;
+    letter-spacing: 1px;
+  }
+
+  .sector-teams {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    font-size: 0.7rem;
+    color: var(--dim);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .sector-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 8px;
+    border-top: 1px solid var(--line);
+  }
+
+  .sector-stat {
+    flex: 1;
+  }
+
+  .sector-stat-val {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--white);
+  }
+
+  .sector-stat-val.red { color: var(--red); }
+
+  .sector-stat-lbl {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.6rem;
+    color: var(--dim);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* ─── PENDING VALIDATION ─── */
+  .pending-item {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .pending-item:last-child { border-bottom: none; }
+
+  .pending-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .pending-icon {
+    width: 36px; height: 36px;
+    background: rgba(240,165,0,0.12);
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  }
+
+  .pending-text {
+    font-size: 0.88rem;
+  }
+
+  .pending-text strong { color: var(--white); }
+  .pending-text .meta {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.72rem;
+    color: var(--dim);
+    margin-top: 2px;
+    letter-spacing: 1px;
+  }
+
+  .pending-actions {
+    display: flex;
+    gap: 6px;
+  }
+
+  .btn-icon {
+    width: 32px; height: 32px;
+    border: 1px solid var(--line-bright);
+    background: var(--panel);
+    color: var(--white);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+  }
+
+  .btn-icon.accept:hover { background: var(--green); border-color: var(--green); color: #fff; }
+  .btn-icon.reject:hover { background: var(--red); border-color: var(--red); color: #fff; }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 1100px) {
+    .grid-2col { grid-template-columns: 1fr; }
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 800px) {
+    .app { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .main { padding: 20px; }
+    .enduro-header-content { grid-template-columns: 1fr; }
+    .enduro-timer { text-align: left; }
+    .sectors-grid { grid-template-columns: 1fr; }
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--line-bright); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--dim2); }
+</style>
+</head>
+<body>
+
+<div class="bg-atmosphere"></div>
+<div class="bg-grid"></div>
+
+<div class="app">
+
+  <!-- ═══════ SIDEBAR ═══════ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <a href="carpstrike-index.html" style="display:inline-block;text-decoration:none" title="Accueil du prototype"><svg class="cs-logo" width="125" height="30" viewBox="0 0 540 130" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="CarpStrike" style="display:block">
+<path d="M10 70 L 70 70 L 80 70 L 88 54 L 98 90 L 108 70 L 150 70 L 165 70 L 178 38 L 192 104 L 206 70 L 250 70 L 262 70 L 275 14 L 290 120 L 305 70 L 330 70 L 345 70 L 356 50 L 367 88 L 377 70 L 430 70 L 445 70 L 456 56 L 466 84 L 476 70 L 530 70" stroke="#e8212b" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="270" y="84" font-family="'Barlow Condensed', sans-serif" font-size="56" font-weight="900" font-style="italic" fill="#f4f0eb" text-anchor="middle" stroke="#0a0908" stroke-width="7" paint-order="stroke">CARP<tspan fill="#e8212b">STRIKE</tspan></text>
+</svg></a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Mon enduro</div>
+      <a class="nav-item active" href="carpstrike-dashboard.html">
+        <div class="icon">⊞</div>
+        Tableau de bord
+      </a>
+      <a class="nav-item" href="carpstrike-classement-live.html">
+        <div class="icon">⚑</div>
+        Classement live
+      </a>
+      <a class="nav-item" href="carpstrike-validations.html">
+        <div class="icon">⚐</div>
+        Validations
+        <span class="badge">3</span>
+      </a>
+      <a class="nav-item" href="carpstrike-equipes.html">
+        <div class="icon">▤</div>
+        Équipes
+      </a>
+      <a class="nav-item" href="carpstrike-dashboard.html">
+        <div class="icon">◫</div>
+        Secteurs
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Gestion</div>
+      <a class="nav-item" href="carpstrike-commissaires.html">
+        <div class="icon">★</div>
+        Commissaires
+      </a>
+      <a class="nav-item" href="carpstrike-demandes.html">
+        <div class="icon">◉</div>
+        Inscriptions
+      </a>
+      <a class="nav-item" href="carpstrike-communication.html">
+        <div class="icon">◎</div>
+        Communication
+      </a>
+      <a class="nav-item" href="carpstrike-parametres.html">
+        <div class="icon">⚙</div>
+        Paramètres
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Historique</div>
+      <a class="nav-item" href="carpstrike-dashboard.html">
+        <div class="icon">▦</div>
+        Mes enduros
+      </a>
+      <a class="nav-item" href="carpstrike-dashboard.html">
+        <div class="icon">⌂</div>
+        Statistiques
+      </a>
+    </div>
+
+    <div class="sidebar-user">
+      <div class="user-card">
+        <div class="user-avatar">M</div>
+        <div class="user-info">
+          <div class="user-name">Maxime D.</div>
+          <div class="user-role">Organisateur</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════ MAIN CONTENT ═══════ -->
+  <main class="main">
+
+    <!-- TOP BAR -->
+    <div class="topbar">
+      <div class="breadcrumb">
+        <a href="#">Mes enduros</a>
+        <span class="sep">/</span>
+        <span class="current">Grand Enduro du Lac Bleu</span>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn" title="Notifications">
+          🔔
+          <span class="dot"></span>
+        </button>
+        <button class="btn btn-ghost">Voir page publique</button>
+        <button class="btn btn-primary">+ Saisir une prise</button>
+      </div>
+    </div>
+
+    <!-- ENDURO HEADER -->
+    <div class="enduro-header">
+      <div class="enduro-header-content">
+        <div>
+          <div class="enduro-meta-top">
+            <div class="status-pill">
+              <div class="status-dot"></div>
+              EN COURS
+            </div>
+            <div class="enduro-cat">National · 72h</div>
+          </div>
+          <h1 class="enduro-name">Grand Enduro du Lac Bleu</h1>
+          <div class="enduro-info-row">
+            <span>📍 Étang de Tournay, 65190</span>
+            <span>📅 28 → 30 Avril 2026</span>
+            <span>🌊 Plan d'eau · 25 ha</span>
+            <span>👥 24 équipes · 4 secteurs</span>
+            <span>🎲 Tirage au sort unique</span>
+            <span style="color: var(--red); cursor: pointer; text-decoration: underline; text-underline-offset: 3px;">⛶ Voir le plan des postes</span>
+          </div>
+        </div>
+        <div class="enduro-timer">
+          <div class="timer-label">Temps restant</div>
+          <div class="timer-value"><span>36</span>h <span>14</span>m</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpi-grid">
+      <div class="kpi">
+        <div class="kpi-top">
+          <div class="kpi-icon">▦</div>
+          <div class="kpi-trend up">▲ +2</div>
+        </div>
+        <div class="kpi-value">24<span class="unit">/24</span></div>
+        <div class="kpi-label">Équipes inscrites</div>
+      </div>
+
+      <div class="kpi">
+        <div class="kpi-top">
+          <div class="kpi-icon">🐟</div>
+          <div class="kpi-trend up">▲ +12</div>
+        </div>
+        <div class="kpi-value">187</div>
+        <div class="kpi-label">Prises validées</div>
+      </div>
+
+      <div class="kpi">
+        <div class="kpi-top">
+          <div class="kpi-icon">⚖</div>
+          <div class="kpi-trend up">▲ 8.2 kg</div>
+        </div>
+        <div class="kpi-value">847<span class="unit">.3 kg</span></div>
+        <div class="kpi-label">Poids total</div>
+      </div>
+
+      <div class="kpi">
+        <div class="kpi-top">
+          <div class="kpi-icon">★</div>
+          <div class="kpi-trend neutral">— Record</div>
+        </div>
+        <div class="kpi-value">14.2<span class="unit"> kg</span></div>
+        <div class="kpi-label">Plus grosse prise</div>
+      </div>
+    </div>
+
+    <!-- 2 COLS: RANKING + SIDE -->
+    <div class="grid-2col">
+      <!-- LIVE RANKING -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">
+            <div class="card-title-accent"></div>
+            Classement live
+          </div>
+          <a class="card-action">Voir tout →</a>
+        </div>
+        <div class="card-body no-pad">
+          <div class="rank-row top1">
+            <div class="rank-num">01</div>
+            <div>
+              <div class="rank-team">Martin & Dupont</div>
+              <div class="sector">Secteur A · Poste 07</div>
+            </div>
+            <div class="rank-fish">8 prises</div>
+            <div class="rank-delta same">—</div>
+            <div class="rank-score">42.6 <span class="kg">kg</span></div>
+          </div>
+          <div class="rank-row top2">
+            <div class="rank-num">02</div>
+            <div>
+              <div class="rank-team">Leroy & Bernard</div>
+              <div class="sector">Secteur B · Poste 12</div>
+            </div>
+            <div class="rank-fish">7 prises</div>
+            <div class="rank-delta up">▲ 2</div>
+            <div class="rank-score">38.2 <span class="kg">kg</span></div>
+          </div>
+          <div class="rank-row top3">
+            <div class="rank-num">03</div>
+            <div>
+              <div class="rank-team">Petit & Moreau</div>
+              <div class="sector">Secteur A · Poste 03</div>
+            </div>
+            <div class="rank-fish">6 prises</div>
+            <div class="rank-delta same">—</div>
+            <div class="rank-score">35.9 <span class="kg">kg</span></div>
+          </div>
+          <div class="rank-row">
+            <div class="rank-num">04</div>
+            <div>
+              <div class="rank-team">Simon & Garcia</div>
+              <div class="sector">Secteur C · Poste 08</div>
+            </div>
+            <div class="rank-fish">6 prises</div>
+            <div class="rank-delta down">▼ 1</div>
+            <div class="rank-score">31.4 <span class="kg">kg</span></div>
+          </div>
+          <div class="rank-row">
+            <div class="rank-num">05</div>
+            <div>
+              <div class="rank-team">Fontaine & Roux</div>
+              <div class="sector">Secteur B · Poste 05</div>
+            </div>
+            <div class="rank-fish">5 prises</div>
+            <div class="rank-delta up">▲ 3</div>
+            <div class="rank-score">28.7 <span class="kg">kg</span></div>
+          </div>
+          <div class="rank-row">
+            <div class="rank-num">06</div>
+            <div>
+              <div class="rank-team">Lambert & Faure</div>
+              <div class="sector">Secteur D · Poste 02</div>
+            </div>
+            <div class="rank-fish">5 prises</div>
+            <div class="rank-delta down">▼ 2</div>
+            <div class="rank-score">26.1 <span class="kg">kg</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div>
+        <!-- QUICK ACTIONS -->
+        <div class="card" style="margin-bottom: 16px;">
+          <div class="card-head">
+            <div class="card-title">
+              <div class="card-title-accent"></div>
+              Actions rapides
+            </div>
+          </div>
+          <div class="quick-actions">
+            <div class="quick-action">
+              <div class="quick-action-icon">＋</div>
+              <div class="quick-action-title">Saisir prise</div>
+              <div class="quick-action-desc">Enregistrer un poisson</div>
+            </div>
+            <div class="quick-action">
+              <div class="quick-action-icon">✉</div>
+              <div class="quick-action-title">Annonce</div>
+              <div class="quick-action-desc">Notifier les équipes</div>
+            </div>
+            <div class="quick-action">
+              <div class="quick-action-icon">★</div>
+              <div class="quick-action-title">Inviter commissaire</div>
+              <div class="quick-action-desc">Ajouter un valideur</div>
+            </div>
+            <div class="quick-action">
+              <div class="quick-action-icon">↗</div>
+              <div class="quick-action-title">Partager</div>
+              <div class="quick-action-desc">Lien public + QR code</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PENDING VALIDATIONS -->
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">
+              <div class="card-title-accent"></div>
+              À valider <span style="color:var(--red);font-size:0.85rem;font-style:normal;">(3)</span>
+            </div>
+            <a class="card-action">Tout voir →</a>
+          </div>
+          <div class="card-body no-pad">
+            <div class="pending-item">
+              <div class="pending-info">
+                <div class="pending-icon">🐟</div>
+                <div class="pending-text">
+                  <strong>Leroy & Bernard</strong> · Carpe miroir <span style="color:var(--red);">12.4 kg</span>
+                  <div class="meta">Il y a 3 min · Sect. B · Comm. Pierre M.</div>
+                </div>
+              </div>
+              <div class="pending-actions">
+                <button class="btn-icon accept" title="Valider">✓</button>
+                <button class="btn-icon reject" title="Rejeter">✕</button>
+              </div>
+            </div>
+            <div class="pending-item">
+              <div class="pending-info">
+                <div class="pending-icon">🐟</div>
+                <div class="pending-text">
+                  <strong>Simon & Garcia</strong> · Carpe commune <span style="color:var(--red);">8.7 kg</span>
+                  <div class="meta">Il y a 8 min · Sect. C · Comm. Julien R.</div>
+                </div>
+              </div>
+              <div class="pending-actions">
+                <button class="btn-icon accept" title="Valider">✓</button>
+                <button class="btn-icon reject" title="Rejeter">✕</button>
+              </div>
+            </div>
+            <div class="pending-item">
+              <div class="pending-info">
+                <div class="pending-icon">🐟</div>
+                <div class="pending-text">
+                  <strong>Petit & Moreau</strong> · Carpe cuir <span style="color:var(--red);">9.1 kg</span>
+                  <div class="meta">Il y a 15 min · Sect. A · Comm. Pierre M.</div>
+                </div>
+              </div>
+              <div class="pending-actions">
+                <button class="btn-icon accept" title="Valider">✓</button>
+                <button class="btn-icon reject" title="Rejeter">✕</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2 COLS: SECTORS + ACTIVITY -->
+    <div class="grid-2col">
+      <!-- SECTORS -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">
+            <div class="card-title-accent"></div>
+            Vue par secteurs
+          </div>
+          <a class="card-action">Détails →</a>
+        </div>
+        <div class="card-body no-pad">
+          <div class="sectors-grid">
+            <div class="sector-card">
+              <div class="sector-head">
+                <div class="sector-name">Secteur A</div>
+                <div class="sector-teams">6 équipes</div>
+              </div>
+              <div class="sector-stats">
+                <div class="sector-stat">
+                  <div class="sector-stat-val red">52</div>
+                  <div class="sector-stat-lbl">Prises</div>
+                </div>
+                <div class="sector-stat">
+                  <div class="sector-stat-val">218<span style="font-size:0.7rem;color:var(--dim);"> kg</span></div>
+                  <div class="sector-stat-lbl">Total</div>
+                </div>
+                <div class="sector-stat">
+                  <div class="sector-stat-val">42.6</div>
+                  <div class="sector-stat-lbl">Leader</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="sector-card">
+              <div class="sector-head">
+                <div class="sector-name">Secteur B</div>
+                <div class="sector-teams">6 équipes</div>
+              </div>
+              <div class="sector-stats">
+                <div class="sector-stat">
+                  <div class="sector-stat-val red">48</div>
+                  <div class="sector-stat-lbl">Prises</div>
+                </div>
+                <div class="sector-stat">
+                  <div class="sector-stat-val">196<span style="font-size:0.7rem;color:var(--dim);"> kg</span></div>
+                  <div class="sector-stat-lbl">Total</div>
+                </div>
+                <div class="sector-stat">
+                  <div class="sector-stat-val">38.2</div>
+                  <div class="sector-stat-lbl">Leader</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="sector-card">
+              <div class="sector-head">
+                <div class="sector-name">Secteur C</div>
+                <div class="sector-teams">6 équipes</div>
+              </div>
+              <div class="sector-stats">
+                <div class="sector-stat">
+                  <div class="sector-stat-val red">44</div>
+                  <div class="sector-stat-lbl">Prises</div>
+                </div>
+                <div class="sector-stat">
+                  <div class="sector-stat-val">211<span style="font-size:0.7rem;color:var(--dim);"> kg</span></div>
+                  <div class="sector-stat-lbl">Total</div>
+                </div>
+                <div class="sector-stat">
+                  <div class="sector-stat-val">31.4</div>
+                  <div class="sector-stat-lbl">Leader</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="sector-card">
+              <div class="sector-head">
+                <div class="sector-name">Secteur D</div>
+                <div class="sector-teams">6 équipes</div>
+              </div>
+              <div class="sector-stats">
+                <div class="sector-stat">
+                  <div class="sector-stat-val red">43</div>
+                  <div class="sector-stat-lbl">Prises</div>
+                </div>
+                <div class="sector-stat">
+                  <div class="sector-stat-val">222<span style="font-size:0.7rem;color:var(--dim);"> kg</span></div>
+                  <div class="sector-stat-lbl">Total</div>
+                </div>
+                <div class="sector-stat">
+                  <div class="sector-stat-val">26.1</div>
+                  <div class="sector-stat-lbl">Leader</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTIVITY FEED -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">
+            <div class="card-title-accent"></div>
+            Activité en direct
+          </div>
+          <a class="card-action">Tout l'historique →</a>
+        </div>
+        <div class="card-body no-pad">
+          <div class="activity-list">
+            <div class="activity-item">
+              <div class="activity-icon catch">🐟</div>
+              <div class="activity-content">
+                <div class="activity-text"><strong>Leroy & Bernard</strong> ont déclaré une prise de <span class="highlight">12.4 kg</span> (Carpe miroir)</div>
+                <div class="activity-time">Il y a 3 minutes</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon validation">✓</div>
+              <div class="activity-content">
+                <div class="activity-text">Prise <strong>Martin & Dupont</strong> validée par <strong>Pierre M.</strong> — <span class="highlight">14.2 kg</span> 🏆 Record !</div>
+                <div class="activity-time">Il y a 8 minutes</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon catch">🐟</div>
+              <div class="activity-content">
+                <div class="activity-text"><strong>Simon & Garcia</strong> ont déclaré une prise de <span class="highlight">8.7 kg</span></div>
+                <div class="activity-time">Il y a 11 minutes</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon info">ℹ</div>
+              <div class="activity-content">
+                <div class="activity-text"><strong>Maxime D.</strong> a publié une annonce : <em>"Vent fort prévu cette nuit, attention aux bivouacs"</em></div>
+                <div class="activity-time">Il y a 22 minutes</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon validation">✓</div>
+              <div class="activity-content">
+                <div class="activity-text">Prise <strong>Fontaine & Roux</strong> validée — <span class="highlight">6.8 kg</span></div>
+                <div class="activity-time">Il y a 28 minutes</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon alert">⚠</div>
+              <div class="activity-content">
+                <div class="activity-text"><strong>Réclamation</strong> de l'équipe <strong>Lambert & Faure</strong> — Litige sur poste voisin</div>
+                <div class="activity-time">Il y a 41 minutes</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon catch">🐟</div>
+              <div class="activity-content">
+                <div class="activity-text"><strong>Petit & Moreau</strong> ont déclaré une prise de <span class="highlight">9.1 kg</span></div>
+                <div class="activity-time">Il y a 1 heure</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon info">★</div>
+              <div class="activity-content">
+                <div class="activity-text">Commissaire <strong>Julien R.</strong> a rejoint le secteur C</div>
+                <div class="activity-time">Il y a 1h 12min</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  // Nav active state
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', e => {
+      e.preventDefault();
+      document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+    });
+  });
+
+  // Pending validation actions
+  document.querySelectorAll('.btn-icon.accept').forEach(btn => {
+    btn.addEventListener('click', e => {
+      const item = e.target.closest('.pending-item');
+      item.style.opacity = '0.4';
+      item.style.pointerEvents = 'none';
+    });
+  });
+
+  document.querySelectorAll('.btn-icon.reject').forEach(btn => {
+    btn.addEventListener('click', e => {
+      const item = e.target.closest('.pending-item');
+      item.style.opacity = '0.4';
+      item.style.pointerEvents = 'none';
+    });
+  });
+</script>
+
+</body>
+</html>

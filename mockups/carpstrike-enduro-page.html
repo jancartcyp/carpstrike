@@ -1,0 +1,1954 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grand Enduro du Lac Bleu — CarpStrike</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,900;1,700;1,900&family=Barlow:wght@300;400;500;600;700&family=Rajdhani:wght@500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #e8212b;
+    --red-bright: #ff2d3a;
+    --red-deep: #8a1820;
+    --red-dim: rgba(232,33,43,0.15);
+    --red-glow: rgba(232,33,43,0.4);
+    --white: #f4f0eb;
+    --off: #c8c0b4;
+    --dim: rgba(244,240,235,0.6);
+    --dim2: rgba(244,240,235,0.3);
+    --dark: #0a0908;
+    --darker: #050403;
+    --panel: #141310;
+    --panel-2: #1a1814;
+    --line: rgba(244,240,235,0.08);
+    --line-bright: rgba(244,240,235,0.18);
+    --gold: #f0a500;
+    --green: #00c850;
+
+    /* THEMABLE VARS — Lac Bleu (default) */
+    --t-accent: #e8212b;
+    --t-accent-bright: #ff2d3a;
+    --t-accent-glow: rgba(232,33,43,0.4);
+    --t-accent-dim: rgba(232,33,43,0.15);
+    --t-bg-1: #0a1620;
+    --t-bg-2: #0d2435;
+    --t-bg-3: #0a1a26;
+    --t-bg-tint: rgba(20, 60, 80, 0.4);
+    --t-water-color: rgba(100, 180, 220, 0.015);
+  }
+
+  /* ─── THEME: FOREST (verte / forêt) ─── */
+  body[data-theme="forest"] {
+    --t-accent: #2ea866;
+    --t-accent-bright: #3ec97a;
+    --t-accent-glow: rgba(46,168,102,0.4);
+    --t-accent-dim: rgba(46,168,102,0.15);
+    --t-bg-1: #0d1a14;
+    --t-bg-2: #1a2e22;
+    --t-bg-3: #0d1c15;
+    --t-bg-tint: rgba(40, 100, 70, 0.35);
+    --t-water-color: rgba(120, 200, 150, 0.015);
+  }
+
+  /* ─── THEME: SUNSET (or / coucher de soleil) ─── */
+  body[data-theme="sunset"] {
+    --t-accent: #ff8c1a;
+    --t-accent-bright: #ffaa42;
+    --t-accent-glow: rgba(255,140,26,0.45);
+    --t-accent-dim: rgba(255,140,26,0.15);
+    --t-bg-1: #1f0d05;
+    --t-bg-2: #2e1810;
+    --t-bg-3: #1a0a04;
+    --t-bg-tint: rgba(180, 90, 30, 0.35);
+    --t-water-color: rgba(255, 180, 100, 0.018);
+  }
+
+  /* ─── THEME: NIGHT (violet / nuit profonde) ─── */
+  body[data-theme="night"] {
+    --t-accent: #9b6bff;
+    --t-accent-bright: #b385ff;
+    --t-accent-glow: rgba(155,107,255,0.45);
+    --t-accent-dim: rgba(155,107,255,0.15);
+    --t-bg-1: #0d0a1f;
+    --t-bg-2: #1a142e;
+    --t-bg-3: #0a0818;
+    --t-bg-tint: rgba(80, 50, 140, 0.35);
+    --t-water-color: rgba(180, 140, 255, 0.018);
+  }
+
+  /* ─── THEME SWITCHER (floating widget) ─── */
+  .theme-switcher {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    z-index: 999;
+    background: rgba(5, 4, 3, 0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--line-bright);
+    padding: 14px 14px 12px;
+    clip-path: polygon(12px 0%, 100% 0%, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0% 100%, 0% 12px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    animation: switcherIn 0.6s 1.2s ease both;
+  }
+
+  @keyframes switcherIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .switcher-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.62rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 8px;
+    text-align: center;
+  }
+
+  .switcher-options {
+    display: flex;
+    gap: 8px;
+  }
+
+  .switcher-opt {
+    width: 36px; height: 36px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  }
+
+  .switcher-opt::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--swatch);
+    clip-path: inherit;
+  }
+
+  .switcher-opt:hover {
+    transform: translateY(-3px);
+  }
+
+  .switcher-opt.active {
+    border-color: var(--white);
+    box-shadow: 0 0 12px var(--swatch);
+  }
+
+  .switcher-opt[data-set="lac-bleu"]   { --swatch: linear-gradient(135deg, #0d2435 0%, #e8212b 100%); }
+  .switcher-opt[data-set="forest"]     { --swatch: linear-gradient(135deg, #1a2e22 0%, #2ea866 100%); }
+  .switcher-opt[data-set="sunset"]     { --swatch: linear-gradient(135deg, #2e1810 0%, #ff8c1a 100%); }
+  .switcher-opt[data-set="night"]      { --swatch: linear-gradient(135deg, #1a142e 0%, #9b6bff 100%); }
+
+  .switcher-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 0.78rem;
+    color: var(--white);
+    text-align: center;
+    margin-top: 8px;
+    letter-spacing: 1px;
+    min-height: 16px;
+  }
+
+  @media (max-width: 600px) {
+    .theme-switcher {
+      bottom: 16px; right: 16px;
+      padding: 10px 10px 8px;
+    }
+    .switcher-opt { width: 30px; height: 30px; }
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--darker);
+    font-family: 'Barlow', sans-serif;
+    color: var(--white);
+    overflow-x: hidden;
+  }
+
+  /* ════════════════════════════════════════════════
+     UNIQUE THEME — "Lac Bleu" : profondeur + brume
+     ════════════════════════════════════════════════ */
+
+  /* ─── TOP NAV ─── */
+  .top-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: rgba(5,4,3,0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--line);
+    transition: padding 0.3s ease;
+  }
+
+  .nav-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 14px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .logo-carp {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 1.4rem;
+    color: var(--white);
+    letter-spacing: 1px;
+    line-height: 1;
+  }
+
+  .logo-strike {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 1.4rem;
+    color: var(--t-accent);
+    letter-spacing: 1px;
+    line-height: 1;
+    text-shadow: 0 0 15px var(--t-accent-glow);
+    transition: color 0.4s, text-shadow 0.4s;
+  }
+
+  .logo-slash {
+    width: 3px; height: 18px;
+    background: var(--t-accent);
+    transform: skewX(-10deg);
+    margin: 0 7px;
+    box-shadow: 0 0 8px var(--t-accent-glow);
+    transition: background 0.4s, box-shadow 0.4s;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 4px;
+    list-style: none;
+  }
+
+  .nav-link {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    font-size: 0.78rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--dim);
+    padding: 6px 14px;
+    text-decoration: none;
+    transition: color 0.2s;
+    cursor: pointer;
+  }
+
+  .nav-link:hover { color: var(--white); }
+  .nav-link.active { color: var(--t-accent); transition: color 0.4s; }
+
+  .nav-cta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .btn {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 0.82rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 9px 18px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: inherit;
+    background: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-primary {
+    background: var(--t-accent);
+    color: #fff;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    box-shadow: 0 0 15px var(--t-accent-glow);
+    transition: background 0.4s, box-shadow 0.4s, transform 0.2s;
+  }
+
+  .btn-primary:hover {
+    background: var(--t-accent-bright);
+    box-shadow: 0 0 30px var(--t-accent-glow);
+    transform: translateY(-1px);
+  }
+
+  .btn-ghost {
+    color: var(--white);
+    border: 1px solid var(--line-bright);
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    transition: border-color 0.4s, color 0.4s;
+  }
+
+  .btn-ghost:hover {
+    border-color: var(--t-accent);
+    color: var(--t-accent);
+  }
+
+  .btn-large {
+    padding: 14px 28px;
+    font-size: 0.95rem;
+  }
+
+  /* ─── HERO CINEMATIC ─── */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    padding: 100px 32px 60px;
+  }
+
+  /* Layered atmospheric background */
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .hero-bg-image {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 100%, var(--t-bg-tint) 0%, transparent 60%),
+      radial-gradient(ellipse 100% 50% at 50% 0%, rgba(10, 9, 8, 0.8) 0%, transparent 50%),
+      linear-gradient(180deg, var(--t-bg-1) 0%, var(--t-bg-2) 30%, var(--t-bg-3) 60%, #050403 100%);
+    transition: background 0.6s ease;
+  }
+
+  /* Animated water surface effect */
+  .hero-water {
+    position: absolute;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(
+        180deg,
+        transparent 0px,
+        var(--t-water-color) 2px,
+        transparent 4px
+      );
+    animation: waterShift 12s linear infinite;
+    transition: background-image 0.6s;
+  }
+
+  @keyframes waterShift {
+    from { background-position: 0 0; }
+    to { background-position: 0 100px; }
+  }
+
+  /* Subtle particles like fog/mist */
+  .hero-particles {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 20% 30%, rgba(255,255,255,0.02) 0%, transparent 2%),
+      radial-gradient(circle at 70% 50%, rgba(255,255,255,0.025) 0%, transparent 2.5%),
+      radial-gradient(circle at 40% 70%, rgba(255,255,255,0.02) 0%, transparent 2%),
+      radial-gradient(circle at 85% 20%, rgba(255,255,255,0.02) 0%, transparent 1.5%),
+      radial-gradient(circle at 10% 60%, rgba(255,255,255,0.025) 0%, transparent 2%);
+    animation: particleDrift 30s ease-in-out infinite alternate;
+  }
+
+  @keyframes particleDrift {
+    from { transform: translate(0, 0); }
+    to { transform: translate(20px, -10px); }
+  }
+
+  /* Red accent ambient light */
+  .hero-glow {
+    position: absolute;
+    bottom: -200px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1200px;
+    height: 600px;
+    background: radial-gradient(ellipse at center, var(--t-accent-glow) 0%, transparent 60%);
+    pointer-events: none;
+    opacity: 0.4;
+    transition: background 0.6s;
+  }
+
+  /* Grid overlay */
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(244,240,235,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(244,240,235,0.025) 1px, transparent 1px);
+    background-size: 80px 80px;
+    mask-image: radial-gradient(ellipse 70% 80% at 50% 50%, #000 0%, transparent 70%);
+    -webkit-mask-image: radial-gradient(ellipse 70% 80% at 50% 50%, #000 0%, transparent 70%);
+  }
+
+  /* Massive watermark text */
+  .hero-watermark {
+    position: absolute;
+    bottom: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: clamp(10rem, 26vw, 24rem);
+    color: rgba(244,240,235,0.025);
+    line-height: 0.85;
+    letter-spacing: -10px;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 1;
+  }
+
+  /* Hero content */
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+
+  .hero-meta {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    animation: fadeUp 0.8s ease both;
+  }
+
+  .meta-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(232,33,43,0.12);
+    border: 1px solid rgba(232,33,43,0.4);
+    color: var(--t-accent);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 0.78rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  }
+
+  .meta-pill .dot {
+    width: 6px; height: 6px;
+    background: var(--t-accent);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--t-accent);
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .meta-tag {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--dim);
+    border: 1px solid var(--line-bright);
+    padding: 4px 10px;
+    background: rgba(255,255,255,0.02);
+  }
+
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.78rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--t-accent);
+    margin-bottom: 18px;
+    animation: fadeUp 0.8s 0.1s ease both;
+  }
+
+  .hero-eyebrow::before {
+    content: '';
+    width: 36px; height: 1px;
+    background: var(--t-accent);
+    box-shadow: 0 0 8px var(--t-accent);
+  }
+
+  .hero-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: clamp(3.5rem, 7vw, 6rem);
+    line-height: 0.92;
+    letter-spacing: -2px;
+    margin-bottom: 24px;
+    animation: heroTitle 1s 0.2s ease both;
+  }
+
+  @keyframes heroTitle {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-title .accent {
+    color: var(--t-accent);
+    text-shadow:
+      0 0 30px rgba(232,33,43,0.4),
+      0 0 60px rgba(232,33,43,0.2);
+    position: relative;
+    display: inline-block;
+  }
+
+  .hero-title .accent::after {
+    content: '';
+    position: absolute;
+    bottom: 8px;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: var(--t-accent);
+    transform: skewX(-10deg);
+    opacity: 0.25;
+  }
+
+  .hero-subtitle {
+    font-size: 1.1rem;
+    color: var(--dim);
+    line-height: 1.65;
+    max-width: 540px;
+    margin-bottom: 32px;
+    animation: fadeUp 0.8s 0.4s ease both;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    animation: fadeUp 0.8s 0.5s ease both;
+  }
+
+  /* ─── KEY INFO CARD (right side of hero) ─── */
+  .info-card {
+    position: relative;
+    background:
+      linear-gradient(140deg, rgba(20, 18, 14, 0.85) 0%, rgba(26, 24, 20, 0.85) 100%);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--line-bright);
+    padding: 32px 30px;
+    clip-path: polygon(20px 0%, 100% 0%, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0% 100%, 0% 20px);
+    animation: fadeUp 0.8s 0.6s ease both;
+  }
+
+  .info-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100px; height: 2px;
+    background: var(--t-accent);
+    box-shadow: 0 0 15px var(--t-accent-glow);
+  }
+
+  .info-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; right: 0;
+    width: 100px; height: 2px;
+    background: var(--t-accent);
+    box-shadow: 0 0 15px var(--t-accent-glow);
+  }
+
+  .countdown-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 12px;
+    text-align: center;
+  }
+
+  .countdown {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 28px;
+  }
+
+  .countdown-cell {
+    text-align: center;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid var(--line);
+    padding: 12px 6px;
+    position: relative;
+  }
+
+  .countdown-cell::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--t-accent);
+    opacity: 0.5;
+  }
+
+  .countdown-num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 2rem;
+    color: var(--white);
+    line-height: 1;
+  }
+
+  .countdown-unit {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-top: 4px;
+  }
+
+  .info-divider {
+    height: 1px;
+    background: var(--line);
+    margin: 0 -30px 20px;
+  }
+
+  .info-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px 20px;
+    margin-bottom: 24px;
+  }
+
+  .info-stat {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .info-stat-icon {
+    width: 32px; height: 32px;
+    background: var(--t-accent-dim);
+    color: var(--t-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  }
+
+  .info-stat-text { line-height: 1.2; }
+
+  .info-stat-val {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 1.15rem;
+    color: var(--white);
+    line-height: 1;
+  }
+
+  .info-stat-lbl {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.65rem;
+    color: var(--dim);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+
+  .info-progress {
+    margin-bottom: 16px;
+  }
+
+  .progress-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+
+  .progress-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.72rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+
+  .progress-val {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 1rem;
+    color: var(--t-accent);
+  }
+
+  .progress-bar {
+    height: 6px;
+    background: rgba(0,0,0,0.5);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--t-accent) 0%, var(--t-accent-bright) 100%);
+    box-shadow: 0 0 10px var(--t-accent-glow);
+    width: 75%;
+    position: relative;
+  }
+
+  .progress-fill::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 30%, rgba(255,255,255,0.3) 50%, transparent 70%);
+    animation: progressShine 2s ease-in-out infinite;
+  }
+
+  @keyframes progressShine {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(100%); }
+  }
+
+  .info-cta {
+    width: 100%;
+    text-align: center;
+    padding: 14px;
+    margin-top: 4px;
+  }
+
+  /* ─── SCROLL INDICATOR ─── */
+  .scroll-indicator {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+    text-align: center;
+    color: var(--dim);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    animation: fadeUp 1s 1s ease both;
+  }
+
+  .scroll-indicator .arrow {
+    margin-top: 8px;
+    animation: bounce 2s ease-in-out infinite;
+    color: var(--t-accent);
+    font-size: 1rem;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(8px); }
+  }
+
+  /* ─── SECTION ─── */
+  .section {
+    position: relative;
+    padding: 100px 32px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .section-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .section-bg-text {
+    position: absolute;
+    top: 50%;
+    right: -50px;
+    transform: translateY(-50%);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: clamp(8rem, 18vw, 18rem);
+    color: rgba(244,240,235,0.018);
+    line-height: 0.85;
+    letter-spacing: -8px;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 0;
+  }
+
+  .section-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.78rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--t-accent);
+    margin-bottom: 14px;
+  }
+
+  .section-eyebrow::before {
+    content: '';
+    width: 36px; height: 1px;
+    background: var(--t-accent);
+  }
+
+  .section-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    line-height: 0.95;
+    letter-spacing: -1.5px;
+    margin-bottom: 50px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .section-title .accent {
+    color: var(--t-accent);
+    text-shadow: 0 0 30px var(--t-accent-glow);
+  }
+
+  /* ─── FEATURES GRID ─── */
+  .features {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .feature {
+    background: linear-gradient(140deg, var(--panel) 0%, var(--panel-2) 100%);
+    border: 1px solid var(--line);
+    padding: 28px 26px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s;
+  }
+
+  .feature::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--t-accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s;
+  }
+
+  .feature:hover {
+    border-color: var(--line-bright);
+    transform: translateY(-4px);
+  }
+
+  .feature:hover::before { transform: scaleX(1); }
+
+  .feature-num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 4rem;
+    color: rgba(232,33,43,0.15);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .feature-icon {
+    width: 44px; height: 44px;
+    background: var(--t-accent-dim);
+    color: var(--t-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-bottom: 16px;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  }
+
+  .feature-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 1.4rem;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+  }
+
+  .feature-desc {
+    color: var(--dim);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  /* ─── DETAILS LAYOUT ─── */
+  .details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .details-col h3 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 1.6rem;
+    margin-bottom: 20px;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .details-col h3 .bar {
+    width: 4px; height: 22px;
+    background: var(--t-accent);
+    box-shadow: 0 0 8px var(--t-accent-glow);
+  }
+
+  .detail-list {
+    list-style: none;
+  }
+
+  .detail-row {
+    display: grid;
+    grid-template-columns: 130px 1fr;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+    align-items: center;
+  }
+
+  .detail-row:last-child { border-bottom: none; }
+
+  .detail-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.72rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+
+  .detail-value {
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.95rem;
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .detail-value strong {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    color: var(--t-accent);
+    font-size: 1.05rem;
+  }
+
+  /* ─── PRICE BLOCK ─── */
+  .price-block {
+    background: linear-gradient(140deg, var(--panel) 0%, var(--panel-2) 100%);
+    border: 1px solid var(--line-bright);
+    padding: 32px 28px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .price-block::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100px; height: 2px;
+    background: var(--t-accent);
+    box-shadow: 0 0 15px var(--t-accent-glow);
+  }
+
+  .price-eyebrow {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 8px;
+  }
+
+  .price-amount {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 4rem;
+    line-height: 1;
+    margin-bottom: 4px;
+    color: var(--white);
+  }
+
+  .price-amount .currency {
+    color: var(--t-accent);
+    font-size: 2.5rem;
+  }
+
+  .price-detail {
+    font-size: 0.85rem;
+    color: var(--dim);
+    margin-bottom: 24px;
+  }
+
+  .price-includes {
+    list-style: none;
+    margin-bottom: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+  }
+
+  .price-includes li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 0;
+    font-size: 0.88rem;
+    color: var(--white);
+  }
+
+  .price-includes li .check {
+    width: 18px; height: 18px;
+    background: var(--t-accent);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    clip-path: polygon(4px 0%, 100% 0%, calc(100% - 4px) 100%, 0% 100%);
+  }
+
+  /* ─── PRIZE PODIUM ─── */
+  .prize-podium {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-top: 30px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .prize {
+    background: linear-gradient(180deg, var(--panel) 0%, var(--panel-2) 100%);
+    border: 1px solid var(--line);
+    padding: 22px 18px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .prize.first {
+    border-color: var(--gold);
+    background: linear-gradient(180deg, rgba(240,165,0,0.08) 0%, var(--panel-2) 100%);
+    transform: translateY(-12px);
+  }
+
+  .prize.first::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--gold);
+    box-shadow: 0 0 15px rgba(240,165,0,0.5);
+  }
+
+  .prize.second::before, .prize.third::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--line-bright);
+  }
+
+  .prize-rank {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 3rem;
+    line-height: 1;
+    margin-bottom: 4px;
+    color: var(--dim2);
+  }
+
+  .prize.first .prize-rank { color: var(--gold); }
+  .prize.second .prize-rank { color: var(--off); }
+  .prize.third .prize-rank { color: #cd7f32; }
+
+  .prize-amount {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 2rem;
+    color: var(--white);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .prize.first .prize-amount {
+    color: var(--gold);
+    text-shadow: 0 0 20px rgba(240,165,0,0.4);
+  }
+
+  .prize-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+
+  /* ─── REGLEMENT ─── */
+  .reglement-box {
+    background: linear-gradient(140deg, var(--panel) 0%, var(--panel-2) 100%);
+    border: 1px solid var(--line);
+    padding: 32px 36px;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  .reglement-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    width: 3px;
+    background: var(--t-accent);
+    box-shadow: 0 0 15px var(--t-accent-glow);
+  }
+
+  .reglement-content {
+    color: var(--off);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    columns: 2;
+    column-gap: 40px;
+    column-rule: 1px solid var(--line);
+  }
+
+  .reglement-content h4 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--white);
+    margin: 18px 0 8px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    break-after: avoid;
+  }
+
+  .reglement-content h4:first-child { margin-top: 0; }
+
+  .reglement-content p {
+    margin-bottom: 12px;
+    break-inside: avoid;
+  }
+
+  .reglement-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+  }
+
+  /* ─── LOCATION MAP ─── */
+  .location-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .map-placeholder {
+    aspect-ratio: 4/3;
+    background:
+      radial-gradient(ellipse 50% 30% at 50% 50%, rgba(20, 60, 80, 0.5) 0%, transparent 70%),
+      linear-gradient(135deg, #0a1620 0%, #0d2435 50%, #0a1a26 100%);
+    border: 1px solid var(--line-bright);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .map-placeholder::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(244,240,235,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(244,240,235,0.05) 1px, transparent 1px);
+    background-size: 30px 30px;
+    mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, #000 0%, transparent 100%);
+  }
+
+  .map-marker {
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px; height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .map-marker::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--t-accent);
+    border-radius: 50%;
+    opacity: 0.2;
+    animation: ping 2s ease-out infinite;
+  }
+
+  .map-marker::after {
+    content: '';
+    position: absolute;
+    inset: 18px;
+    background: var(--t-accent);
+    border-radius: 50%;
+    box-shadow: 0 0 20px var(--t-accent);
+  }
+
+  @keyframes ping {
+    0% { transform: scale(0.5); opacity: 0.6; }
+    100% { transform: scale(2); opacity: 0; }
+  }
+
+  .map-coords {
+    position: absolute;
+    bottom: 14px; left: 14px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    color: var(--dim);
+    background: rgba(0,0,0,0.6);
+    padding: 4px 10px;
+    border: 1px solid var(--line);
+  }
+
+  .location-info { }
+
+  .location-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 1.6rem;
+    margin-bottom: 6px;
+    letter-spacing: 0.5px;
+  }
+
+  .location-address {
+    color: var(--dim);
+    margin-bottom: 24px;
+  }
+
+  /* ─── FINAL CTA ─── */
+  .final-cta {
+    position: relative;
+    padding: 100px 32px;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .final-cta::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(232,33,43,0.15) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .final-cta-content {
+    position: relative;
+    z-index: 1;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .final-cta h2 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    line-height: 0.95;
+    margin-bottom: 16px;
+  }
+
+  .final-cta h2 .accent {
+    color: var(--t-accent);
+    text-shadow: 0 0 40px var(--t-accent-glow);
+  }
+
+  .final-cta p {
+    color: var(--dim);
+    font-size: 1.1rem;
+    margin-bottom: 32px;
+    line-height: 1.6;
+  }
+
+  .final-cta-actions {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* ─── SPONSORS ─── */
+  .sponsors {
+    padding: 50px 32px;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    background: rgba(10, 9, 8, 0.5);
+  }
+
+  .sponsors-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .sponsors-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.72rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 24px;
+  }
+
+  .sponsors-grid {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 60px;
+    flex-wrap: wrap;
+  }
+
+  .sponsor-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 1.4rem;
+    color: var(--dim2);
+    letter-spacing: 2px;
+    transition: color 0.2s;
+    cursor: pointer;
+  }
+
+  .sponsor-name:hover { color: var(--t-accent); }
+
+  /* ─── FOOTER ─── */
+  .footer {
+    padding: 40px 32px 30px;
+    text-align: center;
+    color: var(--dim);
+    font-size: 0.82rem;
+  }
+
+  .footer .logo {
+    justify-content: center;
+    margin-bottom: 12px;
+  }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 1000px) {
+    .hero-content { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+    .features { grid-template-columns: 1fr; }
+    .details { grid-template-columns: 1fr; gap: 40px; }
+    .prize-podium { grid-template-columns: 1fr; }
+    .prize.first { transform: none; }
+    .reglement-content { columns: 1; }
+    .location-grid { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 600px) {
+    .hero { padding: 90px 20px 40px; }
+    .section { padding: 60px 20px; }
+    .nav-inner { padding: 12px 20px; }
+    .info-card { padding: 24px 22px; }
+  }
+
+  ::-webkit-scrollbar { width: 10px; }
+  ::-webkit-scrollbar-track { background: var(--darker); }
+  ::-webkit-scrollbar-thumb { background: var(--line-bright); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--t-accent); }
+</style>
+</head>
+<body>
+
+<!-- ═══════ TOP NAV ═══════ -->
+<nav class="top-nav">
+  <div class="nav-inner">
+    <div class="logo">
+      <a href="carpstrike-index.html" style="display:inline-block;text-decoration:none" title="Accueil du prototype"><svg class="cs-logo" width="125" height="30" viewBox="0 0 540 130" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="CarpStrike" style="display:block">
+<path d="M10 70 L 70 70 L 80 70 L 88 54 L 98 90 L 108 70 L 150 70 L 165 70 L 178 38 L 192 104 L 206 70 L 250 70 L 262 70 L 275 14 L 290 120 L 305 70 L 330 70 L 345 70 L 356 50 L 367 88 L 377 70 L 430 70 L 445 70 L 456 56 L 466 84 L 476 70 L 530 70" stroke="#e8212b" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="270" y="84" font-family="'Barlow Condensed', sans-serif" font-size="56" font-weight="900" font-style="italic" fill="#f4f0eb" text-anchor="middle" stroke="#0a0908" stroke-width="7" paint-order="stroke">CARP<tspan fill="#e8212b">STRIKE</tspan></text>
+</svg></a>
+    </div>
+    <ul class="nav-links">
+      <li><a class="nav-link active" href="#hero">Présentation</a></li>
+      <li><a class="nav-link" href="#features">Highlights</a></li>
+      <li><a class="nav-link" href="#details">Détails</a></li>
+      <li><a class="nav-link" href="#prizes">Dotation</a></li>
+      <li><a class="nav-link" href="carpstrike-enduro-page.html">Règlement</a></li>
+      <li><a class="nav-link" href="#location">Lieu</a></li>
+    </ul>
+    <div class="nav-cta">
+      <button class="btn btn-ghost">Partager</button>
+      <button class="btn btn-primary">S'inscrire →</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════ HERO ═══════ -->
+<section class="hero" id="hero">
+  <div class="hero-bg">
+    <div class="hero-bg-image"></div>
+    <div class="hero-water"></div>
+    <div class="hero-particles"></div>
+    <div class="hero-glow"></div>
+    <div class="hero-grid"></div>
+  </div>
+  <div class="hero-watermark">LAC BLEU</div>
+
+  <div class="hero-content">
+    <div>
+      <div class="hero-meta">
+        <div class="meta-pill">
+          <div class="dot"></div>
+          Inscriptions ouvertes
+        </div>
+        <div class="meta-tag">National · 72h</div>
+        <div class="meta-tag">Édition 2026</div>
+      </div>
+
+      <div class="hero-eyebrow">Grand Enduro Carpe — 4ème édition</div>
+
+      <h1 class="hero-title">
+        Grand Enduro<br>
+        du <span class="accent">Lac Bleu</span>
+      </h1>
+
+      <p class="hero-subtitle">
+        72 heures de pêche intense sur l'un des plus beaux étangs des Hautes-Pyrénées. 24 équipes, 4 secteurs, une dotation de 8 000 €. La compétition de référence de la saison.
+      </p>
+
+      <div class="hero-actions">
+        <button class="btn btn-primary btn-large">S'inscrire — 450 €</button>
+        <button class="btn btn-ghost btn-large">Télécharger le règlement</button>
+      </div>
+    </div>
+
+    <!-- Info card -->
+    <div class="info-card">
+      <div class="countdown-label">Début de l'enduro dans</div>
+      <div class="countdown">
+        <div class="countdown-cell">
+          <div class="countdown-num" id="cd-days">12</div>
+          <div class="countdown-unit">Jours</div>
+        </div>
+        <div class="countdown-cell">
+          <div class="countdown-num" id="cd-hours">06</div>
+          <div class="countdown-unit">Heures</div>
+        </div>
+        <div class="countdown-cell">
+          <div class="countdown-num" id="cd-mins">42</div>
+          <div class="countdown-unit">Min</div>
+        </div>
+        <div class="countdown-cell">
+          <div class="countdown-num" id="cd-secs">18</div>
+          <div class="countdown-unit">Sec</div>
+        </div>
+      </div>
+
+      <div class="info-divider"></div>
+
+      <div class="info-stats">
+        <div class="info-stat">
+          <div class="info-stat-icon">📅</div>
+          <div class="info-stat-text">
+            <div class="info-stat-val">28-30 Mai</div>
+            <div class="info-stat-lbl">Dates</div>
+          </div>
+        </div>
+        <div class="info-stat">
+          <div class="info-stat-icon">⏱</div>
+          <div class="info-stat-text">
+            <div class="info-stat-val">72h</div>
+            <div class="info-stat-lbl">Durée · 1 manche</div>
+          </div>
+        </div>
+        <div class="info-stat">
+          <div class="info-stat-icon">👥</div>
+          <div class="info-stat-text">
+            <div class="info-stat-val">24 équipes</div>
+            <div class="info-stat-lbl">Binômes · 4 cannes</div>
+          </div>
+        </div>
+        <div class="info-stat">
+          <div class="info-stat-icon">🏆</div>
+          <div class="info-stat-text">
+            <div class="info-stat-val">8 000 €</div>
+            <div class="info-stat-lbl">Dotation</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-progress">
+        <div class="progress-head">
+          <div class="progress-label">Inscriptions</div>
+          <div class="progress-val">18 / 24 équipes</div>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill"></div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary info-cta">Réserver mon binôme →</button>
+    </div>
+  </div>
+
+  <div class="scroll-indicator">
+    Découvrir
+    <div class="arrow">▼</div>
+  </div>
+</section>
+
+<!-- ═══════ FEATURES (Highlights) ═══════ -->
+<section class="section" id="features">
+  <div class="section-bg">
+    <div class="section-bg-text">SPECS</div>
+  </div>
+
+  <div class="section-eyebrow">Ce qui vous attend</div>
+  <h2 class="section-title">Une compétition <span class="accent">d'exception</span></h2>
+
+  <div class="features">
+    <div class="feature reveal">
+      <div class="feature-num">01</div>
+      <div class="feature-icon">🌊</div>
+      <div class="feature-title">Plan d'eau exclusif</div>
+      <div class="feature-desc">25 hectares d'eau réservée aux participants. Profondeurs variées, fond vaseux, herbiers — un terrain de jeu parfait pour la grosse carpe.</div>
+    </div>
+    <div class="feature reveal">
+      <div class="feature-num">02</div>
+      <div class="feature-icon">⚡</div>
+      <div class="feature-title">Suivi 100% live</div>
+      <div class="feature-desc">Chaque prise validée apparaît instantanément au classement. Spectateurs et familles suivent l'enduro en temps réel.</div>
+    </div>
+    <div class="feature reveal">
+      <div class="feature-num">03</div>
+      <div class="feature-icon">🍽</div>
+      <div class="feature-title">Repas inclus</div>
+      <div class="feature-desc">Tous les repas du vendredi soir au dimanche midi pris en charge. Cuisine traditionnelle locale, espace convivial sous chapiteau.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ DETAILS ═══════ -->
+<section class="section" id="details">
+  <div class="section-bg">
+    <div class="section-bg-text">INFOS</div>
+  </div>
+
+  <div class="section-eyebrow">Toutes les infos pratiques</div>
+  <h2 class="section-title">Détails de <span class="accent">l'enduro</span></h2>
+
+  <div class="details">
+    <!-- Left col -->
+    <div class="details-col reveal">
+      <h3><span class="bar"></span>Format & règles</h3>
+      <ul class="detail-list">
+        <li class="detail-row">
+          <div class="detail-label">Durée</div>
+          <div class="detail-value"><strong>72h</strong> en continu</div>
+        </li>
+        <li class="detail-row">
+          <div class="detail-label">Manches</div>
+          <div class="detail-value"><strong>1 seule</strong> manche unique</div>
+        </li>
+        <li class="detail-row">
+          <div class="detail-label">Type d'eau</div>
+          <div class="detail-value">Plan d'eau · <strong>25 ha</strong></div>
+        </li>
+        <li class="detail-row">
+          <div class="detail-label">Équipes</div>
+          <div class="detail-value"><strong>24</strong> binômes</div>
+        </li>
+        <li class="detail-row">
+          <div class="detail-label">Cannes / équipe</div>
+          <div class="detail-value"><strong>4 cannes</strong> max</div>
+        </li>
+        <li class="detail-row">
+          <div class="detail-label">Secteurs</div>
+          <div class="detail-value"><strong>4 secteurs</strong> (A, B, C, D)</div>
+        </li>
+        <li class="detail-row">
+          <div class="detail-label">Classement</div>
+          <div class="detail-value">Général + par secteur</div>
+        </li>
+        <li class="detail-row">
+          <div class="detail-label">Attribution</div>
+          <div class="detail-value">🎲 Tirage au sort unique</div>
+        </li>
+        <li class="detail-row">
+          <div class="detail-label">Maille mini</div>
+          <div class="detail-value"><strong>3 kg</strong> minimum</div>
+        </li>
+        <li class="detail-row">
+          <div class="detail-label">Espèces</div>
+          <div class="detail-value">Carpe commune, miroir, cuir</div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Right col: Price block -->
+    <div class="reveal">
+      <div class="price-block">
+        <div class="price-eyebrow">Inscription par équipe</div>
+        <div class="price-amount">450<span class="currency">€</span></div>
+        <div class="price-detail">Tarif par binôme · Paiement sécurisé en ligne</div>
+        <ul class="price-includes">
+          <li><span class="check">✓</span> Pêche 72h sur le plan d'eau</li>
+          <li><span class="check">✓</span> Tous les repas inclus</li>
+          <li><span class="check">✓</span> Café et boissons à volonté</li>
+          <li><span class="check">✓</span> Sac de bienvenue partenaires</li>
+          <li><span class="check">✓</span> Trophée pour les podiums</li>
+          <li><span class="check">✓</span> Suivi live des classements</li>
+        </ul>
+        <button class="btn btn-primary" style="width: 100%; padding: 14px; justify-content: center;">Réserver maintenant →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Prize podium -->
+  <div id="prizes" style="margin-top: 60px;">
+    <div class="section-eyebrow" style="margin-bottom: 14px;">8 000 € de récompenses</div>
+    <h3 style="font-family: 'Barlow Condensed'; font-weight: 900; font-style: italic; font-size: 2rem; margin-bottom: 30px; letter-spacing: -0.5px;">
+      Les <span style="color: var(--gold); text-shadow: 0 0 30px rgba(240,165,0,0.4);">récompenses</span>
+    </h3>
+    <div class="prize-podium">
+      <div class="prize second reveal">
+        <div class="prize-rank">02</div>
+        <div class="prize-amount">2 000 €</div>
+        <div class="prize-label">+ Lots partenaires</div>
+      </div>
+      <div class="prize first reveal">
+        <div class="prize-rank">01</div>
+        <div class="prize-amount">4 000 €</div>
+        <div class="prize-label">+ Trophée + Lots</div>
+      </div>
+      <div class="prize third reveal">
+        <div class="prize-rank">03</div>
+        <div class="prize-amount">1 000 €</div>
+        <div class="prize-label">+ Lots partenaires</div>
+      </div>
+    </div>
+    <div style="text-align: center; margin-top: 20px; color: var(--dim); font-size: 0.85rem;">
+      + 1 000 € répartis en prix spéciaux : grosse prise · meilleur secteur · plus jeune équipe
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ RÈGLEMENT ═══════ -->
+<section class="section" id="reglement">
+  <div class="section-bg">
+    <div class="section-bg-text">RULES</div>
+  </div>
+
+  <div class="section-eyebrow">À lire avant inscription</div>
+  <h2 class="section-title">Règlement <span class="accent">officiel</span></h2>
+
+  <div class="reglement-box reveal">
+    <div class="reglement-content">
+      <h4>Conditions d'accès</h4>
+      <p>Toute équipe inscrite est composée de deux pêcheurs majeurs. Une licence de pêche en cours de validité est obligatoire. L'organisateur se réserve le droit de refuser toute inscription jugée non conforme.</p>
+
+      <h4>Matériel autorisé</h4>
+      <p>Maximum 4 cannes par équipe (2 par pêcheur). Hameçons sans ardillon obligatoires. Tapis de réception, épuisette à carpes et matelas de pesée fournis par l'organisateur. Bait-boats autorisés.</p>
+
+      <h4>Horaires & déroulement</h4>
+      <p>Accueil le vendredi à partir de 14h. Tirage au sort à 16h, mise en place sur les postes de 17h à 19h. Pêche autorisée du vendredi 20h au lundi 20h, soit 72h continues.</p>
+
+      <h4>Pesée des prises</h4>
+      <p>Toute prise supérieure à 3 kg doit être déclarée immédiatement au commissaire de secteur. Pesée effectuée sur tapis humidifié, photo obligatoire. Le poisson est ensuite remis à l'eau avec soin.</p>
+
+      <h4>Comportement & sécurité</h4>
+      <p>Respect du calme entre 22h et 7h. Aucune nuisance sonore tolérée. Port du gilet de sauvetage obligatoire pour toute mise à l'eau. Site à laisser propre, tri des déchets.</p>
+
+      <h4>Sanctions</h4>
+      <p>Tout manquement au règlement peut entraîner un avertissement, une pénalité (déduction de poids) ou une disqualification immédiate. Décision du jury sans appel. Les équipes pénalisées ne peuvent prétendre à aucun remboursement.</p>
+    </div>
+
+    <div class="reglement-actions">
+      <button class="btn btn-primary">Télécharger le PDF complet</button>
+      <button class="btn btn-ghost">Imprimer</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ LOCATION ═══════ -->
+<section class="section" id="location">
+  <div class="section-bg">
+    <div class="section-bg-text">SPOT</div>
+  </div>
+
+  <div class="section-eyebrow">Comment nous trouver</div>
+  <h2 class="section-title">Le <span class="accent">spot</span></h2>
+
+  <div class="location-grid">
+    <div class="reveal">
+      <div class="map-placeholder">
+        <div class="map-marker"></div>
+        <div class="map-coords">43.0942° N · 0.1432° E</div>
+      </div>
+    </div>
+    <div class="location-info reveal">
+      <h3 style="font-family: 'Barlow Condensed'; font-weight: 700; font-style: italic; font-size: 1.6rem; margin-bottom: 6px;">
+        Étang de Tournay
+      </h3>
+      <div class="location-address">65190 Tournay, Hautes-Pyrénées</div>
+
+      <ul class="detail-list">
+        <li class="detail-row">
+          <div class="detail-label">Surface</div>
+          <div class="detail-value"><strong>25 ha</strong> de plan d'eau</div>
+        </li>
+        <li class="detail-row">
+          <div class="detail-label">Profondeur</div>
+          <div class="detail-value">2 à <strong>8 mètres</strong></div>
+        </li>
+        <li class="detail-row">
+          <div class="detail-label">Accès</div>
+          <div class="detail-value">A64 sortie 14, puis 8 km</div>
+        </li>
+        <li class="detail-row">
+          <div class="detail-label">Parking</div>
+          <div class="detail-value">Gratuit · sur place</div>
+        </li>
+        <li class="detail-row">
+          <div class="detail-label">Sanitaires</div>
+          <div class="detail-value">Douches & WC sur site</div>
+        </li>
+      </ul>
+
+      <div style="display: flex; gap: 10px; margin-top: 24px;">
+        <button class="btn btn-primary">Voir l'itinéraire</button>
+        <button class="btn btn-ghost">Plan des postes</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ SPONSORS ═══════ -->
+<section class="sponsors">
+  <div class="sponsors-inner">
+    <div class="sponsors-label">Avec le soutien de nos partenaires</div>
+    <div class="sponsors-grid">
+      <div class="sponsor-name">FOX INTERNATIONAL</div>
+      <div class="sponsor-name">STARBAITS</div>
+      <div class="sponsor-name">NASH TACKLE</div>
+      <div class="sponsor-name">CARP SPIRIT</div>
+      <div class="sponsor-name">PRO LOGIC</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ FINAL CTA ═══════ -->
+<section class="final-cta">
+  <div class="final-cta-content">
+    <div class="section-eyebrow" style="justify-content: center;">Plus que 6 places disponibles</div>
+    <h2>
+      Rejoignez<br>
+      l'enduro <span class="accent">2026</span>
+    </h2>
+    <p>
+      18 équipes ont déjà réservé leur place. Les inscriptions ferment le 20 mai à minuit, ou dès que les 24 places sont prises.
+    </p>
+    <div class="final-cta-actions">
+      <button class="btn btn-primary btn-large">S'inscrire maintenant — 450 €</button>
+      <button class="btn btn-ghost btn-large">Poser une question</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ FOOTER ═══════ -->
+<footer class="footer">
+  <div class="logo">
+    <a href="carpstrike-index.html" style="display:inline-block;text-decoration:none" title="Accueil du prototype"><svg class="cs-logo" width="125" height="30" viewBox="0 0 540 130" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="CarpStrike" style="display:block">
+<path d="M10 70 L 70 70 L 80 70 L 88 54 L 98 90 L 108 70 L 150 70 L 165 70 L 178 38 L 192 104 L 206 70 L 250 70 L 262 70 L 275 14 L 290 120 L 305 70 L 330 70 L 345 70 L 356 50 L 367 88 L 377 70 L 430 70 L 445 70 L 456 56 L 466 84 L 476 70 L 530 70" stroke="#e8212b" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="270" y="84" font-family="'Barlow Condensed', sans-serif" font-size="56" font-weight="900" font-style="italic" fill="#f4f0eb" text-anchor="middle" stroke="#0a0908" stroke-width="7" paint-order="stroke">CARP<tspan fill="#e8212b">STRIKE</tspan></text>
+</svg></a>
+  </div>
+  <div>Page propulsée par CarpStrike · © 2026 · <a href="#" style="color: var(--t-accent); text-decoration: none;">Mentions légales</a></div>
+</footer>
+
+<!-- ═══════ THEME SWITCHER ═══════ -->
+<div class="theme-switcher">
+  <div class="switcher-label">Thème</div>
+  <div class="switcher-options">
+    <div class="switcher-opt active" data-set="lac-bleu" data-name="Lac Bleu" onclick="setTheme(this, '')"></div>
+    <div class="switcher-opt" data-set="forest" data-name="Forêt" onclick="setTheme(this, 'forest')"></div>
+    <div class="switcher-opt" data-set="sunset" data-name="Coucher" onclick="setTheme(this, 'sunset')"></div>
+    <div class="switcher-opt" data-set="night" data-name="Nuit" onclick="setTheme(this, 'night')"></div>
+  </div>
+  <div class="switcher-name" id="switcher-name">Lac Bleu</div>
+</div>
+
+<script>
+  // Theme switcher
+  function setTheme(el, themeName) {
+    document.querySelectorAll('.switcher-opt').forEach(o => o.classList.remove('active'));
+    el.classList.add('active');
+    if (themeName) {
+      document.body.setAttribute('data-theme', themeName);
+    } else {
+      document.body.removeAttribute('data-theme');
+    }
+    document.getElementById('switcher-name').textContent = el.dataset.name;
+
+    // Update watermark text based on theme
+    const watermarks = {
+      '': 'LAC BLEU',
+      'forest': 'FORÊT',
+      'sunset': 'SUNSET',
+      'night': 'NUIT'
+    };
+    const wm = document.querySelector('.hero-watermark');
+    if (wm) wm.textContent = watermarks[themeName || ''];
+  }
+</script>
+
+<script>
+  // Reveal on scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.15 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Countdown
+  function updateCountdown() {
+    const target = new Date('2026-05-28T17:00:00');
+    const now = new Date();
+    const diff = target - now;
+
+    if (diff <= 0) return;
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+    document.getElementById('cd-days').textContent = String(days).padStart(2, '0');
+    document.getElementById('cd-hours').textContent = String(hours).padStart(2, '0');
+    document.getElementById('cd-mins').textContent = String(mins).padStart(2, '0');
+    document.getElementById('cd-secs').textContent = String(secs).padStart(2, '0');
+  }
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
+  // Nav active on scroll
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-link');
+
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(section => {
+      const sectionTop = section.offsetTop;
+      if (window.scrollY >= sectionTop - 200) {
+        current = section.getAttribute('id');
+      }
+    });
+    navLinks.forEach(link => {
+      link.classList.remove('active');
+      if (link.getAttribute('href') === '#' + current) {
+        link.classList.add('active');
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

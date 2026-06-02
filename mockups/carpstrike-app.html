@@ -1,0 +1,3514 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CarpStrike — L'enduro de pêche à la carpe en live</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,900;1,700;1,900&family=Barlow:wght@300;400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #e8212b;
+    --red-bright: #ff2d3a;
+    --red-dim: rgba(232,33,43,0.15);
+    --red-glow: rgba(232,33,43,0.4);
+    --white: #f4f0eb;
+    --off: #c8c0b4;
+    --dim: rgba(244,240,235,0.5);
+    --dim2: rgba(244,240,235,0.25);
+    --dark: #0a0908;
+    --darker: #060504;
+    --panel: #141310;
+    --panel-2: #1a1814;
+    --line: rgba(244,240,235,0.07);
+    --line-bright: rgba(244,240,235,0.15);
+    --gold: #f0a500;
+    --green: #00c850;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--darker);
+    font-family: 'Barlow', sans-serif;
+    color: var(--white);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ─── BACKGROUND ATMOSPHERE ─── */
+  .bg-atmosphere {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 0%, rgba(232,33,43,0.12) 0%, transparent 50%),
+      radial-gradient(ellipse 60% 80% at 100% 100%, rgba(232,33,43,0.08) 0%, transparent 50%),
+      linear-gradient(180deg, #0a0908 0%, #060504 100%);
+  }
+
+  .bg-grid {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background-image:
+      linear-gradient(rgba(244,240,235,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(244,240,235,0.025) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, #000 0%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, #000 0%, transparent 80%);
+  }
+
+  .bg-noise {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+    opacity: 0.04;
+    pointer-events: none;
+  }
+
+  /* ─── HEADER / NAV ─── */
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,9,8,0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .nav {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .logo-carp {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 1.6rem;
+    color: var(--white);
+    letter-spacing: 1px;
+    line-height: 1;
+  }
+
+  .logo-strike {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 1.6rem;
+    color: var(--red);
+    letter-spacing: 1px;
+    line-height: 1;
+    text-shadow: 0 0 20px var(--red-glow);
+  }
+
+  .logo-slash {
+    width: 3px;
+    height: 22px;
+    background: var(--red);
+    transform: skewX(-10deg);
+    margin: 0 8px;
+    box-shadow: 0 0 10px var(--red-glow);
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 4px;
+    list-style: none;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .nav-link {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--dim);
+    padding: 8px 16px;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.2s;
+    text-decoration: none;
+  }
+
+  .nav-link:hover { color: var(--white); }
+
+  .nav-link.active { color: var(--white); }
+
+  .nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: -17px;
+    left: 16px;
+    right: 16px;
+    height: 2px;
+    background: var(--red);
+    box-shadow: 0 0 10px var(--red-glow);
+  }
+
+  .nav-cta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 10px 22px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: inherit;
+    background: none;
+  }
+
+  .btn-ghost {
+    color: var(--white);
+    border: 1px solid var(--line-bright);
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  }
+
+  .btn-ghost:hover {
+    border-color: var(--white);
+    background: rgba(244,240,235,0.05);
+  }
+
+  .btn-primary {
+    background: var(--red);
+    color: #fff;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    box-shadow: 0 0 20px var(--red-glow);
+  }
+
+  .btn-primary:hover {
+    background: var(--red-bright);
+    box-shadow: 0 0 30px var(--red-glow);
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    position: relative;
+    padding: 80px 32px 60px;
+    max-width: 1280px;
+    margin: 0 auto;
+    overflow: hidden;
+  }
+
+  .hero-bg-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: clamp(8rem, 22vw, 22rem);
+    color: rgba(244,240,235,0.025);
+    line-height: 0.85;
+    letter-spacing: -8px;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 0;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 20px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .hero-eyebrow::before {
+    content: '';
+    width: 30px;
+    height: 1px;
+    background: var(--red);
+  }
+
+  .hero-eyebrow .live-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--red);
+    box-shadow: 0 0 10px var(--red);
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.7); }
+  }
+
+  .hero-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    line-height: 0.95;
+    letter-spacing: -1px;
+    margin-bottom: 24px;
+    animation: fadeUp 0.6s 0.1s ease both;
+  }
+
+  .hero-title .accent {
+    color: var(--red);
+    text-shadow: 0 0 40px var(--red-glow);
+    position: relative;
+  }
+
+  .hero-title .accent::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--red);
+    transform: skewX(-10deg);
+    opacity: 0.3;
+  }
+
+  .hero-desc {
+    font-size: 1.05rem;
+    color: var(--dim);
+    line-height: 1.6;
+    max-width: 480px;
+    margin-bottom: 32px;
+    animation: fadeUp 0.6s 0.2s ease both;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 12px;
+    animation: fadeUp 0.6s 0.3s ease both;
+  }
+
+  .btn-large {
+    font-size: 0.95rem;
+    padding: 14px 28px;
+  }
+
+  /* ─── LOGIN CARD ─── */
+  .login-card {
+    position: relative;
+    background: linear-gradient(140deg, var(--panel) 0%, var(--panel-2) 100%);
+    border: 1px solid var(--line-bright);
+    padding: 32px 28px;
+    clip-path: polygon(20px 0%, 100% 0%, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0% 100%, 0% 20px);
+    animation: fadeUp 0.6s 0.4s ease both;
+    overflow: hidden;
+  }
+
+  .login-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 60px; height: 2px;
+    background: var(--red);
+    box-shadow: 0 0 15px var(--red-glow);
+  }
+
+  .login-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; right: 0;
+    width: 60px; height: 2px;
+    background: var(--red);
+    box-shadow: 0 0 15px var(--red-glow);
+  }
+
+  .login-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 24px;
+  }
+
+  .login-tab {
+    flex: 1;
+    text-align: center;
+    padding: 10px 0;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.78rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--dim2);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: all 0.2s;
+  }
+
+  .login-tab.active {
+    color: var(--white);
+    border-bottom-color: var(--red);
+  }
+
+  .login-tab:hover { color: var(--white); }
+
+  .login-icon {
+    text-align: center;
+    margin-bottom: 16px;
+  }
+
+  .login-icon-shape {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px; height: 50px;
+    background: var(--red-dim);
+    border: 1px solid var(--red);
+    color: var(--red);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 1.5rem;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  }
+
+  .login-title {
+    text-align: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 1.3rem;
+    margin-bottom: 4px;
+    letter-spacing: 1px;
+  }
+
+  .login-sub {
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--dim2);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 22px;
+  }
+
+  .field {
+    margin-bottom: 14px;
+  }
+
+  .field label {
+    display: block;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 6px;
+  }
+
+  .field input {
+    width: 100%;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid var(--line);
+    padding: 12px 14px;
+    color: var(--white);
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.9rem;
+    transition: border-color 0.2s, background 0.2s;
+    outline: none;
+  }
+
+  .field input:focus {
+    border-color: var(--red);
+    background: rgba(0,0,0,0.6);
+    box-shadow: 0 0 0 3px var(--red-dim);
+  }
+
+  .field input::placeholder { color: var(--dim2); }
+
+  .field-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: -4px 0 16px;
+    font-size: 0.75rem;
+  }
+
+  .checkbox {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--dim);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .checkbox input { accent-color: var(--red); }
+
+  .forgot {
+    color: var(--red);
+    text-decoration: none;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+  }
+
+  .forgot:hover { text-decoration: underline; }
+
+  .btn-block {
+    width: 100%;
+    text-align: center;
+    padding: 13px;
+    font-size: 0.9rem;
+  }
+
+  .login-foot {
+    text-align: center;
+    margin-top: 18px;
+    font-size: 0.78rem;
+    color: var(--dim);
+  }
+
+  .login-foot a {
+    color: var(--red);
+    text-decoration: none;
+    font-weight: 600;
+    margin-left: 4px;
+  }
+
+  .login-foot a:hover { text-decoration: underline; }
+
+  /* ─── ORGANIZE CARD ─── */
+  .organize-card {
+    position: relative;
+    background:
+      radial-gradient(ellipse at top right, rgba(232,33,43,0.18) 0%, transparent 60%),
+      linear-gradient(140deg, var(--panel) 0%, var(--panel-2) 100%);
+    border: 1px solid var(--line-bright);
+    padding: 32px 30px;
+    clip-path: polygon(20px 0%, 100% 0%, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0% 100%, 0% 20px);
+    animation: fadeUp 0.6s 0.4s ease both;
+    overflow: hidden;
+  }
+
+  .organize-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 80px; height: 2px;
+    background: var(--red);
+    box-shadow: 0 0 15px var(--red-glow);
+  }
+
+  .organize-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; right: 0;
+    width: 80px; height: 2px;
+    background: var(--red);
+    box-shadow: 0 0 15px var(--red-glow);
+  }
+
+  .organize-badge {
+    position: absolute;
+    top: 18px; right: 22px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.6rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--red);
+    border: 1px solid var(--red);
+    padding: 3px 9px;
+    background: var(--red-dim);
+    clip-path: polygon(5px 0%, 100% 0%, calc(100% - 5px) 100%, 0% 100%);
+  }
+
+  .organize-icon {
+    width: 56px; height: 56px;
+    background: var(--red-dim);
+    border: 1px solid var(--red);
+    color: var(--red);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 18px;
+    clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+    box-shadow: 0 0 25px rgba(232,33,43,0.2);
+  }
+
+  .organize-icon svg {
+    width: 28px; height: 28px;
+  }
+
+  .organize-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 2.2rem;
+    line-height: 1;
+    letter-spacing: -0.5px;
+    margin-bottom: 14px;
+  }
+
+  .organize-title .accent {
+    color: var(--red);
+    text-shadow: 0 0 30px var(--red-glow);
+  }
+
+  .organize-desc {
+    font-size: 0.92rem;
+    color: var(--dim);
+    line-height: 1.5;
+    margin-bottom: 20px;
+  }
+
+  .organize-features {
+    list-style: none;
+    margin-bottom: 24px;
+    padding: 16px 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .organize-features li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
+    color: var(--white);
+    padding: 5px 0;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+
+  .organize-features .check {
+    width: 18px; height: 18px;
+    background: var(--red);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    clip-path: polygon(4px 0%, 100% 0%, calc(100% - 4px) 100%, 0% 100%);
+  }
+
+  .organize-btn {
+    margin-bottom: 14px;
+  }
+
+  .organize-foot {
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--dim);
+  }
+
+  .organize-foot strong {
+    color: var(--white);
+    font-weight: 700;
+  }
+
+  /* ─── MODAL OVERLAY ─── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(6, 5, 4, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+
+  .modal-overlay.active {
+    display: flex;
+    opacity: 1;
+  }
+
+  .modal {
+    position: relative;
+    background: linear-gradient(140deg, var(--panel) 0%, var(--panel-2) 100%);
+    border: 1px solid var(--line-bright);
+    width: 100%;
+    max-width: 460px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 36px 36px 32px;
+    clip-path: polygon(20px 0%, 100% 0%, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0% 100%, 0% 20px);
+    transform: translateY(20px) scale(0.97);
+    transition: transform 0.3s ease;
+  }
+
+  .modal-wide {
+    max-width: 720px;
+  }
+
+  .modal-overlay.active .modal {
+    transform: translateY(0) scale(1);
+  }
+
+  .modal::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 90px; height: 2px;
+    background: var(--red);
+    box-shadow: 0 0 15px var(--red-glow);
+  }
+
+  .modal::after {
+    content: '';
+    position: absolute;
+    bottom: 0; right: 0;
+    width: 90px; height: 2px;
+    background: var(--red);
+    box-shadow: 0 0 15px var(--red-glow);
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 16px; right: 18px;
+    width: 32px; height: 32px;
+    background: transparent;
+    border: 1px solid var(--line-bright);
+    color: var(--dim);
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .modal-close:hover {
+    border-color: var(--red);
+    color: var(--red);
+  }
+
+  .modal-eyebrow {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .modal-eyebrow::before {
+    content: '';
+    width: 24px;
+    height: 1px;
+    background: var(--red);
+  }
+
+  .modal-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 1.9rem;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .modal-sub {
+    color: var(--dim);
+    font-size: 0.9rem;
+    margin-bottom: 24px;
+  }
+
+  /* Step indicator */
+  .step-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 22px;
+  }
+
+  .step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--dim2);
+  }
+
+  .step-num {
+    width: 22px; height: 22px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: var(--dim2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+  }
+
+  .step.done .step-num,
+  .step.active .step-num {
+    background: var(--red);
+    border-color: var(--red);
+    color: #fff;
+    box-shadow: 0 0 12px var(--red-glow);
+  }
+
+  .step.active { color: var(--white); }
+  .step.done { color: var(--white); }
+
+  .step-line {
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+  }
+
+  .step-line.done { background: var(--red); }
+
+  /* Choice cards */
+  .choice-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 8px;
+  }
+
+  .choice-card {
+    position: relative;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--line);
+    padding: 22px 20px 20px;
+    cursor: pointer;
+    transition: all 0.25s;
+    overflow: hidden;
+    text-align: left;
+  }
+
+  .choice-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--red);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s;
+  }
+
+  .choice-card:hover {
+    border-color: var(--red);
+    background: rgba(232,33,43,0.05);
+    transform: translateY(-3px);
+  }
+
+  .choice-card:hover::before { transform: scaleX(1); }
+
+  .choice-icon {
+    width: 44px; height: 44px;
+    background: var(--red-dim);
+    border: 1px solid var(--red);
+    color: var(--red);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  }
+
+  .choice-icon svg {
+    width: 22px; height: 22px;
+  }
+
+  .choice-tag {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 4px;
+  }
+
+  .choice-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 1.25rem;
+    line-height: 1.1;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+  }
+
+  .choice-desc {
+    font-size: 0.82rem;
+    color: var(--dim);
+    line-height: 1.5;
+    margin-bottom: 14px;
+  }
+
+  .choice-features {
+    list-style: none;
+    border-top: 1px solid var(--line);
+    padding-top: 12px;
+  }
+
+  .choice-features li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 0.78rem;
+    color: var(--white);
+    padding: 4px 0;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 500;
+  }
+
+  .choice-features li::before {
+    content: '✓';
+    color: var(--red);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .choice-cta {
+    margin-top: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--red);
+    padding-top: 10px;
+    border-top: 1px solid var(--line);
+  }
+
+  .choice-cta::after {
+    content: '→';
+    font-size: 1.2rem;
+    transition: transform 0.2s;
+  }
+
+  .choice-card:hover .choice-cta::after { transform: translateX(4px); }
+
+  .choice-recommended {
+    position: absolute;
+    top: 12px; right: 12px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    background: rgba(240,165,0,0.12);
+    border: 1px solid rgba(240,165,0,0.4);
+    padding: 2px 7px;
+  }
+
+  /* ─── CONFIG FORM (Step 3) ─── */
+  .modal-xl {
+    max-width: 820px;
+  }
+
+  .form-section {
+    margin-bottom: 24px;
+    padding-bottom: 22px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .form-section:last-of-type {
+    border-bottom: none;
+    margin-bottom: 12px;
+  }
+
+  .form-section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 1.05rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--white);
+    margin-bottom: 16px;
+  }
+
+  .form-section-num {
+    width: 22px; height: 22px;
+    background: var(--red);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 700;
+    font-style: normal;
+    flex-shrink: 0;
+    box-shadow: 0 0 12px var(--red-glow);
+  }
+
+  .form-grid {
+    display: grid;
+    gap: 14px;
+  }
+
+  .grid-2 { grid-template-columns: 1fr 1fr; }
+  .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+  .field-config {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .field-config label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    font-size: 0.72rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 6px;
+  }
+
+  .field-config label .req {
+    color: var(--red);
+    font-size: 0.9rem;
+  }
+
+  .field-config label .optional {
+    font-size: 0.6rem;
+    color: var(--dim2);
+    text-transform: none;
+    letter-spacing: 1px;
+    margin-left: auto;
+    font-weight: 500;
+  }
+
+  .field-config input,
+  .field-config select,
+  .field-config textarea {
+    width: 100%;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid var(--line);
+    padding: 11px 13px;
+    color: var(--white);
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.88rem;
+    transition: all 0.2s;
+    outline: none;
+  }
+
+  .field-config input:focus,
+  .field-config select:focus,
+  .field-config textarea:focus {
+    border-color: var(--red);
+    background: rgba(0,0,0,0.6);
+    box-shadow: 0 0 0 3px var(--red-dim);
+  }
+
+  .field-config input::placeholder,
+  .field-config textarea::placeholder { color: var(--dim2); }
+
+  .field-config select {
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23e8212b' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+  }
+
+  .field-config textarea {
+    resize: vertical;
+    min-height: 70px;
+    font-family: 'Barlow', sans-serif;
+  }
+
+  .input-with-suffix {
+    position: relative;
+  }
+
+  .input-with-suffix input {
+    padding-right: 50px;
+  }
+
+  .input-with-suffix .suffix {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.75rem;
+    color: var(--red);
+    letter-spacing: 1px;
+    pointer-events: none;
+  }
+
+  /* Radio / toggle pills */
+  .pill-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .pill {
+    flex: 1;
+    min-width: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--line);
+    padding: 11px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    font-size: 0.82rem;
+    color: var(--dim);
+    letter-spacing: 1px;
+    text-align: center;
+    user-select: none;
+  }
+
+  .pill:hover {
+    color: var(--white);
+    border-color: var(--line-bright);
+  }
+
+  .pill.active {
+    background: var(--red-dim);
+    color: var(--red);
+    border-color: var(--red);
+    box-shadow: 0 0 12px rgba(232,33,43,0.15);
+  }
+
+  .pill input {
+    display: none;
+  }
+
+  .pill .icon {
+    font-size: 1rem;
+  }
+
+  /* Conditional reveals */
+  .conditional {
+    display: none;
+    animation: slideIn 0.3s ease;
+  }
+
+  .conditional.show {
+    display: block;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .help-text {
+    font-size: 0.72rem;
+    color: var(--dim);
+    margin-top: 5px;
+    font-style: italic;
+  }
+
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--line);
+    margin-bottom: 10px;
+  }
+
+  .toggle-row-label {
+    flex: 1;
+  }
+
+  .toggle-row-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--white);
+    letter-spacing: 1px;
+  }
+
+  .toggle-row-desc {
+    font-size: 0.75rem;
+    color: var(--dim);
+    margin-top: 2px;
+  }
+
+  .switch {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    background: var(--line);
+    cursor: pointer;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+
+  .switch::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    background: var(--white);
+    transition: transform 0.2s;
+  }
+
+  .switch.on {
+    background: var(--red);
+  }
+
+  .switch.on::after {
+    transform: translateX(20px);
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+  }
+
+  .btn-back {
+    background: transparent;
+    border: 1px solid var(--line-bright);
+    color: var(--white);
+  }
+
+  .btn-back:hover {
+    border-color: var(--white);
+    background: rgba(244,240,235,0.05);
+  }
+
+  .summary-bar {
+    background: rgba(232,33,43,0.06);
+    border: 1px solid rgba(232,33,43,0.2);
+    border-left: 3px solid var(--red);
+    padding: 12px 16px;
+    margin-bottom: 22px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.82rem;
+  }
+
+  .summary-bar-icon {
+    color: var(--red);
+    font-size: 1.1rem;
+  }
+
+  .summary-bar strong {
+    color: var(--white);
+  }
+
+  /* ─── PHOTO UPLOAD ─── */
+  .photo-upload {
+    position: relative;
+    border: 2px dashed var(--line-bright);
+    background: rgba(0,0,0,0.3);
+    padding: 28px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s;
+    overflow: hidden;
+  }
+
+  .photo-upload:hover {
+    border-color: var(--red);
+    background: rgba(232,33,43,0.04);
+  }
+
+  .photo-upload.has-file {
+    border-style: solid;
+    border-color: var(--red);
+    background: rgba(232,33,43,0.06);
+    padding: 16px 18px;
+    text-align: left;
+  }
+
+  .photo-upload input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .upload-icon {
+    width: 44px; height: 44px;
+    background: var(--red-dim);
+    color: var(--red);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    margin-bottom: 12px;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  }
+
+  .upload-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 1rem;
+    letter-spacing: 1px;
+    color: var(--white);
+    margin-bottom: 4px;
+  }
+
+  .upload-desc {
+    font-size: 0.78rem;
+    color: var(--dim);
+  }
+
+  .upload-formats {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.68rem;
+    color: var(--dim2);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-top: 8px;
+  }
+
+  .upload-preview {
+    display: none;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .photo-upload.has-file .upload-preview { display: flex; }
+  .photo-upload.has-file .upload-empty { display: none; }
+
+  .upload-thumb {
+    width: 56px; height: 56px;
+    background: var(--panel);
+    border: 1px solid var(--line-bright);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--red);
+    font-size: 1.4rem;
+    flex-shrink: 0;
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  }
+
+  .upload-info { flex: 1; min-width: 0; }
+
+  .upload-filename {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.88rem;
+    color: var(--white);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .upload-size {
+    font-size: 0.75rem;
+    color: var(--dim);
+    margin-top: 2px;
+  }
+
+  .upload-remove {
+    background: transparent;
+    border: 1px solid var(--line-bright);
+    color: var(--dim);
+    padding: 6px 12px;
+    cursor: pointer;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    font-size: 0.72rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    z-index: 2;
+    position: relative;
+  }
+
+  .upload-remove:hover {
+    color: var(--red);
+    border-color: var(--red);
+  }
+
+  /* ─── THEME PICKER ─── */
+  .theme-picker {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .theme-card {
+    position: relative;
+    cursor: pointer;
+    border: 2px solid var(--line);
+    overflow: hidden;
+    transition: all 0.25s;
+    background: rgba(0,0,0,0.3);
+  }
+
+  .theme-card:hover {
+    border-color: var(--line-bright);
+    transform: translateY(-3px);
+  }
+
+  .theme-card.active {
+    border-color: var(--red);
+    box-shadow: 0 0 0 3px var(--red-dim), 0 8px 24px rgba(0,0,0,0.5);
+  }
+
+  .theme-card input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .theme-preview {
+    height: 110px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .theme-preview::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size: 20px 20px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, #000 0%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, #000 0%, transparent 80%);
+  }
+
+  .theme-preview-glow {
+    position: absolute;
+    bottom: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 160px;
+    height: 80px;
+    border-radius: 50%;
+    filter: blur(20px);
+    opacity: 0.6;
+  }
+
+  .theme-preview-bar {
+    position: absolute;
+    top: 0; left: 0;
+    width: 50%; height: 2px;
+  }
+
+  .theme-preview-text {
+    position: absolute;
+    bottom: 12px; left: 12px;
+    right: 12px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 1.4rem;
+    line-height: 1;
+    color: rgba(255,255,255,0.9);
+    letter-spacing: -0.5px;
+    z-index: 1;
+  }
+
+  .theme-preview-text .accent {
+    display: block;
+    font-size: 0.85rem;
+    margin-top: 2px;
+    letter-spacing: 0.5px;
+  }
+
+  /* Lac Bleu */
+  .theme-preview.lac-bleu {
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 100%, rgba(20, 60, 80, 0.4) 0%, transparent 60%),
+      linear-gradient(180deg, #0a1620 0%, #0d2435 60%, #050403 100%);
+  }
+  .theme-preview.lac-bleu .theme-preview-glow { background: rgba(232, 33, 43, 0.6); }
+  .theme-preview.lac-bleu .theme-preview-bar { background: #e8212b; box-shadow: 0 0 8px rgba(232,33,43,0.6); }
+  .theme-preview.lac-bleu .theme-preview-text .accent { color: #e8212b; }
+
+  /* Forest */
+  .theme-preview.forest {
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 100%, rgba(40, 100, 70, 0.35) 0%, transparent 60%),
+      linear-gradient(180deg, #0d1a14 0%, #1a2e22 60%, #050403 100%);
+  }
+  .theme-preview.forest .theme-preview-glow { background: rgba(46, 168, 102, 0.6); }
+  .theme-preview.forest .theme-preview-bar { background: #2ea866; box-shadow: 0 0 8px rgba(46,168,102,0.6); }
+  .theme-preview.forest .theme-preview-text .accent { color: #2ea866; }
+
+  /* Sunset */
+  .theme-preview.sunset {
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 100%, rgba(180, 90, 30, 0.35) 0%, transparent 60%),
+      linear-gradient(180deg, #1f0d05 0%, #2e1810 60%, #050403 100%);
+  }
+  .theme-preview.sunset .theme-preview-glow { background: rgba(255, 140, 26, 0.6); }
+  .theme-preview.sunset .theme-preview-bar { background: #ff8c1a; box-shadow: 0 0 8px rgba(255,140,26,0.6); }
+  .theme-preview.sunset .theme-preview-text .accent { color: #ff8c1a; }
+
+  /* Night */
+  .theme-preview.night {
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 100%, rgba(80, 50, 140, 0.35) 0%, transparent 60%),
+      linear-gradient(180deg, #0d0a1f 0%, #1a142e 60%, #050403 100%);
+  }
+  .theme-preview.night .theme-preview-glow { background: rgba(155, 107, 255, 0.6); }
+  .theme-preview.night .theme-preview-bar { background: #9b6bff; box-shadow: 0 0 8px rgba(155,107,255,0.6); }
+  .theme-preview.night .theme-preview-text .accent { color: #9b6bff; }
+
+  .theme-info {
+    padding: 10px 14px;
+    border-top: 1px solid var(--line);
+    background: rgba(0,0,0,0.3);
+  }
+
+  .theme-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+    color: var(--white);
+  }
+
+  .theme-desc {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.7rem;
+    color: var(--dim);
+    letter-spacing: 0.5px;
+    margin-top: 1px;
+  }
+
+  .theme-card .check-mark {
+    position: absolute;
+    top: 8px; right: 8px;
+    width: 24px; height: 24px;
+    background: var(--red);
+    color: #fff;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+    z-index: 2;
+    clip-path: polygon(5px 0%, 100% 0%, calc(100% - 5px) 100%, 0% 100%);
+    box-shadow: 0 0 12px var(--red-glow);
+  }
+
+  .theme-card.active .check-mark { display: flex; }
+
+  /* ─── SPONSOR BANNER ─── */
+  .sponsor-banner {
+    max-width: 1280px;
+    margin: 0 auto 40px;
+    padding: 0 32px;
+  }
+
+  .banner-card {
+    position: relative;
+    background: linear-gradient(95deg, #1a1410 0%, #2a1a14 50%, #1a1410 100%);
+    border: 1px solid rgba(240,165,0,0.2);
+    padding: 18px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    overflow: hidden;
+    clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+  }
+
+  .banner-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -50%;
+    width: 200%; height: 100%;
+    background: linear-gradient(90deg, transparent 30%, rgba(240,165,0,0.08) 50%, transparent 70%);
+    animation: shine 6s ease-in-out infinite;
+  }
+
+  @keyframes shine {
+    0%, 100% { transform: translateX(-30%); }
+    50% { transform: translateX(30%); }
+  }
+
+  .banner-tag {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.65rem;
+    color: rgba(240,165,0,0.6);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    border: 1px solid rgba(240,165,0,0.3);
+    padding: 3px 8px;
+    flex-shrink: 0;
+  }
+
+  .banner-content { flex: 1; position: relative; }
+
+  .banner-brand {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 1.2rem;
+    color: var(--gold);
+    letter-spacing: 1px;
+  }
+
+  .banner-text {
+    font-size: 0.85rem;
+    color: var(--dim);
+    margin-top: 2px;
+  }
+
+  .banner-cta {
+    flex-shrink: 0;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    border: 1px solid var(--gold);
+    padding: 8px 18px;
+    text-decoration: none;
+    transition: all 0.2s;
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  }
+
+  .banner-cta:hover {
+    background: var(--gold);
+    color: #1a1410;
+  }
+
+  /* ─── SECTION ─── */
+  .section {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 60px 32px;
+  }
+
+  .section-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+  }
+
+  .section-titles { }
+
+  .section-eyebrow {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-eyebrow::before {
+    content: '';
+    width: 24px;
+    height: 1px;
+    background: var(--red);
+  }
+
+  .section-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 2.5rem;
+    line-height: 1;
+    letter-spacing: -1px;
+  }
+
+  /* ─── SEARCH BAR ─── */
+  .search {
+    display: flex;
+    align-items: center;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 4px;
+    min-width: 380px;
+    clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+  }
+
+  .search:focus-within {
+    border-color: var(--red);
+    box-shadow: 0 0 0 3px var(--red-dim);
+  }
+
+  .search input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 10px 14px;
+    color: var(--white);
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.9rem;
+    outline: none;
+  }
+
+  .search input::placeholder { color: var(--dim2); }
+
+  .search-btn {
+    background: var(--red);
+    color: #fff;
+    border: none;
+    padding: 8px 18px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  }
+
+  /* ─── FILTERS ─── */
+  .filters {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  .filter-chip {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: var(--dim);
+    cursor: pointer;
+    transition: all 0.2s;
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  }
+
+  .filter-chip:hover { color: var(--white); border-color: var(--line-bright); }
+
+  .filter-chip.active {
+    background: var(--red-dim);
+    color: var(--red);
+    border-color: var(--red);
+  }
+
+  /* ─── ENDURO CARDS ─── */
+  .enduros-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 16px;
+  }
+
+  .enduro {
+    position: relative;
+    background: linear-gradient(140deg, var(--panel) 0%, var(--panel-2) 100%);
+    border: 1px solid var(--line);
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .enduro::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    width: 3px;
+    background: var(--red);
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform 0.3s;
+  }
+
+  .enduro:hover {
+    border-color: var(--line-bright);
+    transform: translateY(-3px);
+  }
+
+  .enduro:hover::before { transform: scaleY(1); }
+
+  .enduro-top {
+    padding: 16px 20px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--line);
+    background:
+      radial-gradient(ellipse at top right, rgba(232,33,43,0.06) 0%, transparent 60%);
+  }
+
+  .enduro-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .status-live { color: var(--red); }
+  .status-soon { color: var(--gold); }
+  .status-open { color: var(--green); }
+
+  .status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+  }
+
+  .status-live .status-dot {
+    background: var(--red);
+    box-shadow: 0 0 8px var(--red);
+    animation: pulse 1.2s ease-in-out infinite;
+  }
+
+  .status-soon .status-dot { background: var(--gold); }
+  .status-open .status-dot { background: var(--green); }
+
+  .enduro-cat {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.65rem;
+    color: var(--dim2);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .enduro-body {
+    padding: 18px 20px 20px;
+  }
+
+  .enduro-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 1.4rem;
+    line-height: 1.1;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+  }
+
+  .enduro-meta {
+    display: flex;
+    gap: 14px;
+    font-size: 0.78rem;
+    color: var(--dim);
+    margin-bottom: 16px;
+  }
+
+  .enduro-meta span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .enduro-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+  }
+
+  .enduro-stat-val {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 1.3rem;
+    line-height: 1;
+    color: var(--white);
+  }
+
+  .enduro-stat-val.red { color: var(--red); }
+
+  .enduro-stat-lbl {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.6rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--dim2);
+    margin-top: 2px;
+  }
+
+  .enduro-cta {
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--red);
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+  }
+
+  .enduro-cta::after {
+    content: '→';
+    font-size: 1.2rem;
+    transition: transform 0.2s;
+  }
+
+  .enduro:hover .enduro-cta::after { transform: translateX(4px); }
+
+  /* ─── SPONSOR INLINE BANNER ─── */
+  .inline-banner {
+    grid-column: 1 / -1;
+    background: linear-gradient(95deg, #0d1a2a 0%, #14283e 50%, #0d1a2a 100%);
+    border: 1px solid rgba(80, 160, 240, 0.2);
+    padding: 22px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    position: relative;
+    overflow: hidden;
+    clip-path: polygon(15px 0%, 100% 0%, calc(100% - 15px) 100%, 0% 100%);
+  }
+
+  .inline-banner::before {
+    content: 'PUBLICITÉ';
+    position: absolute;
+    top: 8px; left: 14px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.55rem;
+    letter-spacing: 3px;
+    color: rgba(255,255,255,0.25);
+  }
+
+  .inline-banner-left {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex: 1;
+  }
+
+  .inline-banner-icon {
+    width: 50px; height: 50px;
+    background: rgba(80,160,240,0.15);
+    border: 1px solid rgba(80,160,240,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  }
+
+  .inline-banner-text { }
+
+  .inline-banner-brand {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 1.25rem;
+    color: #6cb0f0;
+    letter-spacing: 1px;
+  }
+
+  .inline-banner-desc {
+    font-size: 0.82rem;
+    color: var(--dim);
+    margin-top: 2px;
+  }
+
+  .inline-banner-cta {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #6cb0f0;
+    border: 1px solid #6cb0f0;
+    padding: 9px 20px;
+    text-decoration: none;
+    transition: all 0.2s;
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+    flex-shrink: 0;
+  }
+
+  .inline-banner-cta:hover {
+    background: #6cb0f0;
+    color: #0d1a2a;
+  }
+
+  /* ─── FOOTER ─── */
+  .footer {
+    border-top: 1px solid var(--line);
+    margin-top: 60px;
+    padding: 40px 32px 30px;
+    background: var(--darker);
+  }
+
+  .footer-content {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 32px;
+  }
+
+  .footer-brand-text {
+    color: var(--dim);
+    font-size: 0.85rem;
+    line-height: 1.6;
+    margin-top: 16px;
+    max-width: 320px;
+  }
+
+  .footer-col h4 {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.78rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--white);
+    margin-bottom: 14px;
+  }
+
+  .footer-col ul {
+    list-style: none;
+  }
+
+  .footer-col li {
+    margin-bottom: 8px;
+  }
+
+  .footer-col a {
+    color: var(--dim);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: color 0.2s;
+  }
+
+  .footer-col a:hover { color: var(--red); }
+
+  .footer-bottom {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.78rem;
+    color: var(--dim2);
+  }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 900px) {
+    .hero-content { grid-template-columns: 1fr; gap: 40px; }
+    .nav-links { display: none; }
+    .footer-content { grid-template-columns: 1fr 1fr; }
+    .section-head { flex-direction: column; align-items: stretch; }
+    .search { min-width: 0; width: 100%; }
+    .nav { padding: 14px 20px; gap: 12px; }
+    .hero, .section, .sponsor-banner { padding-left: 20px; padding-right: 20px; }
+    .banner-card { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .inline-banner { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-atmosphere"></div>
+<div class="bg-grid"></div>
+<div class="bg-noise"></div>
+
+<!-- ═══════ HEADER ═══════ -->
+<header class="header">
+  <nav class="nav">
+    <div class="logo">
+      <a href="carpstrike-index.html" style="display:inline-block;text-decoration:none" title="Accueil du prototype"><svg class="cs-logo" width="125" height="30" viewBox="0 0 540 130" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="CarpStrike" style="display:block">
+<path d="M10 70 L 70 70 L 80 70 L 88 54 L 98 90 L 108 70 L 150 70 L 165 70 L 178 38 L 192 104 L 206 70 L 250 70 L 262 70 L 275 14 L 290 120 L 305 70 L 330 70 L 345 70 L 356 50 L 367 88 L 377 70 L 430 70 L 445 70 L 456 56 L 466 84 L 476 70 L 530 70" stroke="#e8212b" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="270" y="84" font-family="'Barlow Condensed', sans-serif" font-size="56" font-weight="900" font-style="italic" fill="#f4f0eb" text-anchor="middle" stroke="#0a0908" stroke-width="7" paint-order="stroke">CARP<tspan fill="#e8212b">STRIKE</tspan></text>
+</svg></a>
+    </div>
+    <ul class="nav-links">
+      <li><a class="nav-link active" href="carpstrike-app.html">Accueil</a></li>
+      <li><a class="nav-link" href="carpstrike-classement-live.html">En direct</a></li>
+      <li><a class="nav-link" href="carpstrike-recherche.html">À venir</a></li>
+      <li><a class="nav-link" href="carpstrike-classement-live.html">Classements</a></li>
+      <li><a class="nav-link" href="carpstrike-enduro-page.html">Règlement</a></li>
+    </ul>
+    <div class="nav-cta">
+      <!-- État déconnecté (par défaut) -->
+      <div id="nav-logged-out" style="display: flex; gap: 10px;">
+        <button class="btn btn-ghost" onclick="simulateLogin()">Inscription</button>
+        <button class="btn btn-primary" onclick="simulateLogin()">Connexion</button>
+      </div>
+
+      <!-- État connecté (caché par défaut) -->
+      <div id="nav-logged-in" style="display: none; align-items: center; gap: 12px;">
+        <a href="carpstrike-profil-pecheur.html" style="display: flex; align-items: center; gap: 10px; padding: 5px 14px 5px 5px; background: var(--panel); border: 1px solid var(--line); text-decoration: none; color: var(--white); transition: all 0.2s; cursor: pointer;" onmouseover="this.style.borderColor='var(--red)'" onmouseout="this.style.borderColor='var(--line)'">
+          <div style="width: 30px; height: 30px; background: linear-gradient(135deg, var(--red) 0%, #8a1820 100%); color: #fff; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-style: italic; font-size: 0.85rem;">JM</div>
+          <div>
+            <div style="font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 0.82rem; line-height: 1.1;">Jean Martin</div>
+            <div style="font-size: 0.65rem; color: var(--dim); letter-spacing: 1px; text-transform: uppercase;">Mon profil →</div>
+          </div>
+        </a>
+        <button class="btn btn-ghost" onclick="simulateLogout()" style="padding: 8px 14px; font-size: 0.7rem;">Déconnexion</button>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<!-- ═══════ HERO + LOGIN ═══════ -->
+<section class="hero">
+  <div class="hero-bg-text">CARPSTRIKE</div>
+  <div class="hero-content">
+    <div>
+      <div class="hero-eyebrow">
+        <div class="live-dot"></div>
+        3 enduros en direct maintenant
+      </div>
+      <h1 class="hero-title">
+        L'enduro carpe<br>
+        en <span class="accent">live</span>, sans temps mort.
+      </h1>
+      <p class="hero-desc">
+        Suivez les classements minute par minute. Organisez vos compétitions, validez les prises sur le terrain, partagez les résultats avec votre communauté — tout au même endroit.
+      </p>
+      <div class="hero-actions">
+        <button class="btn btn-primary btn-large">Voir les enduros live</button>
+        <button class="btn btn-ghost btn-large">Comment ça marche</button>
+      </div>
+    </div>
+
+    <!-- ORGANIZE ENDURO CARD -->
+    <div class="organize-card">
+      <div class="organize-badge">Organisateurs</div>
+      <div class="organize-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+          <path d="M2 17l10 5 10-5"/>
+          <path d="M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <h3 class="organize-title">Organisez<br>votre <span class="accent">enduro</span></h3>
+      <p class="organize-desc">
+        Créez votre compétition, gérez les équipes, attribuez les secteurs et suivez les prises en temps réel. Tout est centralisé.
+      </p>
+
+      <ul class="organize-features">
+        <li><span class="check">✓</span> Gestion complète des inscriptions</li>
+        <li><span class="check">✓</span> Validation des prises par commissaires</li>
+        <li><span class="check">✓</span> Classements live partagés en un clic</li>
+        <li><span class="check">✓</span> Statistiques et records automatiques</li>
+      </ul>
+
+      <button class="btn btn-primary btn-block organize-btn">Organiser un enduro</button>
+
+      <div class="organize-foot">
+        Plus de <strong>240 enduros</strong> organisés avec CarpStrike
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ TOP SPONSOR BANNER ═══════ -->
+<div class="sponsor-banner">
+  <div class="banner-card">
+    <div class="banner-tag">Partenaire officiel</div>
+    <div class="banner-content">
+      <div class="banner-brand">FOX INTERNATIONAL</div>
+      <div class="banner-text">-20% sur la gamme cannes carpe Horizon X4 jusqu'au 15 mai · Code CARPSTRIKE20</div>
+    </div>
+    <a href="#" class="banner-cta">Voir l'offre →</a>
+  </div>
+</div>
+
+<!-- ═══════ ENDUROS EN DIRECT ═══════ -->
+<section class="section" id="live">
+  <div class="section-head">
+    <div class="section-titles">
+      <div class="section-eyebrow">
+        <div class="live-dot" style="width:6px;height:6px;border-radius:50%;background:var(--red);box-shadow:0 0 8px var(--red);animation:pulse 1.2s infinite;"></div>
+        En ce moment
+      </div>
+      <h2 class="section-title">Enduros <span style="color:var(--red);">en direct</span></h2>
+    </div>
+    <div class="search">
+      <input type="text" placeholder="Rechercher un enduro live, une équipe, un lieu...">
+      <button class="search-btn">Chercher</button>
+    </div>
+  </div>
+
+  <div class="filters">
+    <div class="filter-chip active">Tous</div>
+    <div class="filter-chip">48h</div>
+    <div class="filter-chip">72h</div>
+    <div class="filter-chip">96h</div>
+    <div class="filter-chip">National</div>
+    <div class="filter-chip">Régional</div>
+  </div>
+
+  <div class="enduros-grid">
+    <div class="enduro">
+      <div class="enduro-top">
+        <div class="enduro-status status-live">
+          <div class="status-dot"></div>
+          Live · 36h restant
+        </div>
+        <div class="enduro-cat">National · 72h</div>
+      </div>
+      <div class="enduro-body">
+        <div class="enduro-title">Grand Enduro du Lac Bleu</div>
+        <div class="enduro-meta">
+          <span>📍 Étang de Tournay</span>
+          <span>📅 28-30 Avril</span>
+        </div>
+        <div class="enduro-stats">
+          <div>
+            <div class="enduro-stat-val red">24</div>
+            <div class="enduro-stat-lbl">Équipes</div>
+          </div>
+          <div>
+            <div class="enduro-stat-val">187</div>
+            <div class="enduro-stat-lbl">Prises</div>
+          </div>
+          <div>
+            <div class="enduro-stat-val">42.6<span style="font-size:0.7rem;color:var(--dim);">kg</span></div>
+            <div class="enduro-stat-lbl">Leader</div>
+          </div>
+        </div>
+        <div class="enduro-cta">Suivre en direct</div>
+      </div>
+    </div>
+
+    <div class="enduro">
+      <div class="enduro-top">
+        <div class="enduro-status status-live">
+          <div class="status-dot"></div>
+          Live · 12h restant
+        </div>
+        <div class="enduro-cat">Régional · 48h</div>
+      </div>
+      <div class="enduro-body">
+        <div class="enduro-title">Challenge des Brotteaux</div>
+        <div class="enduro-meta">
+          <span>📍 Lac de Saint-Cassien</span>
+          <span>📅 27-29 Avril</span>
+        </div>
+        <div class="enduro-stats">
+          <div>
+            <div class="enduro-stat-val red">16</div>
+            <div class="enduro-stat-lbl">Équipes</div>
+          </div>
+          <div>
+            <div class="enduro-stat-val">94</div>
+            <div class="enduro-stat-lbl">Prises</div>
+          </div>
+          <div>
+            <div class="enduro-stat-val">38.1<span style="font-size:0.7rem;color:var(--dim);">kg</span></div>
+            <div class="enduro-stat-lbl">Leader</div>
+          </div>
+        </div>
+        <div class="enduro-cta">Suivre en direct</div>
+      </div>
+    </div>
+
+    <div class="enduro">
+      <div class="enduro-top">
+        <div class="enduro-status status-live">
+          <div class="status-dot"></div>
+          Live · 60h restant
+        </div>
+        <div class="enduro-cat">National · 96h</div>
+      </div>
+      <div class="enduro-body">
+        <div class="enduro-title">Carpe Master du Sud-Ouest</div>
+        <div class="enduro-meta">
+          <span>📍 Lac de Lacanau</span>
+          <span>📅 27-31 Avril</span>
+        </div>
+        <div class="enduro-stats">
+          <div>
+            <div class="enduro-stat-val red">32</div>
+            <div class="enduro-stat-lbl">Équipes</div>
+          </div>
+          <div>
+            <div class="enduro-stat-val">142</div>
+            <div class="enduro-stat-lbl">Prises</div>
+          </div>
+          <div>
+            <div class="enduro-stat-val">51.3<span style="font-size:0.7rem;color:var(--dim);">kg</span></div>
+            <div class="enduro-stat-lbl">Leader</div>
+          </div>
+        </div>
+        <div class="enduro-cta">Suivre en direct</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ ENDUROS À VENIR ═══════ -->
+<section class="section" id="upcoming">
+  <div class="section-head">
+    <div class="section-titles">
+      <div class="section-eyebrow">Prochaines compétitions</div>
+      <h2 class="section-title">Enduros <span style="color:var(--red);">à venir</span></h2>
+    </div>
+    <div class="search">
+      <input type="text" placeholder="Rechercher par nom, lieu, date...">
+      <button class="search-btn">Chercher</button>
+    </div>
+  </div>
+
+  <div class="filters">
+    <div class="filter-chip active">Tous</div>
+    <div class="filter-chip">Cette semaine</div>
+    <div class="filter-chip">Ce mois</div>
+    <div class="filter-chip">3 mois</div>
+    <div class="filter-chip">Inscriptions ouvertes</div>
+  </div>
+
+  <div class="enduros-grid">
+    <div class="enduro">
+      <div class="enduro-top">
+        <div class="enduro-status status-open">
+          <div class="status-dot"></div>
+          Inscriptions ouvertes
+        </div>
+        <div class="enduro-cat">National · 72h</div>
+      </div>
+      <div class="enduro-body">
+        <div class="enduro-title">Trophée de Madine</div>
+        <div class="enduro-meta">
+          <span>📍 Lac de Madine</span>
+          <span>📅 15-17 Mai 2026</span>
+        </div>
+        <div class="enduro-stats">
+          <div>
+            <div class="enduro-stat-val red">18<span style="font-size:0.7rem;color:var(--dim);">/30</span></div>
+            <div class="enduro-stat-lbl">Inscrits</div>
+          </div>
+          <div>
+            <div class="enduro-stat-val">450€</div>
+            <div class="enduro-stat-lbl">Inscription</div>
+          </div>
+          <div>
+            <div class="enduro-stat-val">8K€</div>
+            <div class="enduro-stat-lbl">Dotation</div>
+          </div>
+        </div>
+        <div class="enduro-cta">S'inscrire</div>
+      </div>
+    </div>
+
+    <div class="enduro">
+      <div class="enduro-top">
+        <div class="enduro-status status-soon">
+          <div class="status-dot"></div>
+          Bientôt complet
+        </div>
+        <div class="enduro-cat">Régional · 48h</div>
+      </div>
+      <div class="enduro-body">
+        <div class="enduro-title">Open des Étangs Mosellans</div>
+        <div class="enduro-meta">
+          <span>📍 Étang de Lindre</span>
+          <span>📅 22-24 Mai 2026</span>
+        </div>
+        <div class="enduro-stats">
+          <div>
+            <div class="enduro-stat-val red">22<span style="font-size:0.7rem;color:var(--dim);">/24</span></div>
+            <div class="enduro-stat-lbl">Inscrits</div>
+          </div>
+          <div>
+            <div class="enduro-stat-val">280€</div>
+            <div class="enduro-stat-lbl">Inscription</div>
+          </div>
+          <div>
+            <div class="enduro-stat-val">4K€</div>
+            <div class="enduro-stat-lbl">Dotation</div>
+          </div>
+        </div>
+        <div class="enduro-cta">S'inscrire</div>
+      </div>
+    </div>
+
+    <!-- INLINE SPONSOR BANNER -->
+    <div class="inline-banner">
+      <div class="inline-banner-left">
+        <div class="inline-banner-icon">🎣</div>
+        <div class="inline-banner-text">
+          <div class="inline-banner-brand">STARBAITS PRO</div>
+          <div class="inline-banner-desc">Bouillettes, pellets, additifs — Livraison offerte dès 80€ sur tout le catalogue</div>
+        </div>
+      </div>
+      <a href="#" class="inline-banner-cta">Découvrir →</a>
+    </div>
+
+    <div class="enduro">
+      <div class="enduro-top">
+        <div class="enduro-status status-open">
+          <div class="status-dot"></div>
+          Inscriptions ouvertes
+        </div>
+        <div class="enduro-cat">National · 96h</div>
+      </div>
+      <div class="enduro-body">
+        <div class="enduro-title">Coupe de France Carpe 2026</div>
+        <div class="enduro-meta">
+          <span>📍 Lac du Der</span>
+          <span>📅 5-9 Juin 2026</span>
+        </div>
+        <div class="enduro-stats">
+          <div>
+            <div class="enduro-stat-val red">42<span style="font-size:0.7rem;color:var(--dim);">/64</span></div>
+            <div class="enduro-stat-lbl">Inscrits</div>
+          </div>
+          <div>
+            <div class="enduro-stat-val">650€</div>
+            <div class="enduro-stat-lbl">Inscription</div>
+          </div>
+          <div>
+            <div class="enduro-stat-val">25K€</div>
+            <div class="enduro-stat-lbl">Dotation</div>
+          </div>
+        </div>
+        <div class="enduro-cta">S'inscrire</div>
+      </div>
+    </div>
+
+    <div class="enduro">
+      <div class="enduro-top">
+        <div class="enduro-status status-open">
+          <div class="status-dot"></div>
+          Inscriptions ouvertes
+        </div>
+        <div class="enduro-cat">Régional · 72h</div>
+      </div>
+      <div class="enduro-body">
+        <div class="enduro-title">Enduro des Gravières d'Alsace</div>
+        <div class="enduro-meta">
+          <span>📍 Plobsheim</span>
+          <span>📅 12-14 Juin 2026</span>
+        </div>
+        <div class="enduro-stats">
+          <div>
+            <div class="enduro-stat-val red">12<span style="font-size:0.7rem;color:var(--dim);">/20</span></div>
+            <div class="enduro-stat-lbl">Inscrits</div>
+          </div>
+          <div>
+            <div class="enduro-stat-val">320€</div>
+            <div class="enduro-stat-lbl">Inscription</div>
+          </div>
+          <div>
+            <div class="enduro-stat-val">5K€</div>
+            <div class="enduro-stat-lbl">Dotation</div>
+          </div>
+        </div>
+        <div class="enduro-cta">S'inscrire</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ FOOTER ═══════ -->
+<footer class="footer">
+  <div class="footer-content">
+    <div>
+      <div class="logo">
+        <a href="carpstrike-index.html" style="display:inline-block;text-decoration:none" title="Accueil du prototype"><svg class="cs-logo" width="125" height="30" viewBox="0 0 540 130" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="CarpStrike" style="display:block">
+<path d="M10 70 L 70 70 L 80 70 L 88 54 L 98 90 L 108 70 L 150 70 L 165 70 L 178 38 L 192 104 L 206 70 L 250 70 L 262 70 L 275 14 L 290 120 L 305 70 L 330 70 L 345 70 L 356 50 L 367 88 L 377 70 L 430 70 L 445 70 L 456 56 L 466 84 L 476 70 L 530 70" stroke="#e8212b" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="270" y="84" font-family="'Barlow Condensed', sans-serif" font-size="56" font-weight="900" font-style="italic" fill="#f4f0eb" text-anchor="middle" stroke="#0a0908" stroke-width="7" paint-order="stroke">CARP<tspan fill="#e8212b">STRIKE</tspan></text>
+</svg></a>
+      </div>
+      <p class="footer-brand-text">
+        La plateforme dédiée à l'organisation et au suivi en direct des enduros de pêche à la carpe. Pour les organisateurs, les commissaires et les pêcheurs passionnés.
+      </p>
+    </div>
+    <div class="footer-col">
+      <h4>Compétitions</h4>
+      <ul>
+        <li><a href="#">Enduros en direct</a></li>
+        <li><a href="#">Calendrier</a></li>
+        <li><a href="#">Classements</a></li>
+        <li><a href="#">Records</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Espace Pro</h4>
+      <ul>
+        <li><a href="#">Organisateurs</a></li>
+        <li><a href="#">Commissaires</a></li>
+        <li><a href="#">Tarifs</a></li>
+        <li><a href="#">Documentation</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="#">Support</a></li>
+        <li><a href="#">Partenariats</a></li>
+        <li><a href="#">Mentions légales</a></li>
+        <li><a href="#">CGU</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div>© 2026 CarpStrike — Tous droits réservés</div>
+    <div>Made with passion for carp anglers 🎣</div>
+  </div>
+</footer>
+
+<!-- ═══════ MODAL 1 : AUTH (Connexion / Inscription) ═══════ -->
+<div class="modal-overlay" id="modal-auth">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-auth')">✕</button>
+
+    <div class="step-bar">
+      <div class="step active">
+        <div class="step-num">1</div>
+        Compte
+      </div>
+      <div class="step-line"></div>
+      <div class="step">
+        <div class="step-num">2</div>
+        Choix
+      </div>
+      <div class="step-line"></div>
+      <div class="step">
+        <div class="step-num">3</div>
+        Enduro
+      </div>
+    </div>
+
+    <div class="modal-eyebrow">Étape 1 sur 3</div>
+    <h2 class="modal-title">Accédez à votre <span style="color:var(--red);">espace</span></h2>
+    <p class="modal-sub">Connectez-vous ou créez un compte pour organiser votre enduro.</p>
+
+    <div class="login-tabs">
+      <div class="login-tab active" onclick="switchAuthTab(this, 'auth-login')">Connexion</div>
+      <div class="login-tab" onclick="switchAuthTab(this, 'auth-signup')">Inscription</div>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div id="auth-login">
+      <div class="field">
+        <label>Identifiant ou email</label>
+        <input type="text" placeholder="votre.identifiant">
+      </div>
+      <div class="field">
+        <label>Mot de passe</label>
+        <input type="password" placeholder="••••••••••">
+      </div>
+      <div class="field-row">
+        <label class="checkbox">
+          <input type="checkbox"> Rester connecté
+        </label>
+        <a href="#" class="forgot">Mot de passe oublié ?</a>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="goToChoice()">Se connecter</button>
+      <div class="login-foot">
+        Pas encore de compte ?<a href="#" onclick="switchAuthTab(document.querySelectorAll('#modal-auth .login-tab')[1], 'auth-signup'); return false;">Créer un compte</a>
+      </div>
+    </div>
+
+    <!-- SIGNUP FORM -->
+    <div id="auth-signup" style="display:none;">
+      <div class="field">
+        <label>Nom complet</label>
+        <input type="text" placeholder="Prénom Nom">
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" placeholder="vous@exemple.fr">
+      </div>
+      <div class="field">
+        <label>Téléphone</label>
+        <input type="tel" placeholder="06 12 34 56 78">
+      </div>
+      <div class="field">
+        <label>Mot de passe</label>
+        <input type="password" placeholder="Minimum 8 caractères">
+      </div>
+      <div class="field-row">
+        <label class="checkbox">
+          <input type="checkbox"> J'accepte les conditions d'utilisation
+        </label>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="goToChoice()">Créer mon compte</button>
+      <div class="login-foot">
+        Déjà inscrit ?<a href="#" onclick="switchAuthTab(document.querySelectorAll('#modal-auth .login-tab')[0], 'auth-login'); return false;">Se connecter</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ MODAL 2 : CHOICE (Inscriptions ou Gestion seule) ═══════ -->
+<div class="modal-overlay" id="modal-choice">
+  <div class="modal modal-wide">
+    <button class="modal-close" onclick="closeModal('modal-choice')">✕</button>
+
+    <div class="step-bar">
+      <div class="step done">
+        <div class="step-num">✓</div>
+        Compte
+      </div>
+      <div class="step-line done"></div>
+      <div class="step active">
+        <div class="step-num">2</div>
+        Choix
+      </div>
+      <div class="step-line"></div>
+      <div class="step">
+        <div class="step-num">3</div>
+        Enduro
+      </div>
+    </div>
+
+    <div class="modal-eyebrow">Étape 2 sur 3</div>
+    <h2 class="modal-title">Comment souhaitez-vous <span style="color:var(--red);">utiliser</span> CarpStrike ?</h2>
+    <p class="modal-sub">Choisissez le mode qui correspond à votre besoin. Vous pourrez le modifier plus tard.</p>
+
+    <div class="choice-grid">
+
+      <!-- OPTION A: Inscriptions ouvertes -->
+      <div class="choice-card" onclick="selectMode('public')">
+        <div class="choice-recommended">★ Recommandé</div>
+        <div class="choice-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 00-3-3.87"/>
+            <path d="M16 3.13a4 4 0 010 7.75"/>
+          </svg>
+        </div>
+        <div class="choice-tag">Tout-en-un</div>
+        <div class="choice-title">Lancer les inscriptions sur CarpStrike</div>
+        <div class="choice-desc">
+          Vous gérez tout via la plateforme : les pêcheurs s'inscrivent en ligne et vous suivez l'enduro en direct.
+        </div>
+        <ul class="choice-features">
+          <li>Inscriptions en ligne automatisées</li>
+          <li>Paiements sécurisés intégrés</li>
+          <li>Gestion automatique des places</li>
+          <li>Promotion auprès de la communauté</li>
+          <li>Classements live publics</li>
+        </ul>
+        <div class="choice-cta">Choisir ce mode</div>
+      </div>
+
+      <!-- OPTION B: Gestion uniquement -->
+      <div class="choice-card" onclick="selectMode('manage-only')">
+        <div class="choice-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M9 11H5a2 2 0 00-2 2v7a2 2 0 002 2h14a2 2 0 002-2v-7a2 2 0 00-2-2h-4"/>
+            <polyline points="9 7 12 4 15 7"/>
+            <line x1="12" y1="4" x2="12" y2="15"/>
+          </svg>
+        </div>
+        <div class="choice-tag">Gestion seule</div>
+        <div class="choice-title">Gérer uniquement mon enduro</div>
+        <div class="choice-desc">
+          Vos équipes sont déjà inscrites par vos soins. Vous utilisez CarpStrike uniquement pour le suivi en direct.
+        </div>
+        <ul class="choice-features">
+          <li>Ajout manuel des équipes participantes</li>
+          <li>Validation des prises sur le terrain</li>
+          <li>Classements live publics</li>
+          <li>Page enduro visible par tous</li>
+          <li>Aucune gestion d'inscription en ligne</li>
+        </ul>
+        <div class="choice-cta">Choisir ce mode</div>
+      </div>
+
+    </div>
+
+    <div style="text-align:center;margin-top:18px;font-size:0.78rem;color:var(--dim);">
+      Besoin d'aide ? <a href="#" style="color:var(--red);text-decoration:none;font-weight:600;">Comparer les deux modes en détail</a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ MODAL 3 : CONFIG ENDURO ═══════ -->
+<div class="modal-overlay" id="modal-config">
+  <div class="modal modal-xl">
+    <button class="modal-close" onclick="closeModal('modal-config')">✕</button>
+
+    <div class="step-bar">
+      <div class="step done">
+        <div class="step-num">✓</div>
+        Compte
+      </div>
+      <div class="step-line done"></div>
+      <div class="step done">
+        <div class="step-num">✓</div>
+        Choix
+      </div>
+      <div class="step-line done"></div>
+      <div class="step active">
+        <div class="step-num">3</div>
+        Enduro
+      </div>
+    </div>
+
+    <div class="modal-eyebrow">Étape 3 sur 3</div>
+    <h2 class="modal-title">Configurez votre <span style="color:var(--red);">enduro</span></h2>
+    <p class="modal-sub">Renseignez les informations de votre compétition. Vous pourrez les modifier plus tard.</p>
+
+    <div class="summary-bar" id="mode-summary">
+      <span class="summary-bar-icon">●</span>
+      <span>Mode sélectionné : <strong id="mode-label">Inscriptions sur CarpStrike</strong></span>
+    </div>
+
+    <!-- ─── SECTION 1: INFORMATIONS GÉNÉRALES ─── -->
+    <div class="form-section">
+      <div class="form-section-title">
+        <div class="form-section-num">1</div>
+        Informations générales
+      </div>
+
+      <div class="form-grid">
+        <div class="field-config">
+          <label>Nom de l'enduro <span class="req">*</span></label>
+          <input type="text" placeholder="Ex : Grand Enduro du Lac Bleu">
+        </div>
+
+        <div class="field-config">
+          <label>Description <span class="optional">facultatif</span></label>
+          <textarea placeholder="Présentez votre enduro en quelques lignes : ambiance, particularités, dotation..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── SECTION 2: DATES & DURÉE ─── -->
+    <div class="form-section">
+      <div class="form-section-title">
+        <div class="form-section-num">2</div>
+        Dates & durée
+      </div>
+
+      <div class="form-grid grid-2">
+        <div class="field-config">
+          <label>Date & heure de début <span class="req">*</span></label>
+          <input type="datetime-local">
+        </div>
+        <div class="field-config">
+          <label>Date & heure de fin <span class="req">*</span></label>
+          <input type="datetime-local">
+        </div>
+      </div>
+
+      <div class="form-grid" style="margin-top: 14px;">
+        <div class="field-config">
+          <label>Nombre de manches <span class="req">*</span></label>
+          <div class="pill-group" data-name="manches">
+            <label class="pill active">
+              <input type="radio" name="manches" value="1" checked>
+              <span class="icon">①</span> 1 manche
+            </label>
+            <label class="pill">
+              <input type="radio" name="manches" value="2">
+              <span class="icon">②</span> 2 manches
+            </label>
+          </div>
+        </div>
+
+        <div class="conditional" id="manche2-config">
+          <div class="form-grid grid-2">
+            <div class="field-config">
+              <label>Fin manche 1 / Début manche 2 <span class="req">*</span></label>
+              <input type="datetime-local">
+            </div>
+            <div class="field-config">
+              <label>Pause entre manches <span class="optional">facultatif</span></label>
+              <div class="input-with-suffix">
+                <input type="number" placeholder="0" min="0">
+                <span class="suffix">h</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── SECTION 3: LIEU ─── -->
+    <div class="form-section">
+      <div class="form-section-title">
+        <div class="form-section-num">3</div>
+        Lieu de l'enduro
+      </div>
+
+      <div class="form-grid">
+        <div class="field-config">
+          <label>Nom du lieu <span class="req">*</span></label>
+          <input type="text" placeholder="Ex : Étang de Tournay, Lac de Madine...">
+        </div>
+
+        <div class="field-config">
+          <label>Adresse complète <span class="req">*</span></label>
+          <input type="text" placeholder="N° rue, code postal, ville">
+        </div>
+
+        <div class="form-grid grid-2">
+          <div class="field-config">
+            <label>Type d'eau <span class="req">*</span></label>
+            <div class="pill-group" data-name="water">
+              <label class="pill active">
+                <input type="radio" name="water" value="plan" checked>
+                <span class="icon">🌊</span> Plan d'eau
+              </label>
+              <label class="pill">
+                <input type="radio" name="water" value="riviere">
+                <span class="icon">🏞</span> Rivière
+              </label>
+            </div>
+          </div>
+          <div class="field-config">
+            <label>Superficie / Linéaire <span class="optional">facultatif</span></label>
+            <div class="input-with-suffix">
+              <input type="number" placeholder="Ex : 25" min="0" step="0.1">
+              <span class="suffix" id="water-unit">ha</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── SECTION 4: ÉQUIPES & SECTEURS ─── -->
+    <div class="form-section">
+      <div class="form-section-title">
+        <div class="form-section-num">4</div>
+        Équipes & secteurs
+      </div>
+
+      <div class="form-grid grid-3">
+        <div class="field-config">
+          <label>Nb d'équipes max <span class="req">*</span></label>
+          <input type="number" placeholder="24" min="2" max="200">
+        </div>
+        <div class="field-config">
+          <label>Pêcheurs / équipe <span class="req">*</span></label>
+          <select>
+            <option>1 (individuel)</option>
+            <option selected>2 (binôme)</option>
+            <option>3</option>
+            <option>4</option>
+          </select>
+        </div>
+        <div class="field-config">
+          <label>Cannes par équipe <span class="req">*</span></label>
+          <select>
+            <option>2</option>
+            <option>3</option>
+            <option selected>4</option>
+            <option>6</option>
+            <option>8</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="toggle-row" style="margin-top: 16px;">
+        <div class="toggle-row-label">
+          <div class="toggle-row-title">Présence de secteurs</div>
+          <div class="toggle-row-desc">Diviser le plan d'eau en zones distinctes pour répartir les équipes</div>
+        </div>
+        <div class="switch on" id="switch-sectors" onclick="toggleSwitch(this, 'sectors-config')"></div>
+      </div>
+
+      <div class="conditional show" id="sectors-config">
+        <div class="form-grid grid-2">
+          <div class="field-config">
+            <label>Nombre de secteurs <span class="req">*</span></label>
+            <input type="number" placeholder="4" min="2" max="20" value="4">
+          </div>
+          <div class="field-config">
+            <label>Type de classement <span class="req">*</span></label>
+            <select id="ranking-type" onchange="updateRankingHelp(this)">
+              <option value="general">Classement général (tous secteurs)</option>
+              <option value="sectors">Classement secteur par secteur</option>
+              <option value="both">Les deux (général + par secteur)</option>
+            </select>
+            <div class="help-text" id="ranking-help">Un seul classement global réunissant toutes les équipes.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Attribution des postes -->
+      <div class="field-config" style="margin-top: 16px;">
+        <label>Attribution des postes <span class="req">*</span></label>
+        <div class="pill-group" data-name="attribution">
+          <label class="pill active">
+            <input type="radio" name="attribution" value="tirage-unique" checked>
+            <span class="icon">🎲</span> Tirage au sort unique
+          </label>
+          <label class="pill">
+            <input type="radio" name="attribution" value="tirage-double">
+            <span class="icon">🎲🎲</span> Tirage au sort double
+          </label>
+          <label class="pill">
+            <input type="radio" name="attribution" value="lancer">
+            <span class="icon">🎯</span> Lancer de précision
+          </label>
+          <label class="pill">
+            <input type="radio" name="attribution" value="autre">
+            <span class="icon">＋</span> Autre
+          </label>
+        </div>
+        <div class="help-text" id="attribution-help">Un seul tirage détermine la position de chaque équipe pour toute la durée de l'enduro.</div>
+      </div>
+
+      <div class="conditional" id="attribution-other-config">
+        <div class="field-config" style="margin-top: 14px;">
+          <label>Précisez la méthode d'attribution <span class="req">*</span></label>
+          <textarea placeholder="Décrivez votre méthode d'attribution des postes (ex : choix par classement antérieur, sélection par l'organisateur, etc.)" required></textarea>
+        </div>
+      </div>
+
+      <!-- Plan des postes -->
+      <div class="field-config" style="margin-top: 16px;">
+        <label>Plan des postes <span class="optional">facultatif</span></label>
+        <div class="photo-upload" id="plan-upload">
+          <input type="file" accept="image/*,application/pdf" onchange="handleUpload(this, 'plan-upload')">
+          <div class="upload-empty">
+            <div class="upload-icon">⛶</div>
+            <div class="upload-title">Ajouter le plan des postes</div>
+            <div class="upload-desc">Glissez-déposez votre fichier ou cliquez pour parcourir</div>
+            <div class="upload-formats">JPG · PNG · PDF — max 10 Mo</div>
+          </div>
+          <div class="upload-preview">
+            <div class="upload-thumb">⛶</div>
+            <div class="upload-info">
+              <div class="upload-filename" id="plan-filename"></div>
+              <div class="upload-size" id="plan-size"></div>
+            </div>
+            <button class="upload-remove" onclick="removeUpload(event, 'plan-upload')">Supprimer</button>
+          </div>
+        </div>
+        <div class="help-text">Ce plan sera visible par les équipes et les commissaires sur la page de l'enduro.</div>
+      </div>
+    </div>
+
+    <!-- ─── SECTION 5: RÈGLES DE PESÉE ─── -->
+    <div class="form-section">
+      <div class="form-section-title">
+        <div class="form-section-num">5</div>
+        Règles de pesée
+      </div>
+
+      <div class="toggle-row">
+        <div class="toggle-row-label">
+          <div class="toggle-row-title">Maille minimale</div>
+          <div class="toggle-row-desc">Poids minimum requis pour qu'une prise soit comptabilisée</div>
+        </div>
+        <div class="switch on" id="switch-maille" onclick="toggleSwitch(this, 'maille-config')"></div>
+      </div>
+
+      <div class="conditional show" id="maille-config">
+        <div class="form-grid grid-2">
+          <div class="field-config">
+            <label>Poids de la maille <span class="req">*</span></label>
+            <div class="input-with-suffix">
+              <input type="number" placeholder="3" min="0" step="0.1" value="3">
+              <span class="suffix">kg</span>
+            </div>
+          </div>
+          <div class="field-config">
+            <label>Espèces autorisées <span class="req">*</span></label>
+            <select multiple style="height: 44px;">
+              <option selected>Carpe commune</option>
+              <option selected>Carpe miroir</option>
+              <option selected>Carpe cuir</option>
+              <option>Amour blanc</option>
+              <option>Esturgeon</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── SECTION 6: THÈME DE LA PAGE ─── -->
+    <div class="form-section">
+      <div class="form-section-title">
+        <div class="form-section-num">6</div>
+        Thème de la page publique
+      </div>
+
+      <div class="field-config">
+        <label>Choisissez l'ambiance visuelle de votre enduro <span class="req">*</span></label>
+        <div class="theme-picker">
+
+          <label class="theme-card active">
+            <input type="radio" name="theme" value="lac-bleu" checked>
+            <div class="check-mark">✓</div>
+            <div class="theme-preview lac-bleu">
+              <div class="theme-preview-bar"></div>
+              <div class="theme-preview-glow"></div>
+              <div class="theme-preview-text">Lac Bleu<span class="accent">★ Compétition</span></div>
+            </div>
+            <div class="theme-info">
+              <div class="theme-name">Lac Bleu</div>
+              <div class="theme-desc">Rouge & bleu profond — Sport & compétition</div>
+            </div>
+          </label>
+
+          <label class="theme-card">
+            <input type="radio" name="theme" value="forest">
+            <div class="check-mark">✓</div>
+            <div class="theme-preview forest">
+              <div class="theme-preview-bar"></div>
+              <div class="theme-preview-glow"></div>
+              <div class="theme-preview-text">Forêt<span class="accent">★ Naturel</span></div>
+            </div>
+            <div class="theme-info">
+              <div class="theme-name">Forêt</div>
+              <div class="theme-desc">Vert émeraude — Nature & sous-bois</div>
+            </div>
+          </label>
+
+          <label class="theme-card">
+            <input type="radio" name="theme" value="sunset">
+            <div class="check-mark">✓</div>
+            <div class="theme-preview sunset">
+              <div class="theme-preview-bar"></div>
+              <div class="theme-preview-glow"></div>
+              <div class="theme-preview-text">Coucher<span class="accent">★ Chaleureux</span></div>
+            </div>
+            <div class="theme-info">
+              <div class="theme-name">Coucher de soleil</div>
+              <div class="theme-desc">Orange & acajou — Convivial & chaleureux</div>
+            </div>
+          </label>
+
+          <label class="theme-card">
+            <input type="radio" name="theme" value="night">
+            <div class="check-mark">✓</div>
+            <div class="theme-preview night">
+              <div class="theme-preview-bar"></div>
+              <div class="theme-preview-glow"></div>
+              <div class="theme-preview-text">Nuit<span class="accent">★ Mystique</span></div>
+            </div>
+            <div class="theme-info">
+              <div class="theme-name">Nuit</div>
+              <div class="theme-desc">Violet profond — Pêche nocturne</div>
+            </div>
+          </label>
+
+        </div>
+        <div class="help-text">Le thème personnalisera l'ambiance visuelle de la page publique de votre enduro. Vous pourrez le modifier à tout moment.</div>
+      </div>
+    </div>
+
+    <!-- ─── SECTION 7: RÈGLEMENT ─── -->
+    <div class="form-section">
+      <div class="form-section-title">
+        <div class="form-section-num">7</div>
+        Règlement de l'enduro
+      </div>
+
+      <div class="field-config">
+        <label>Mode de règlement <span class="req">*</span></label>
+        <div class="pill-group" data-name="reglement-mode">
+          <label class="pill active">
+            <input type="radio" name="reglement-mode" value="text" checked>
+            <span class="icon">✎</span> Rédiger en ligne
+          </label>
+          <label class="pill">
+            <input type="radio" name="reglement-mode" value="pdf">
+            <span class="icon">⛶</span> Importer un PDF
+          </label>
+          <label class="pill">
+            <input type="radio" name="reglement-mode" value="both">
+            <span class="icon">⊕</span> Les deux
+          </label>
+        </div>
+      </div>
+
+      <!-- Mode texte -->
+      <div class="conditional show" id="reglement-text-config">
+        <div class="field-config" style="margin-top: 14px;">
+          <label>Règlement de l'enduro <span class="req">*</span></label>
+          <textarea id="reglement-text" placeholder="Rédigez ici le règlement complet de votre enduro : conditions d'accès, matériel autorisé, horaires de pesée, sanctions, comportement attendu, etc." style="min-height: 180px;"></textarea>
+          <div class="help-text">Ce règlement sera affiché sur la page publique de l'enduro et devra être accepté par chaque équipe lors de l'inscription.</div>
+        </div>
+      </div>
+
+      <!-- Mode PDF -->
+      <div class="conditional" id="reglement-pdf-config">
+        <div class="field-config" style="margin-top: 14px;">
+          <label>Règlement au format PDF <span class="req">*</span></label>
+          <div class="photo-upload" id="reglement-upload">
+            <input type="file" accept="application/pdf" onchange="handleUpload(this, 'reglement-upload')">
+            <div class="upload-empty">
+              <div class="upload-icon">⛶</div>
+              <div class="upload-title">Ajouter le règlement</div>
+              <div class="upload-desc">Glissez-déposez votre PDF ou cliquez pour parcourir</div>
+              <div class="upload-formats">PDF — max 10 Mo</div>
+            </div>
+            <div class="upload-preview">
+              <div class="upload-thumb">⛶</div>
+              <div class="upload-info">
+                <div class="upload-filename" id="reglement-filename"></div>
+                <div class="upload-size" id="reglement-size"></div>
+              </div>
+              <button class="upload-remove" onclick="removeUpload(event, 'reglement-upload')">Supprimer</button>
+            </div>
+          </div>
+          <div class="help-text">Le PDF sera téléchargeable depuis la page publique de l'enduro.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── SECTION 8: INSCRIPTIONS (uniquement mode public) ─── -->
+    <div class="form-section conditional" id="registration-section">
+      <div class="form-section-title">
+        <div class="form-section-num">8</div>
+        Inscriptions sur CarpStrike
+      </div>
+
+      <div class="form-grid grid-2">
+        <div class="field-config">
+          <label>Ouverture des inscriptions <span class="req">*</span></label>
+          <input type="datetime-local">
+        </div>
+        <div class="field-config">
+          <label>Clôture des inscriptions <span class="req">*</span></label>
+          <input type="datetime-local">
+        </div>
+      </div>
+
+      <div class="form-grid grid-2" style="margin-top: 14px;">
+        <div class="field-config">
+          <label>Tarif d'inscription <span class="req">*</span></label>
+          <div class="input-with-suffix">
+            <input type="number" placeholder="450" min="0">
+            <span class="suffix">€</span>
+          </div>
+        </div>
+        <div class="field-config">
+          <label>Dotation totale <span class="optional">facultatif</span></label>
+          <div class="input-with-suffix">
+            <input type="number" placeholder="8000" min="0">
+            <span class="suffix">€</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="toggle-row" style="margin-top: 14px;">
+        <div class="toggle-row-label">
+          <div class="toggle-row-title">Liste d'attente</div>
+          <div class="toggle-row-desc">Permettre aux pêcheurs de s'inscrire en attente une fois le quota atteint</div>
+        </div>
+        <div class="switch on" onclick="toggleSwitch(this, null)"></div>
+      </div>
+
+      <div class="toggle-row">
+        <div class="toggle-row-label">
+          <div class="toggle-row-title">Repas inclus</div>
+          <div class="toggle-row-desc">Indiquer aux participants si les repas sont compris dans l'inscription</div>
+        </div>
+        <div class="switch" id="switch-meals" onclick="toggleSwitch(this, 'meals-config')"></div>
+      </div>
+
+      <div class="conditional" id="meals-config">
+        <div class="field-config" style="margin-top: 4px;">
+          <label>Repas compris <span class="req">*</span></label>
+          <div class="pill-group" data-name="meals">
+            <label class="pill active">
+              <input type="radio" name="meals" value="all" checked>
+              <span class="icon">🍽</span> Tous les repas
+            </label>
+            <label class="pill">
+              <input type="radio" name="meals" value="breakfast">
+              <span class="icon">☕</span> Petits-déjeuners
+            </label>
+            <label class="pill">
+              <input type="radio" name="meals" value="lunch-dinner">
+              <span class="icon">🍴</span> Déj. & dîners
+            </label>
+            <label class="pill">
+              <input type="radio" name="meals" value="custom">
+              <span class="icon">＋</span> Personnalisé
+            </label>
+          </div>
+        </div>
+
+        <div class="conditional" id="meals-custom-config">
+          <div class="field-config" style="margin-top: 14px;">
+            <label>Précisez les repas inclus <span class="req">*</span></label>
+            <textarea placeholder="Ex : Dîner du vendredi, petit-déjeuner et déjeuner du samedi, remise des prix dimanche midi..."></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── SECTION 7: COMMISSAIRES & CONTACT ─── -->
+    <div class="form-section">
+      <div class="form-section-title">
+        <div class="form-section-num" id="contact-num">6</div>
+        Contact & commissaires
+      </div>
+
+      <div class="form-grid grid-2">
+        <div class="field-config">
+          <label>Email de contact <span class="req">*</span></label>
+          <input type="email" placeholder="organisation@enduro.fr">
+        </div>
+        <div class="field-config">
+          <label>Téléphone <span class="req">*</span></label>
+          <input type="tel" placeholder="06 12 34 56 78">
+        </div>
+      </div>
+
+      <div class="field-config" style="margin-top: 14px;">
+        <label>Nombre de commissaires <span class="optional">facultatif</span></label>
+        <input type="number" placeholder="4" min="1">
+        <div class="help-text">Vous pourrez inviter vos commissaires par email après la création.</div>
+      </div>
+    </div>
+
+    <!-- ─── ACTIONS ─── -->
+    <div class="form-actions">
+      <button class="btn btn-back" onclick="goBackToChoice()" style="clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);">← Retour</button>
+      <button class="btn btn-ghost" style="flex: 0;">Enregistrer brouillon</button>
+      <button class="btn btn-primary" style="flex: 1;" onclick="finishEnduro()">Créer l'enduro →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function switchTab(tab, target) {
+    document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('login-form').style.display = target === 'login' ? 'block' : 'none';
+    document.getElementById('signup-form').style.display = target === 'signup' ? 'block' : 'none';
+  }
+
+  function switchAuthTab(tab, target) {
+    document.querySelectorAll('#modal-auth .login-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('auth-login').style.display = target === 'auth-login' ? 'block' : 'none';
+    document.getElementById('auth-signup').style.display = target === 'auth-signup' ? 'block' : 'none';
+  }
+
+  function openModal(id) {
+    document.getElementById(id).classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  function goToChoice() {
+    closeModal('modal-auth');
+    setTimeout(() => openModal('modal-choice'), 300);
+  }
+
+  function selectMode(mode) {
+    closeModal('modal-choice');
+    // Adapt config modal based on mode
+    const regSection = document.getElementById('registration-section');
+    const modeLabel = document.getElementById('mode-label');
+    const contactNum = document.getElementById('contact-num');
+
+    if (mode === 'public') {
+      regSection.classList.add('show');
+      modeLabel.textContent = 'Inscriptions sur CarpStrike';
+      contactNum.textContent = '9';
+    } else {
+      regSection.classList.remove('show');
+      modeLabel.textContent = 'Gestion seule (inscriptions externes)';
+      contactNum.textContent = '8';
+    }
+
+    setTimeout(() => openModal('modal-config'), 300);
+  }
+
+  function goBackToChoice() {
+    closeModal('modal-config');
+    setTimeout(() => openModal('modal-choice'), 300);
+  }
+
+  function finishEnduro() {
+    closeModal('modal-config');
+    setTimeout(() => {
+      alert('🎣 Votre enduro a bien été créé !\n\nVous allez être redirigé vers votre tableau de bord pour finaliser les détails (commissaires, secteurs, médias...).');
+    }, 300);
+  }
+
+  // Toggle switch (with optional conditional content)
+  function toggleSwitch(el, conditionalId) {
+    el.classList.toggle('on');
+    if (conditionalId) {
+      const target = document.getElementById(conditionalId);
+      if (target) {
+        target.classList.toggle('show', el.classList.contains('on'));
+      }
+    }
+  }
+
+  // Pill group radio behavior
+  document.querySelectorAll('.pill-group').forEach(group => {
+    group.querySelectorAll('.pill').forEach(pill => {
+      pill.addEventListener('click', e => {
+        if (e.target.tagName === 'INPUT') return;
+        group.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        const input = pill.querySelector('input');
+        if (input) input.checked = true;
+
+        // Special handling for manches (1 or 2)
+        if (input && input.name === 'manches') {
+          const manche2 = document.getElementById('manche2-config');
+          if (manche2) manche2.classList.toggle('show', input.value === '2');
+        }
+
+        // Special handling for water type (unit suffix)
+        if (input && input.name === 'water') {
+          const unit = document.getElementById('water-unit');
+          if (unit) unit.textContent = input.value === 'riviere' ? 'km' : 'ha';
+        }
+
+        // Special handling for attribution type
+        if (input && input.name === 'attribution') {
+          const otherConfig = document.getElementById('attribution-other-config');
+          const help = document.getElementById('attribution-help');
+          const helps = {
+            'tirage-unique': 'Un seul tirage détermine la position de chaque équipe pour toute la durée de l\'enduro.',
+            'tirage-double': 'Deux tirages successifs : un avant chaque manche, permettant un changement de poste.',
+            'lancer': 'Concours de précision au lancer pour déterminer l\'ordre de choix des postes.',
+            'autre': 'Précisez votre méthode d\'attribution dans le champ ci-dessous.'
+          };
+          if (help) help.textContent = helps[input.value];
+          if (otherConfig) otherConfig.classList.toggle('show', input.value === 'autre');
+        }
+
+        // Special handling for meals (custom option)
+        if (input && input.name === 'meals') {
+          const customConfig = document.getElementById('meals-custom-config');
+          if (customConfig) customConfig.classList.toggle('show', input.value === 'custom');
+        }
+
+        // Special handling for reglement mode
+        if (input && input.name === 'reglement-mode') {
+          const textConfig = document.getElementById('reglement-text-config');
+          const pdfConfig = document.getElementById('reglement-pdf-config');
+          if (textConfig) textConfig.classList.toggle('show', input.value === 'text' || input.value === 'both');
+          if (pdfConfig) pdfConfig.classList.toggle('show', input.value === 'pdf' || input.value === 'both');
+        }
+      });
+    });
+  });
+
+  // Update help text for ranking type
+  function updateRankingHelp(select) {
+    const help = document.getElementById('ranking-help');
+    const helps = {
+      'general': 'Un seul classement global réunissant toutes les équipes.',
+      'sectors': 'Un classement indépendant pour chaque secteur. Idéal pour des conditions de pêche très différentes.',
+      'both': 'Affichage du classement général ET d\'un classement détaillé par secteur.'
+    };
+    help.textContent = helps[select.value];
+  }
+
+  // File upload handling
+  function handleUpload(input, containerId) {
+    const file = input.files[0];
+    if (!file) return;
+    const container = document.getElementById(containerId);
+    const filename = container.querySelector('.upload-filename');
+    const size = container.querySelector('.upload-size');
+    filename.textContent = file.name;
+    size.textContent = formatFileSize(file.size);
+    container.classList.add('has-file');
+  }
+
+  function removeUpload(e, containerId) {
+    e.preventDefault();
+    e.stopPropagation();
+    const container = document.getElementById(containerId);
+    const input = container.querySelector('input[type="file"]');
+    input.value = '';
+    container.classList.remove('has-file');
+  }
+
+  function formatFileSize(bytes) {
+    if (bytes < 1024) return bytes + ' o';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' Ko';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' Mo';
+  }
+
+  // Theme card selection
+  document.querySelectorAll('.theme-card').forEach(card => {
+    card.addEventListener('click', e => {
+      e.preventDefault();
+      document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      const input = card.querySelector('input[type="radio"]');
+      if (input) input.checked = true;
+    });
+  });
+
+  // Open auth modal from "Organiser un enduro" button
+  document.querySelectorAll('.organize-btn').forEach(btn => {
+    btn.addEventListener('click', () => openModal('modal-auth'));
+  });
+
+  // Also from nav buttons
+  document.querySelectorAll('.btn-primary').forEach(btn => {
+    if (btn.textContent.trim() === 'Connexion') {
+      btn.addEventListener('click', () => openModal('modal-auth'));
+    }
+  });
+  document.querySelectorAll('.btn-ghost').forEach(btn => {
+    if (btn.textContent.trim() === 'Inscription') {
+      btn.addEventListener('click', () => {
+        openModal('modal-auth');
+        setTimeout(() => {
+          const signupTab = document.querySelectorAll('#modal-auth .login-tab')[1];
+          if (signupTab) switchAuthTab(signupTab, 'auth-signup');
+        }, 50);
+      });
+    }
+  });
+
+  // Close on overlay click
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) closeModal(overlay.id);
+    });
+  });
+
+  // Close on Escape key
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.modal-overlay.active').forEach(m => closeModal(m.id));
+    }
+  });
+
+  // Filter chip toggle
+  document.querySelectorAll('.filters').forEach(filterGroup => {
+    filterGroup.querySelectorAll('.filter-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        filterGroup.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+      });
+    });
+  });
+  // ═════════════════════════════════════════
+  // SIMULATION LOGIN/LOGOUT
+  // ═════════════════════════════════════════
+  function updateAuthState() {
+    const isLoggedIn = localStorage.getItem('carpstrike-logged-in') === 'true';
+    const loggedOut = document.getElementById('nav-logged-out');
+    const loggedIn = document.getElementById('nav-logged-in');
+    if (isLoggedIn) {
+      loggedOut.style.display = 'none';
+      loggedIn.style.display = 'flex';
+    } else {
+      loggedOut.style.display = 'flex';
+      loggedIn.style.display = 'none';
+    }
+  }
+
+  function simulateLogin() {
+    localStorage.setItem('carpstrike-logged-in', 'true');
+    updateAuthState();
+  }
+
+  function simulateLogout() {
+    localStorage.removeItem('carpstrike-logged-in');
+    updateAuthState();
+  }
+
+  // Init auth state
+  updateAuthState();
+
+</script>
+
+</body>
+</html>

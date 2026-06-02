@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inscription — Grand Enduro du Lac Bleu</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,900;1,700;1,900&family=Barlow:wght@300;400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #e8212b;
+    --red-bright: #ff2d3a;
+    --red-dim: rgba(232,33,43,0.15);
+    --red-glow: rgba(232,33,43,0.4);
+    --white: #f4f0eb;
+    --off: #c8c0b4;
+    --dim: rgba(244,240,235,0.6);
+    --dim2: rgba(244,240,235,0.3);
+    --dark: #0a0908;
+    --darker: #050403;
+    --panel: #141310;
+    --panel-2: #1a1814;
+    --line: rgba(244,240,235,0.08);
+    --line-bright: rgba(244,240,235,0.18);
+    --gold: #f0a500;
+    --green: #00c850;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--darker);
+    font-family: 'Barlow', sans-serif;
+    color: var(--white);
+    min-height: 100vh;
+  }
+
+  /* ─── BACKGROUND ─── */
+  .bg-atmosphere {
+    position: fixed; inset: 0; z-index: -2;
+    background:
+      radial-gradient(ellipse 60% 50% at 0% 0%, rgba(232,33,43,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse 60% 60% at 100% 100%, rgba(20, 60, 80, 0.15) 0%, transparent 50%),
+      linear-gradient(180deg, #0a0908 0%, #050403 100%);
+  }
+
+  .bg-grid {
+    position: fixed; inset: 0; z-index: -1;
+    background-image:
+      linear-gradient(rgba(244,240,235,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(244,240,235,0.02) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, #000 0%, transparent 80%);
+  }
+
+  /* ─── HEADER ─── */
+  .header {
+    background: rgba(10,9,8,0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+    padding: 14px 0;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+  }
+
+  .logo-carp {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 1.4rem;
+    color: var(--white);
+    letter-spacing: 1px;
+    line-height: 1;
+  }
+
+  .logo-strike {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 1.4rem;
+    color: var(--red);
+    letter-spacing: 1px;
+    line-height: 1;
+    text-shadow: 0 0 15px var(--red-glow);
+  }
+
+  .logo-slash {
+    width: 3px; height: 18px;
+    background: var(--red);
+    transform: skewX(-10deg);
+    margin: 0 7px;
+    box-shadow: 0 0 8px var(--red-glow);
+  }
+
+  .header-secure {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.72rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--green);
+  }
+
+  .header-secure .icon { color: var(--green); }
+
+  /* ─── PAGE LAYOUT ─── */
+  .page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px;
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 28px;
+  }
+
+  /* ─── ENDURO SUMMARY (right side - sticky) ─── */
+  .summary {
+    position: sticky;
+    top: 92px;
+    align-self: start;
+  }
+
+  .summary-card {
+    background: linear-gradient(140deg, var(--panel) 0%, var(--panel-2) 100%);
+    border: 1px solid var(--line-bright);
+    overflow: hidden;
+    clip-path: polygon(16px 0%, 100% 0%, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0% 100%, 0% 16px);
+    position: relative;
+  }
+
+  .summary-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 80px; height: 2px;
+    background: var(--red);
+    box-shadow: 0 0 12px var(--red-glow);
+  }
+
+  .summary-hero {
+    padding: 22px 24px 18px;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 100%, rgba(20, 60, 80, 0.4) 0%, transparent 60%),
+      linear-gradient(180deg, #0a1620 0%, #0d2435 100%);
+    border-bottom: 1px solid var(--line);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .summary-hero::after {
+    content: 'LAC BLEU';
+    position: absolute;
+    bottom: -20px; right: -10px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 4rem;
+    color: rgba(255,255,255,0.025);
+    line-height: 0.9;
+    letter-spacing: -3px;
+    pointer-events: none;
+  }
+
+  .summary-cat {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.62rem;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--red);
+    background: var(--red-dim);
+    border: 1px solid rgba(232,33,43,0.4);
+    padding: 3px 8px;
+    margin-bottom: 12px;
+  }
+
+  .summary-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 1.5rem;
+    line-height: 1;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .summary-meta {
+    font-size: 0.78rem;
+    color: var(--dim);
+    line-height: 1.5;
+  }
+
+  .summary-body {
+    padding: 18px 24px 22px;
+  }
+
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    font-size: 0.85rem;
+  }
+
+  .summary-row + .summary-row {
+    border-top: 1px solid var(--line);
+  }
+
+  .summary-row-label {
+    color: var(--dim);
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .summary-row-value {
+    color: var(--white);
+    font-weight: 600;
+  }
+
+  .summary-total {
+    margin-top: 14px;
+    padding-top: 16px;
+    border-top: 2px solid var(--line-bright);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+
+  .summary-total-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.78rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--white);
+  }
+
+  .summary-total-value {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 2.2rem;
+    color: var(--white);
+    line-height: 1;
+  }
+
+  .summary-total-value .currency {
+    color: var(--red);
+    font-size: 1.4rem;
+  }
+
+  .summary-availability {
+    margin-top: 18px;
+    padding: 12px 14px;
+    background: rgba(232,33,43,0.06);
+    border: 1px solid rgba(232,33,43,0.2);
+    border-left: 3px solid var(--red);
+    font-size: 0.82rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .summary-availability .icon {
+    color: var(--red);
+    font-size: 1rem;
+  }
+
+  .summary-availability strong {
+    color: var(--white);
+  }
+
+  /* ─── MAIN FORM ─── */
+  .form-main {
+    background: linear-gradient(140deg, var(--panel) 0%, var(--panel-2) 100%);
+    border: 1px solid var(--line);
+    padding: 32px 36px 30px;
+    overflow: hidden;
+  }
+
+  /* Step indicator */
+  .step-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 24px;
+  }
+
+  .step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--dim2);
+  }
+
+  .step-num {
+    width: 24px; height: 24px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: var(--dim2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    flex-shrink: 0;
+  }
+
+  .step.done .step-num,
+  .step.active .step-num {
+    background: var(--red);
+    border-color: var(--red);
+    color: #fff;
+    box-shadow: 0 0 12px var(--red-glow);
+  }
+
+  .step.active { color: var(--white); }
+  .step.done { color: var(--white); }
+
+  .step-line {
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+    min-width: 12px;
+  }
+
+  .step-line.done { background: var(--red); }
+
+  /* Form header */
+  .form-eyebrow {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.72rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .form-eyebrow::before {
+    content: '';
+    width: 24px;
+    height: 1px;
+    background: var(--red);
+  }
+
+  .form-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 1.9rem;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .form-title .accent { color: var(--red); }
+
+  .form-sub {
+    color: var(--dim);
+    font-size: 0.92rem;
+    margin-bottom: 28px;
+  }
+
+  /* ─── FORM FIELDS ─── */
+  .form-grid {
+    display: grid;
+    gap: 14px;
+  }
+
+  .grid-2 { grid-template-columns: 1fr 1fr; }
+  .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .field label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    font-size: 0.72rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 6px;
+  }
+
+  .field label .req {
+    color: var(--red);
+    font-size: 0.9rem;
+  }
+
+  .field label .optional {
+    font-size: 0.6rem;
+    color: var(--dim2);
+    text-transform: none;
+    letter-spacing: 1px;
+    margin-left: auto;
+    font-weight: 500;
+  }
+
+  .field input,
+  .field select,
+  .field textarea {
+    width: 100%;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid var(--line);
+    padding: 11px 13px;
+    color: var(--white);
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.88rem;
+    transition: all 0.2s;
+    outline: none;
+  }
+
+  .field input:focus,
+  .field select:focus,
+  .field textarea:focus {
+    border-color: var(--red);
+    background: rgba(0,0,0,0.6);
+    box-shadow: 0 0 0 3px var(--red-dim);
+  }
+
+  .field input::placeholder,
+  .field textarea::placeholder { color: var(--dim2); }
+
+  .field select {
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23e8212b' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+  }
+
+  /* ─── FISHERMAN BLOCK ─── */
+  .fisherman-block {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--line);
+    padding: 22px 22px 18px;
+    margin-bottom: 14px;
+    position: relative;
+  }
+
+  .fisherman-block.captain {
+    border-color: rgba(232,33,43,0.3);
+    background: rgba(232,33,43,0.04);
+  }
+
+  .fisherman-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .fisherman-num {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .fisherman-badge {
+    width: 30px; height: 30px;
+    background: var(--red);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+    box-shadow: 0 0 10px var(--red-glow);
+  }
+
+  .fisherman-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 1.15rem;
+    letter-spacing: 1px;
+  }
+
+  .fisherman-tag {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.62rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--red);
+    border: 1px solid var(--red);
+    padding: 3px 9px;
+    background: var(--red-dim);
+  }
+
+  /* ─── REGLEMENT BLOCK ─── */
+  .reglement-summary {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--line);
+    padding: 20px 22px;
+    margin-bottom: 18px;
+    max-height: 240px;
+    overflow-y: auto;
+  }
+
+  .reglement-summary h4 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+    margin-top: 14px;
+    margin-bottom: 6px;
+    color: var(--white);
+  }
+
+  .reglement-summary h4:first-child { margin-top: 0; }
+
+  .reglement-summary p {
+    font-size: 0.82rem;
+    color: var(--dim);
+    line-height: 1.55;
+    margin-bottom: 10px;
+  }
+
+  .reglement-actions {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+  }
+
+  .link-btn {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.72rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--red);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .link-btn:hover { color: var(--red-bright); }
+
+  /* ─── CHECKBOXES ─── */
+  .check-line {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 14px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--line);
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+  }
+
+  .check-line:hover {
+    border-color: var(--line-bright);
+  }
+
+  .check-line.checked {
+    border-color: var(--red);
+    background: rgba(232,33,43,0.06);
+  }
+
+  .check-line input { display: none; }
+
+  .check-box {
+    width: 20px; height: 20px;
+    border: 2px solid var(--line-bright);
+    background: rgba(0,0,0,0.4);
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .check-line.checked .check-box {
+    background: var(--red);
+    border-color: var(--red);
+    box-shadow: 0 0 10px var(--red-glow);
+  }
+
+  .check-box::after {
+    content: '✓';
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 700;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .check-line.checked .check-box::after { opacity: 1; }
+
+  .check-text {
+    flex: 1;
+    font-size: 0.85rem;
+    line-height: 1.45;
+  }
+
+  .check-text strong { color: var(--white); }
+  .check-text a {
+    color: var(--red);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .check-text .meta {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.7rem;
+    color: var(--dim);
+    margin-top: 2px;
+    letter-spacing: 1px;
+  }
+
+  /* ─── PAYMENT METHODS ─── */
+  .payment-methods {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .payment-method {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--line);
+    padding: 14px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s;
+    user-select: none;
+  }
+
+  .payment-method:hover {
+    border-color: var(--line-bright);
+  }
+
+  .payment-method.active {
+    border-color: var(--red);
+    background: rgba(232,33,43,0.06);
+    box-shadow: 0 0 0 2px var(--red-dim);
+  }
+
+  .payment-method input { display: none; }
+
+  .payment-radio {
+    width: 18px; height: 18px;
+    border: 2px solid var(--line-bright);
+    border-radius: 50%;
+    flex-shrink: 0;
+    position: relative;
+    transition: all 0.2s;
+  }
+
+  .payment-method.active .payment-radio {
+    border-color: var(--red);
+  }
+
+  .payment-method.active .payment-radio::after {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    background: var(--red);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--red-glow);
+  }
+
+  .payment-method-info {
+    flex: 1;
+  }
+
+  .payment-method-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--white);
+    letter-spacing: 0.5px;
+  }
+
+  .payment-method-desc {
+    font-size: 0.72rem;
+    color: var(--dim);
+    margin-top: 2px;
+  }
+
+  .payment-method-icon {
+    font-size: 1.3rem;
+  }
+
+  /* ─── CARD INPUTS ─── */
+  .card-input-row {
+    display: grid;
+    grid-template-columns: 1fr 100px 100px;
+    gap: 10px;
+  }
+
+  /* ─── CONFIRMATION ─── */
+  .confirmation {
+    text-align: center;
+    padding: 20px 0;
+  }
+
+  .confirmation-icon {
+    width: 72px; height: 72px;
+    background: var(--red);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 18px;
+    box-shadow: 0 0 30px var(--red-glow);
+    clip-path: polygon(15px 0%, 100% 0%, calc(100% - 15px) 100%, 0% 100%);
+  }
+
+  .confirmation-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 2.2rem;
+    line-height: 1;
+    margin-bottom: 10px;
+  }
+
+  .confirmation-title .accent { color: var(--red); }
+
+  .confirmation-desc {
+    color: var(--dim);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 24px;
+    max-width: 420px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .confirmation-info {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--red);
+    padding: 16px 20px;
+    text-align: left;
+    margin-bottom: 24px;
+  }
+
+  .confirmation-info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    font-size: 0.85rem;
+  }
+
+  .confirmation-info-row .label {
+    color: var(--dim);
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .confirmation-info-row .value {
+    color: var(--white);
+    font-weight: 600;
+  }
+
+  .confirmation-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* ─── BUTTONS ─── */
+  .btn {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 0.88rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 12px 22px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: inherit;
+    background: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-primary {
+    background: var(--red);
+    color: #fff;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    box-shadow: 0 0 15px var(--red-glow);
+  }
+
+  .btn-primary:hover {
+    background: var(--red-bright);
+    box-shadow: 0 0 25px var(--red-glow);
+  }
+
+  .btn-primary:disabled {
+    background: var(--line);
+    box-shadow: none;
+    color: var(--dim2);
+    cursor: not-allowed;
+  }
+
+  .btn-ghost {
+    color: var(--white);
+    border: 1px solid var(--line-bright);
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  }
+
+  .btn-ghost:hover {
+    border-color: var(--white);
+    background: rgba(244,240,235,0.05);
+  }
+
+  .btn-back {
+    color: var(--dim);
+    border: 1px solid var(--line);
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  }
+
+  .btn-back:hover { color: var(--white); border-color: var(--line-bright); }
+
+  /* ─── FORM ACTIONS ─── */
+  .form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+  }
+
+  .form-actions .btn-primary { flex: 1; justify-content: center; }
+
+  /* ─── SECURE BANNER ─── */
+  .secure-banner {
+    margin-top: 16px;
+    padding: 10px 14px;
+    background: rgba(0, 200, 80, 0.06);
+    border: 1px solid rgba(0, 200, 80, 0.2);
+    font-size: 0.78rem;
+    color: var(--dim);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .secure-banner .icon {
+    color: var(--green);
+    font-size: 1.1rem;
+  }
+
+  /* ─── STEPS VISIBILITY ─── */
+  .step-content {
+    display: none;
+    animation: slideIn 0.3s ease;
+  }
+
+  .step-content.active { display: block; }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(8px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  /* ─── HELP TEXT ─── */
+  .help-text {
+    font-size: 0.72rem;
+    color: var(--dim);
+    margin-top: 5px;
+    font-style: italic;
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 900px) {
+    .page {
+      grid-template-columns: 1fr;
+      padding: 20px;
+    }
+    .summary {
+      position: static;
+      order: -1;
+    }
+    .form-main { padding: 24px 22px; }
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .card-input-row { grid-template-columns: 1fr; }
+    .payment-methods { grid-template-columns: 1fr; }
+    .step { font-size: 0; gap: 0; }
+    .step-num { font-size: 0.72rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-atmosphere"></div>
+<div class="bg-grid"></div>
+
+<!-- ═══════ HEADER ═══════ -->
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <a href="carpstrike-index.html" style="display:inline-block;text-decoration:none" title="Accueil du prototype"><svg class="cs-logo" width="125" height="30" viewBox="0 0 540 130" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="CarpStrike" style="display:block">
+<path d="M10 70 L 70 70 L 80 70 L 88 54 L 98 90 L 108 70 L 150 70 L 165 70 L 178 38 L 192 104 L 206 70 L 250 70 L 262 70 L 275 14 L 290 120 L 305 70 L 330 70 L 345 70 L 356 50 L 367 88 L 377 70 L 430 70 L 445 70 L 456 56 L 466 84 L 476 70 L 530 70" stroke="#e8212b" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="270" y="84" font-family="'Barlow Condensed', sans-serif" font-size="56" font-weight="900" font-style="italic" fill="#f4f0eb" text-anchor="middle" stroke="#0a0908" stroke-width="7" paint-order="stroke">CARP<tspan fill="#e8212b">STRIKE</tspan></text>
+</svg></a>
+    </div>
+    <div class="header-secure">
+      <span class="icon">🔒</span>
+      Paiement sécurisé SSL
+    </div>
+  </div>
+</header>
+
+<div class="page">
+
+  <!-- ═══════ MAIN FORM ═══════ -->
+  <div class="form-main">
+
+    <!-- Step indicator -->
+    <div class="step-bar">
+      <div class="step active" data-step="1">
+        <div class="step-num">1</div>
+        Équipe
+      </div>
+      <div class="step-line"></div>
+      <div class="step" data-step="2">
+        <div class="step-num">2</div>
+        Pêcheurs
+      </div>
+      <div class="step-line"></div>
+      <div class="step" data-step="3">
+        <div class="step-num">3</div>
+        Règlement
+      </div>
+      <div class="step-line"></div>
+      <div class="step" data-step="4">
+        <div class="step-num">4</div>
+        Demande envoyée
+      </div>
+    </div>
+
+    <!-- ═══ STEP 1: ÉQUIPE ═══ -->
+    <div class="step-content active" id="step-1">
+      <div class="form-eyebrow">Étape 1 sur 4</div>
+      <h2 class="form-title">Votre <span class="accent">équipe</span></h2>
+      <p class="form-sub">Donnez un nom à votre binôme et choisissez vos préférences pour cet enduro.</p>
+
+      <div class="form-grid">
+        <div class="field">
+          <label>Nom de l'équipe <span class="req">*</span></label>
+          <input type="text" placeholder="Ex : Les Pêcheurs du Dimanche, Carp Hunters...">
+          <div class="help-text">Ce nom apparaîtra dans les classements live.</div>
+        </div>
+
+        <div class="field">
+          <label>Commentaire pour l'organisateur <span class="optional">facultatif</span></label>
+          <textarea placeholder="Allergies alimentaires, besoins spécifiques, demandes particulières..." style="min-height: 70px;"></textarea>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="goToStep(2)">Continuer →</button>
+      </div>
+    </div>
+
+    <!-- ═══ STEP 2: PÊCHEURS ═══ -->
+    <div class="step-content" id="step-2">
+      <div class="form-eyebrow">Étape 2 sur 4</div>
+      <h2 class="form-title">Les <span class="accent">pêcheurs</span></h2>
+      <p class="form-sub">Renseignez les informations des deux membres de l'équipe.</p>
+
+      <!-- PÊCHEUR 1 -->
+      <div class="fisherman-block captain">
+        <div class="fisherman-head">
+          <div class="fisherman-num">
+            <div class="fisherman-badge">1</div>
+            <div class="fisherman-title">Capitaine d'équipe</div>
+          </div>
+          <div class="fisherman-tag">Référent</div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-grid grid-2">
+            <div class="field">
+              <label>Prénom <span class="req">*</span></label>
+              <input type="text" placeholder="Jean">
+            </div>
+            <div class="field">
+              <label>Nom <span class="req">*</span></label>
+              <input type="text" placeholder="Dupont">
+            </div>
+          </div>
+
+          <div class="form-grid grid-2">
+            <div class="field">
+              <label>Date de naissance <span class="req">*</span></label>
+              <input type="date">
+            </div>
+            <div class="field">
+              <label>Téléphone <span class="req">*</span></label>
+              <input type="tel" placeholder="06 12 34 56 78">
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Email <span class="req">*</span></label>
+            <input type="email" placeholder="jean.dupont@email.fr">
+            <div class="help-text">Sert à recevoir la confirmation et les communications de l'enduro.</div>
+          </div>
+
+          <div class="form-grid grid-2">
+            <div class="field">
+              <label>Adresse <span class="req">*</span></label>
+              <input type="text" placeholder="N° rue">
+            </div>
+            <div class="field">
+              <label>Code postal · Ville <span class="req">*</span></label>
+              <input type="text" placeholder="65000 Tarbes">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PÊCHEUR 2 -->
+      <div class="fisherman-block">
+        <div class="fisherman-head">
+          <div class="fisherman-num">
+            <div class="fisherman-badge" style="background: rgba(255,255,255,0.1); color: var(--white); box-shadow: none;">2</div>
+            <div class="fisherman-title">Co-équipier</div>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-grid grid-2">
+            <div class="field">
+              <label>Prénom <span class="req">*</span></label>
+              <input type="text" placeholder="Pierre">
+            </div>
+            <div class="field">
+              <label>Nom <span class="req">*</span></label>
+              <input type="text" placeholder="Martin">
+            </div>
+          </div>
+
+          <div class="form-grid grid-2">
+            <div class="field">
+              <label>Date de naissance <span class="req">*</span></label>
+              <input type="date">
+            </div>
+            <div class="field">
+              <label>Téléphone <span class="req">*</span></label>
+              <input type="tel" placeholder="06 98 76 54 32">
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Email <span class="optional">facultatif</span></label>
+            <input type="email" placeholder="pierre.martin@email.fr">
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTACT URGENCE -->
+      <div class="fisherman-block" style="margin-top: 14px;">
+        <div class="fisherman-head">
+          <div class="fisherman-num">
+            <div class="fisherman-badge" style="background: rgba(240,165,0,0.15); color: var(--gold); box-shadow: none; border: 1px solid var(--gold);">⚠</div>
+            <div class="fisherman-title">Contact d'urgence</div>
+          </div>
+        </div>
+
+        <div class="form-grid grid-2">
+          <div class="field">
+            <label>Nom complet <span class="req">*</span></label>
+            <input type="text" placeholder="Personne à contacter">
+          </div>
+          <div class="field">
+            <label>Téléphone <span class="req">*</span></label>
+            <input type="tel" placeholder="06 11 22 33 44">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-back" onclick="goToStep(1)">← Retour</button>
+        <button class="btn btn-primary" onclick="goToStep(3)">Continuer →</button>
+      </div>
+    </div>
+
+    <!-- ═══ STEP 3: RÈGLEMENT ═══ -->
+    <div class="step-content" id="step-3">
+      <div class="form-eyebrow">Étape 3 sur 4</div>
+      <h2 class="form-title">Règlement & <span class="accent">consentements</span></h2>
+      <p class="form-sub">Lisez attentivement le règlement et acceptez les conditions pour finaliser votre inscription.</p>
+
+      <div class="reglement-summary">
+        <h4>Conditions d'accès</h4>
+        <p>Toute équipe inscrite est composée de deux pêcheurs majeurs. Une licence de pêche en cours de validité est obligatoire.</p>
+
+        <h4>Matériel autorisé</h4>
+        <p>Maximum 4 cannes par équipe (2 par pêcheur). Hameçons sans ardillon obligatoires. Tapis de réception, épuisette à carpes et matelas de pesée fournis par l'organisateur.</p>
+
+        <h4>Pesée des prises</h4>
+        <p>Toute prise supérieure à 3 kg doit être déclarée immédiatement au commissaire de secteur. Pesée effectuée sur tapis humidifié, photo obligatoire.</p>
+
+        <h4>Sanctions</h4>
+        <p>Tout manquement au règlement peut entraîner un avertissement, une pénalité (déduction de poids) ou une disqualification immédiate.</p>
+
+        <div class="reglement-actions">
+          <button class="link-btn">📄 Télécharger le règlement complet (PDF)</button>
+        </div>
+      </div>
+
+      <!-- Checkboxes -->
+      <label class="check-line" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <div class="check-box"></div>
+        <div class="check-text">
+          <strong>J'ai lu et j'accepte le règlement</strong> du Grand Enduro du Lac Bleu dans son intégralité.
+          <div class="meta">Obligatoire pour valider l'inscription</div>
+        </div>
+      </label>
+
+      <label class="check-line" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <div class="check-box"></div>
+        <div class="check-text">
+          <strong>J'accepte les <a href="#">conditions générales</a> et la <a href="#">politique de confidentialité</a></strong> de CarpStrike.
+          <div class="meta">Obligatoire</div>
+        </div>
+      </label>
+
+      <label class="check-line" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <div class="check-box"></div>
+        <div class="check-text">
+          <strong>J'autorise la diffusion de mon nom et de mes résultats</strong> sur les classements publics et la communication de l'enduro.
+          <div class="meta">Recommandé pour figurer aux classements live</div>
+        </div>
+      </label>
+
+      <label class="check-line" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <div class="check-box"></div>
+        <div class="check-text">
+          <strong>J'autorise la publication de photos et vidéos</strong> sur lesquelles je pourrais apparaître (prises, cérémonie, ambiance) sur la page de l'enduro et les réseaux sociaux de CarpStrike.
+          <div class="meta">Facultatif — Vous pouvez retirer votre consentement à tout moment</div>
+        </div>
+      </label>
+
+      <label class="check-line" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <div class="check-box"></div>
+        <div class="check-text">
+          <strong>J'accepte de recevoir les actualités de l'enduro</strong> par email (annonces, modifications, résultats).
+          <div class="meta">Facultatif</div>
+        </div>
+      </label>
+
+      <div class="form-actions">
+        <button class="btn btn-back" onclick="goToStep(2)">← Retour</button>
+        <button class="btn btn-primary" onclick="goToStep(4)">📨 Envoyer ma demande d'inscription</button>
+      </div>
+    </div>
+
+    <!-- ═══ STEP 4: DEMANDE ENVOYÉE ═══ -->
+    <div class="step-content" id="step-4">
+      <div class="confirmation">
+        <div class="confirmation-icon" style="background: var(--gold); box-shadow: 0 0 40px rgba(240,165,0,0.5);">⏳</div>
+        <h2 class="confirmation-title">Demande <span class="accent">envoyée</span> !</h2>
+        <p class="confirmation-desc">
+          Votre demande d'inscription au <strong style="color: var(--white);">Grand Enduro du Lac Bleu 2026</strong> a bien été transmise à l'organisateur. Vous recevrez une notification dès que votre inscription sera validée — vous pourrez alors procéder au paiement pour finaliser votre place.
+        </p>
+
+        <div class="confirmation-info">
+          <div class="confirmation-info-row">
+            <div class="label">N° de demande</div>
+            <div class="value">#DEM-LB26-019</div>
+          </div>
+          <div class="confirmation-info-row">
+            <div class="label">Équipe</div>
+            <div class="value">Les Pêcheurs du Dimanche</div>
+          </div>
+          <div class="confirmation-info-row">
+            <div class="label">Statut</div>
+            <div class="value" style="color: var(--gold);">⏳ En attente de validation</div>
+          </div>
+          <div class="confirmation-info-row">
+            <div class="label">Email de suivi</div>
+            <div class="value">jean.dupont@email.fr</div>
+          </div>
+          <div class="confirmation-info-row">
+            <div class="label">Délai indicatif</div>
+            <div class="value">48 à 72h</div>
+          </div>
+        </div>
+
+        <div style="background: rgba(74,158,255,0.06); border: 1px solid rgba(74,158,255,0.25); border-left: 3px solid var(--blue); padding: 16px 18px; margin: 22px 0; text-align: left;">
+          <div style="font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 0.85rem; color: var(--white); margin-bottom: 6px;">📨 Et maintenant ?</div>
+          <div style="font-size: 0.88rem; color: var(--off); line-height: 1.6;">
+            <strong style="color: var(--white);">1.</strong> L'organisateur examine votre demande<br>
+            <strong style="color: var(--white);">2.</strong> Vous recevez un email + notification sur l'app<br>
+            <strong style="color: var(--white);">3.</strong> Vous procédez au paiement <strong style="color: var(--gold);">(450 €)</strong> pour confirmer<br>
+            <strong style="color: var(--white);">4.</strong> Votre place est définitivement réservée ! 🎣
+          </div>
+        </div>
+
+        <div class="confirmation-actions">
+          <button class="btn btn-primary" onclick="window.location='carpstrike-profil-pecheur.html'">Voir mes demandes</button>
+          <button class="btn btn-ghost">Retour à l'enduro</button>
+        </div>
+
+        <div class="secure-banner" style="margin-top: 24px;">
+          <span class="icon">💡</span>
+          Astuce : vous pouvez suivre l'évolution de votre demande à tout moment depuis votre <strong style="color: var(--white);">profil pêcheur</strong>.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════ ENDURO SUMMARY ═══════ -->
+  <div class="summary">
+    <div class="summary-card">
+      <div class="summary-hero">
+        <div class="summary-cat">● Inscriptions ouvertes</div>
+        <div class="summary-name">Grand Enduro du Lac Bleu</div>
+        <div class="summary-meta">28-30 mai 2026 · 72h<br>Étang de Tournay (65)</div>
+      </div>
+      <div class="summary-body">
+        <div class="summary-row">
+          <div class="summary-row-label">Inscription équipe</div>
+          <div class="summary-row-value">450,00 €</div>
+        </div>
+        <div class="summary-row">
+          <div class="summary-row-label">Frais de plateforme</div>
+          <div class="summary-row-value">Offerts</div>
+        </div>
+        <div class="summary-row">
+          <div class="summary-row-label">Repas inclus</div>
+          <div class="summary-row-value">✓ Tous</div>
+        </div>
+        <div class="summary-row">
+          <div class="summary-row-label">Cannes max</div>
+          <div class="summary-row-value">4 par équipe</div>
+        </div>
+
+        <div class="summary-total">
+          <div class="summary-total-label">Total</div>
+          <div class="summary-total-value">450<span class="currency">€</span></div>
+        </div>
+
+        <div class="summary-availability">
+          <span class="icon">⚡</span>
+          <div>Plus que <strong>6 places</strong> disponibles sur 24</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // Step navigation
+  function goToStep(num) {
+    // Hide all step contents
+    document.querySelectorAll('.step-content').forEach(c => c.classList.remove('active'));
+
+    // Show target step
+    const target = document.getElementById('step-' + num);
+    if (target) target.classList.add('active');
+
+    // Update step indicator
+    document.querySelectorAll('.step').forEach(s => {
+      const step = parseInt(s.dataset.step);
+      s.classList.remove('active', 'done');
+      if (step < num) s.classList.add('done');
+      if (step === num) s.classList.add('active');
+    });
+
+    // Update step lines
+    document.querySelectorAll('.step-line').forEach((line, idx) => {
+      line.classList.toggle('done', idx < num - 1);
+    });
+
+    // If step 5 (confirmation), mark all steps as done
+    if (num === 5) {
+      document.querySelectorAll('.step').forEach(s => {
+        s.classList.remove('active');
+        s.classList.add('done');
+      });
+      document.querySelectorAll('.step-line').forEach(line => line.classList.add('done'));
+    }
+
+    // Replace step nums with check marks for done steps
+    document.querySelectorAll('.step.done .step-num').forEach(n => {
+      n.textContent = '✓';
+    });
+    document.querySelectorAll('.step:not(.done) .step-num').forEach(n => {
+      n.textContent = n.parentElement.dataset.step;
+    });
+
+    // Scroll top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Toggle checkbox lines
+  function toggleCheck(el) {
+    el.classList.toggle('checked');
+    const input = el.querySelector('input');
+    if (input) input.checked = el.classList.contains('checked');
+  }
+
+  // Payment method selection
+  function selectPayment(el) {
+    document.querySelectorAll('.payment-method').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    const input = el.querySelector('input');
+    if (input) input.checked = true;
+
+    // Toggle card / transfer form
+    const cardForm = document.getElementById('card-form');
+    const transferForm = document.getElementById('transfer-form');
+    if (input.value === 'card') {
+      cardForm.style.display = 'block';
+      transferForm.style.display = 'none';
+    } else {
+      cardForm.style.display = 'none';
+      transferForm.style.display = 'block';
+    }
+  }
+</script>
+
+</body>
+</html>

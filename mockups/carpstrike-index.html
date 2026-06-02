@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CarpStrike — Prototype complet</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,700;0,900;1,900&family=Barlow:wght@400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #e8212b; --red-bright: #ff2d3a; --red-dim: rgba(232,33,43,0.15); --red-glow: rgba(232,33,43,0.4);
+    --white: #f4f0eb; --off: #c8c0b4; --dim: rgba(244,240,235,0.6); --dim2: rgba(244,240,235,0.3);
+    --dark: #0a0908; --darker: #050403; --panel: #141310; --panel-2: #1a1814;
+    --line: rgba(244,240,235,0.07); --line-bright: rgba(244,240,235,0.15);
+    --gold: #f0a500; --green: #00c850; --blue: #4a9eff; --purple: #b87de8;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--darker); font-family: 'Barlow', sans-serif; color: var(--white); min-height: 100vh; }
+  .bg-atmosphere { position: fixed; inset: 0; z-index: -2; background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(232,33,43,0.1) 0%, transparent 55%), linear-gradient(180deg, #0a0908 0%, #060504 100%); }
+  .bg-grid { position: fixed; inset: 0; z-index: -1; background-image: linear-gradient(rgba(244,240,235,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(244,240,235,0.02) 1px, transparent 1px); background-size: 60px 60px; mask-image: radial-gradient(ellipse 80% 60% at 50% 25%, #000 0%, transparent 80%); }
+
+  .hero { text-align: center; padding: 70px 24px 50px; position: relative; }
+  .hero::before { content: 'PROTOTYPE'; position: absolute; top: 6px; left: 50%; transform: translateX(-50%); font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-style: italic; font-size: 11rem; color: rgba(244,240,235,0.022); letter-spacing: -6px; line-height: 1; pointer-events: none; white-space: nowrap; }
+  .hero-logo { display: flex; justify-content: center; margin-bottom: 20px; position: relative; }
+  .hero-eyebrow { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 0.78rem; letter-spacing: 5px; text-transform: uppercase; color: var(--red); margin-bottom: 14px; position: relative; }
+  .hero-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-style: italic; font-size: 3.4rem; line-height: 1; letter-spacing: -1.5px; margin-bottom: 16px; position: relative; }
+  .hero-sub { color: var(--dim); font-size: 1.05rem; line-height: 1.6; max-width: 620px; margin: 0 auto; position: relative; }
+  .hero-stats { display: flex; justify-content: center; gap: 36px; margin-top: 30px; flex-wrap: wrap; position: relative; }
+  .hero-stat { text-align: center; }
+  .hero-stat-val { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-style: italic; font-size: 2rem; color: var(--white); line-height: 1; }
+  .hero-stat-val .accent { color: var(--red); }
+  .hero-stat-lbl { font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); margin-top: 5px; }
+
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 20px 24px 80px; }
+  .group { margin-bottom: 44px; }
+  .group-head { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+  .group-icon { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%); }
+  .group-icon.public { background: rgba(232,33,43,0.15); color: var(--red); }
+  .group-icon.org { background: rgba(74,158,255,0.15); color: var(--blue); }
+  .group-icon.comm { background: rgba(0,200,80,0.15); color: var(--green); }
+  .group-icon.fisher { background: rgba(240,165,0,0.15); color: var(--gold); }
+  .group-icon.brand { background: rgba(184,125,232,0.15); color: var(--purple); }
+  .group-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-style: italic; font-size: 1.7rem; line-height: 1; letter-spacing: -0.5px; }
+  .group-sub { font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: 0.78rem; letter-spacing: 1px; color: var(--dim); margin-top: 4px; }
+
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; }
+  .card { background: linear-gradient(140deg, var(--panel) 0%, var(--panel-2) 100%); border: 1px solid var(--line); padding: 20px; text-decoration: none; color: inherit; transition: all 0.22s; position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 10px; }
+  .card::before { content: ''; position: absolute; top: 0; left: 0; width: 50px; height: 2px; background: var(--accent, var(--red)); transition: width 0.22s; }
+  .card:hover { border-color: var(--accent, var(--red)); transform: translateY(-3px); box-shadow: 0 10px 28px rgba(0,0,0,0.45); }
+  .card:hover::before { width: 100%; }
+  .card.public { --accent: var(--red); }
+  .card.org { --accent: var(--blue); }
+  .card.comm { --accent: var(--green); }
+  .card.fisher { --accent: var(--gold); }
+  .card.brand { --accent: var(--purple); }
+  .card-num { font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--dim2); letter-spacing: 1px; }
+  .card-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-style: italic; font-size: 1.2rem; line-height: 1.1; color: var(--white); }
+  .card-desc { font-size: 0.82rem; color: var(--dim); line-height: 1.45; flex: 1; }
+  .card-go { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase; color: var(--accent, var(--red)); display: flex; align-items: center; gap: 6px; }
+
+  .flow { background: linear-gradient(140deg, rgba(232,33,43,0.06) 0%, rgba(232,33,43,0.02) 100%); border: 1px solid rgba(232,33,43,0.2); border-left: 3px solid var(--red); padding: 22px 26px; margin-bottom: 44px; }
+  .flow-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-style: italic; font-size: 1.2rem; margin-bottom: 14px; }
+  .flow-steps { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .flow-step { background: rgba(0,0,0,0.4); border: 1px solid var(--line); padding: 7px 13px; font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 0.78rem; color: var(--off); }
+  .flow-arrow { color: var(--red); font-weight: 700; }
+
+  .footer { text-align: center; padding: 30px 24px 50px; color: var(--dim); font-size: 0.85rem; line-height: 1.6; border-top: 1px solid var(--line); }
+  .footer strong { color: var(--white); }
+
+  @media (max-width: 700px) {
+    .hero-title { font-size: 2.3rem; }
+    .cards { grid-template-columns: 1fr; }
+    .hero-stats { gap: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-atmosphere"></div>
+<div class="bg-grid"></div>
+
+<div class="hero">
+  <div class="hero-logo">
+    <svg width="300" height="72" viewBox="0 0 540 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M10 70 L 70 70 L 80 70 L 88 54 L 98 90 L 108 70 L 150 70 L 165 70 L 178 38 L 192 104 L 206 70 L 250 70 L 262 70 L 275 14 L 290 120 L 305 70 L 330 70 L 345 70 L 356 50 L 367 88 L 377 70 L 430 70 L 445 70 L 456 56 L 466 84 L 476 70 L 530 70" stroke="#e8212b" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="270" y="84" font-family="'Barlow Condensed', sans-serif" font-size="56" font-weight="900" font-style="italic" fill="#f4f0eb" text-anchor="middle" stroke="#050403" stroke-width="7" paint-order="stroke">CARP<tspan fill="#e8212b">STRIKE</tspan></text>
+    </svg>
+  </div>
+  <div class="hero-eyebrow">Prototype interactif · v1</div>
+  <h1 class="hero-title">L'app des enduros carpe</h1>
+  <p class="hero-sub">Toutes les maquettes reliées entre elles. Navigue par profil utilisateur ou suis un parcours complet. Clique sur n'importe quel écran pour le visiter.</p>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hero-stat-val"><span class="accent">20</span></div>
+      <div class="hero-stat-lbl">Écrans</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-val"><span class="accent">4</span></div>
+      <div class="hero-stat-lbl">Profils</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-val"><span class="accent">100%</span></div>
+      <div class="hero-stat-lbl">Navigable</div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- PARCOURS TYPE -->
+  <div class="flow">
+    <div class="flow-title">🎣 Parcours pêcheur — de la découverte à la victoire</div>
+    <div class="flow-steps">
+      <a href="carpstrike-app.html" class="flow-step">Accueil</a>
+      <span class="flow-arrow">→</span>
+      <a href="carpstrike-recherche.html" class="flow-step">Recherche</a>
+      <span class="flow-arrow">→</span>
+      <a href="carpstrike-inscription.html" class="flow-step">Demande d'inscription</a>
+      <span class="flow-arrow">→</span>
+      <a href="carpstrike-paiement.html" class="flow-step">Paiement</a>
+      <span class="flow-arrow">→</span>
+      <a href="carpstrike-classement-live.html" class="flow-step">Classement live</a>
+      <span class="flow-arrow">→</span>
+      <a href="carpstrike-resultats.html" class="flow-step">Résultats</a>
+      <span class="flow-arrow">→</span>
+      <a href="carpstrike-profil-pecheur.html" class="flow-step">Profil</a>
+    </div>
+  </div>
+
+  <!-- PUBLIC -->
+  <div class="group">
+    <div class="group-head">
+      <div class="group-icon public">🌐</div>
+      <div>
+        <div class="group-title">Pages publiques</div>
+        <div class="group-sub">Accessibles à tous · spectateurs et visiteurs</div>
+      </div>
+    </div>
+    <div class="cards">
+      <a href="carpstrike-app.html" class="card public">
+        <div class="card-num">01</div>
+        <div class="card-name">Page d'accueil</div>
+        <div class="card-desc">Landing avec hero, enduros en direct et à venir, connexion.</div>
+        <div class="card-go">Ouvrir →</div>
+      </a>
+      <a href="carpstrike-recherche.html" class="card public">
+        <div class="card-num">02</div>
+        <div class="card-name">Recherche d'enduros</div>
+        <div class="card-desc">Filtres avancés : région, dates, prix, dotation, services.</div>
+        <div class="card-go">Ouvrir →</div>
+      </a>
+      <a href="carpstrike-enduro-page.html" class="card public">
+        <div class="card-num">03</div>
+        <div class="card-name">Page d'un enduro</div>
+        <div class="card-desc">Présentation publique, countdown, podium, règlement, lieu.</div>
+        <div class="card-go">Ouvrir →</div>
+      </a>
+      <a href="carpstrike-classement-live.html" class="card public">
+        <div class="card-num">04</div>
+        <div class="card-name">Classement live</div>
+        <div class="card-desc">Suivi temps réel, podium, stats par secteur, rotation.</div>
+        <div class="card-go">Ouvrir →</div>
+      </a>
+      <a href="carpstrike-resultats.html" class="card public">
+        <div class="card-num">05</div>
+        <div class="card-name">Résultats finaux</div>
+        <div class="card-desc">Champion, podium, galerie photo, certificats à télécharger.</div>
+        <div class="card-go">Ouvrir →</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- PÊCHEUR -->
+  <div class="group">
+    <div class="group-head">
+      <div class="group-icon fisher">🎣</div>
+      <div>
+        <div class="group-title">Espace pêcheur</div>
+        <div class="group-sub">Inscription, paiement et profil personnel</div>
+      </div>
+    </div>
+    <div class="cards">
+      <a href="carpstrike-inscription.html" class="card fisher">
+        <div class="card-num">06</div>
+        <div class="card-name">Demande d'inscription</div>
+        <div class="card-desc">Formulaire équipe + pêcheurs + règlement → demande envoyée.</div>
+        <div class="card-go">Ouvrir →</div>
+      </a>
+      <a href="carpstrike-paiement.html" class="card fisher">
+        <div class="card-num">07</div>
+        <div class="card-name">Paiement</div>
+        <div class="card-desc">Après validation : CB ou virement, délai 7 jours, confirmation.</div>
+        <div class="card-go">Ouvrir →</div>
+      </a>
+      <a href="carpstrike-profil-pecheur.html" class="card fisher">
+        <div class="card-num">08</div>
+        <div class="card-name">Profil pêcheur</div>
+        <div class="card-desc">Stats, record perso, historique, trophées, mes enduros.</div>
+        <div class="card-go">Ouvrir →</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- ORGANISATEUR -->
+  <div class="group">
+    <div class="group-head">
+      <div class="group-icon org">⚙</div>
+      <div>
+        <div class="group-title">Espace organisateur</div>
+        <div class="group-sub">Gestion complète de l'enduro · sidebar reliée</div>
+      </div>
+    </div>
+    <div class="cards">
+      <a href="carpstrike-dashboard.html" class="card org">
+        <div class="card-num">09</div>
+        <div class="card-name">Tableau de bord</div>
+        <div class="card-desc">Vue d'ensemble : KPIs, classement live, validations, activité.</div>
+        <div class="card-go">Ouvrir →</div>
+      </a>
+      <a href="carpstrike-demandes.html" class="card org">
+        <div class="card-num">10</div>
+        <div class="card-name">Demandes d'inscription</div>
+        <div class="card-desc">Valider ou refuser les équipes avant paiement.</div>
+        <div class="card-go">Ouvrir →</div>
+      </a>
+      <a href="carpstrike-validations.html" class="card org">
+        <div class="card-num">11</div>
+        <div class="card-name">Validations des prises</div>
+        <div class="card-desc">Suivi temps réel des prises validées par les commissaires.</div>
+        <div class="card-go">Ouvrir →</div>
+      </a>
+      <a href="carpstrike-equipes.html" class="card org">
+        <div class="card-num">12</div>
+        <div class="card-name">Équipes</div>
+        <div class="card-desc">Liste des équipes, attribution des postes après tirage.</div>
+        <div class="card-go">Ouvrir →</div>
+      </a>
+      <a href="carpstrike-lancer-precision.html" class="card org">
+        <div class="card-num">13</div>
+        <div class="card-name">Lancer de précision</div>
+        <div class="card-desc">Préparation, saisie des lancers, classement pour attribution.</div>
+        <div class="card-go">Ouvrir →</div>
+      </a>
+      <a href="carpstrike-commissaires.html" class="card org">
+        <div class="card-num">14</div>
+        <div class="card-name">Commissaires</div>
+        <div class="card-desc">Génération d'identifiants d'accès uniques par commissaire.</div>
+        <div class="card-go">Ouvrir →</div>
+      </a>
+      <a href="carpstrike-communication.html" class="card org">
+        <div class="card-num">15</div>
+        <div class="card-name">Communication</div>
+        <div class="card-desc">Envoi d'annonces multi-canal avec modèles et aperçu.</div>
+        <div class="card-go">Ouvrir →</div>
+      </a>
+      <a href="carpstrike-parametres.html" class="card org">
+        <div class="card-num">16</div>
+        <div class="card-name">Paramètres</div>
+        <div class="card-desc">Édition de l'enduro, sections verrouillées, zone de danger.</div>
+        <div class="card-go">Ouvrir →</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- COMMISSAIRE -->
+  <div class="group">
+    <div class="group-head">
+      <div class="group-icon comm">★</div>
+      <div>
+        <div class="group-title">Espace commissaire</div>
+        <div class="group-sub">Application mobile de terrain</div>
+      </div>
+    </div>
+    <div class="cards">
+      <a href="carpstrike-commissaire-app.html" class="card comm">
+        <div class="card-num">17</div>
+        <div class="card-name">App commissaire (mobile)</div>
+        <div class="card-desc">Login, saisie des prises, pesée, photo, historique. Optimisé téléphone.</div>
+        <div class="card-go">Ouvrir →</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- PAGES VITRINE -->
+  <div class="group">
+    <div class="group-head">
+      <div class="group-icon public">📄</div>
+      <div>
+        <div class="group-title">Pages vitrine</div>
+        <div class="group-sub">Tarifs, aide et contact · conversion visiteurs</div>
+      </div>
+    </div>
+    <div class="cards">
+      <a href="carpstrike-tarifs.html" class="card public">
+        <div class="card-num">18</div>
+        <div class="card-name">Tarifs</div>
+        <div class="card-desc">3 formules organisateur, comparatif détaillé, FAQ tarifs.</div>
+        <div class="card-go">Ouvrir →</div>
+      </a>
+      <a href="carpstrike-faq.html" class="card public">
+        <div class="card-num">19</div>
+        <div class="card-name">FAQ</div>
+        <div class="card-desc">Questions par profil : pêcheur, organisateur, commissaire.</div>
+        <div class="card-go">Ouvrir →</div>
+      </a>
+      <a href="carpstrike-contact.html" class="card public">
+        <div class="card-num">20</div>
+        <div class="card-name">Contact & À propos</div>
+        <div class="card-desc">Formulaire de contact, coordonnées, histoire de la marque.</div>
+        <div class="card-go">Ouvrir →</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- MARQUE -->
+  <div class="group">
+    <div class="group-head">
+      <div class="group-icon brand">✦</div>
+      <div>
+        <div class="group-title">Identité de marque</div>
+        <div class="group-sub">Logo et déclinaisons</div>
+      </div>
+    </div>
+    <div class="cards">
+      <a href="carpstrike-logo-final.html" class="card brand">
+        <div class="card-num">—</div>
+        <div class="card-name">Logo CarpStrike</div>
+        <div class="card-desc">Logo ECG final + déclinaisons fond clair / sombre.</div>
+        <div class="card-go">Ouvrir →</div>
+      </a>
+      <a href="carpstrike-logo-ecg.html" class="card brand">
+        <div class="card-num">—</div>
+        <div class="card-name">Variantes de logo</div>
+        <div class="card-desc">Les 3 concepts ECG explorés + icônes app.</div>
+        <div class="card-go">Ouvrir →</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="footer">
+    <strong>CarpStrike</strong> — Prototype interactif · 16 écrans reliés<br>
+    Navigation : sidebar organisateur câblée · header public câblé · parcours pêcheur complet<br>
+    Conçu pour les organisateurs d'enduros carpe en France 🐟
+  </div>
+
+</div>
+
+</body>
+</html>

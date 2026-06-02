@@ -1,0 +1,1902 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestion des équipes — Grand Enduro du Lac Bleu</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,900;1,700;1,900&family=Barlow:wght@300;400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #e8212b;
+    --red-bright: #ff2d3a;
+    --red-dim: rgba(232,33,43,0.15);
+    --red-glow: rgba(232,33,43,0.4);
+    --white: #f4f0eb;
+    --off: #c8c0b4;
+    --dim: rgba(244,240,235,0.6);
+    --dim2: rgba(244,240,235,0.3);
+    --dark: #0a0908;
+    --darker: #050403;
+    --panel: #141310;
+    --panel-2: #1a1814;
+    --line: rgba(244,240,235,0.07);
+    --line-bright: rgba(244,240,235,0.15);
+    --gold: #f0a500;
+    --green: #00c850;
+    --blue: #4a9eff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--darker);
+    font-family: 'Barlow', sans-serif;
+    color: var(--white);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .bg-atmosphere {
+    position: fixed; inset: 0; z-index: -2;
+    background:
+      radial-gradient(ellipse 60% 40% at 0% 0%, rgba(232,33,43,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse 60% 60% at 100% 100%, rgba(232,33,43,0.05) 0%, transparent 50%),
+      linear-gradient(180deg, #0a0908 0%, #060504 100%);
+  }
+
+  .bg-grid {
+    position: fixed; inset: 0; z-index: -1;
+    background-image:
+      linear-gradient(rgba(244,240,235,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(244,240,235,0.02) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, #000 0%, transparent 80%);
+  }
+
+  /* ─── LAYOUT ─── */
+  .app {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    min-height: 100vh;
+  }
+
+  /* ─── SIDEBAR ─── */
+  .sidebar {
+    background: var(--dark);
+    border-right: 1px solid var(--line);
+    padding: 24px 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar-logo {
+    display: flex;
+    align-items: center;
+    padding: 0 22px 24px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 18px;
+  }
+
+  .logo-carp {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 1.4rem;
+    color: var(--white);
+    letter-spacing: 1px;
+    line-height: 1;
+  }
+
+  .logo-strike {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 1.4rem;
+    color: var(--red);
+    letter-spacing: 1px;
+    line-height: 1;
+    text-shadow: 0 0 15px var(--red-glow);
+  }
+
+  .logo-slash {
+    width: 3px; height: 18px;
+    background: var(--red);
+    transform: skewX(-10deg);
+    margin: 0 7px;
+    box-shadow: 0 0 8px var(--red-glow);
+  }
+
+  .nav-section {
+    padding: 0 14px 18px;
+  }
+
+  .nav-section-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.62rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--dim2);
+    padding: 0 10px 8px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 10px 12px;
+    color: var(--dim);
+    text-decoration: none;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    font-size: 0.88rem;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+    cursor: pointer;
+    position: relative;
+    margin-bottom: 2px;
+  }
+
+  .nav-item:hover {
+    color: var(--white);
+    background: rgba(244,240,235,0.03);
+  }
+
+  .nav-item.active {
+    color: var(--white);
+    background: var(--red-dim);
+  }
+
+  .nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 6px; bottom: 6px;
+    width: 2px;
+    background: var(--red);
+    box-shadow: 0 0 8px var(--red-glow);
+  }
+
+  .nav-item .icon {
+    width: 18px; height: 18px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .nav-item .badge {
+    margin-left: auto;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.65rem;
+    background: var(--red);
+    color: #fff;
+    padding: 1px 6px;
+    letter-spacing: 1px;
+  }
+
+  .sidebar-user {
+    margin-top: auto;
+    padding: 14px 14px 0;
+    margin: auto 14px 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .user-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+  }
+
+  .user-avatar {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--red) 0%, #8a1820 100%);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+  }
+
+  .user-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.82rem;
+    color: var(--white);
+  }
+
+  .user-role {
+    font-size: 0.68rem;
+    color: var(--dim);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* ─── MAIN ─── */
+  .main {
+    padding: 28px 36px 50px;
+    max-width: 1400px;
+  }
+
+  /* Top bar */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    gap: 20px;
+  }
+
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.78rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+
+  .breadcrumb a {
+    color: var(--dim);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .breadcrumb a:hover { color: var(--white); }
+  .breadcrumb .sep { color: var(--dim2); }
+  .breadcrumb .current { color: var(--white); }
+
+  /* Page header */
+  .page-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+
+  .page-eyebrow {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.72rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .page-eyebrow::before {
+    content: '';
+    width: 24px; height: 1px;
+    background: var(--red);
+  }
+
+  .page-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 2.4rem;
+    line-height: 1;
+    letter-spacing: -1px;
+  }
+
+  .page-title .accent { color: var(--red); }
+
+  .page-actions {
+    display: flex;
+    gap: 10px;
+  }
+
+  /* ─── BUTTONS ─── */
+  .btn {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 10px 22px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: inherit;
+    background: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-primary {
+    background: var(--red);
+    color: #fff;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    box-shadow: 0 0 15px var(--red-glow);
+  }
+
+  .btn-primary:hover {
+    background: var(--red-bright);
+    box-shadow: 0 0 25px var(--red-glow);
+  }
+
+  .btn-ghost {
+    color: var(--white);
+    border: 1px solid var(--line-bright);
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  }
+
+  .btn-ghost:hover {
+    border-color: var(--white);
+    background: rgba(244,240,235,0.05);
+  }
+
+  .btn-small {
+    padding: 7px 14px;
+    font-size: 0.75rem;
+  }
+
+  /* ─── ALERT INFO ─── */
+  .alert-info {
+    background: rgba(74,158,255,0.06);
+    border: 1px solid rgba(74,158,255,0.25);
+    border-left: 3px solid var(--blue);
+    padding: 14px 18px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .alert-info-icon {
+    color: var(--blue);
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  .alert-info-text {
+    font-size: 0.9rem;
+    color: var(--off);
+    line-height: 1.5;
+  }
+
+  .alert-info-text strong { color: var(--white); }
+
+  /* ─── PROGRESS BAR ─── */
+  .progress-card {
+    background: linear-gradient(140deg, var(--panel) 0%, var(--panel-2) 100%);
+    border: 1px solid var(--line);
+    padding: 22px 26px;
+    margin-bottom: 22px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 24px;
+    align-items: center;
+  }
+
+  .progress-info { }
+
+  .progress-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .progress-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.78rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--white);
+  }
+
+  .progress-count {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 1.4rem;
+    color: var(--red);
+  }
+
+  .progress-count .total {
+    color: var(--dim);
+    font-weight: 400;
+  }
+
+  .progress-bar {
+    height: 8px;
+    background: rgba(0,0,0,0.5);
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 10px;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--red) 0%, var(--red-bright) 100%);
+    box-shadow: 0 0 10px var(--red-glow);
+    width: 50%;
+    transition: width 0.5s ease;
+    position: relative;
+  }
+
+  .progress-fill::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 30%, rgba(255,255,255,0.3) 50%, transparent 70%);
+    animation: progressShine 2s ease-in-out infinite;
+  }
+
+  @keyframes progressShine {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(100%); }
+  }
+
+  .progress-meta {
+    font-size: 0.78rem;
+    color: var(--dim);
+  }
+
+  .progress-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  /* ─── ADD TEAM FORM ─── */
+  .add-card {
+    background: linear-gradient(140deg, var(--panel) 0%, var(--panel-2) 100%);
+    border: 1px solid var(--line-bright);
+    padding: 24px 26px;
+    margin-bottom: 22px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .add-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 80px; height: 2px;
+    background: var(--red);
+    box-shadow: 0 0 12px var(--red-glow);
+  }
+
+  .add-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+  }
+
+  .add-card-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .add-card-title .bar {
+    width: 4px; height: 22px;
+    background: var(--red);
+    box-shadow: 0 0 8px var(--red-glow);
+  }
+
+  .add-form {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 100px auto;
+    gap: 10px;
+    align-items: end;
+  }
+
+  .field { display: flex; flex-direction: column; }
+
+  .field label {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 6px;
+  }
+
+  .field input,
+  .field select {
+    width: 100%;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid var(--line);
+    padding: 10px 12px;
+    color: var(--white);
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.88rem;
+    transition: all 0.2s;
+    outline: none;
+  }
+
+  .field input:focus,
+  .field select:focus {
+    border-color: var(--red);
+    background: rgba(0,0,0,0.6);
+    box-shadow: 0 0 0 3px var(--red-dim);
+  }
+
+  .field input::placeholder { color: var(--dim2); }
+
+  .field select {
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23e8212b' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+  }
+
+  .add-btn {
+    background: var(--red);
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    height: 39px;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    box-shadow: 0 0 15px var(--red-glow);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+
+  .add-btn:hover {
+    background: var(--red-bright);
+    box-shadow: 0 0 25px var(--red-glow);
+  }
+
+  .add-options {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .add-options-info {
+    font-size: 0.82rem;
+    color: var(--dim);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .add-options-info kbd {
+    background: var(--panel);
+    border: 1px solid var(--line-bright);
+    padding: 2px 7px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.72rem;
+    color: var(--white);
+  }
+
+  .add-options-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  /* ─── FILTER BAR ─── */
+  .filter-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+
+  .filter-search {
+    flex: 1;
+    min-width: 240px;
+    position: relative;
+  }
+
+  .filter-search input {
+    width: 100%;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 9px 12px 9px 36px;
+    color: var(--white);
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.88rem;
+    outline: none;
+    transition: all 0.2s;
+  }
+
+  .filter-search input:focus {
+    border-color: var(--red);
+    background: rgba(0,0,0,0.6);
+    box-shadow: 0 0 0 3px var(--red-dim);
+  }
+
+  .filter-search::before {
+    content: '⌕';
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--dim);
+    font-size: 1.1rem;
+  }
+
+  .filter-chips {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .filter-chip {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    font-size: 0.72rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: var(--dim);
+    cursor: pointer;
+    transition: all 0.2s;
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  }
+
+  .filter-chip:hover {
+    color: var(--white);
+    border-color: var(--line-bright);
+  }
+
+  .filter-chip.active {
+    background: var(--red-dim);
+    color: var(--red);
+    border-color: var(--red);
+  }
+
+  /* ─── TEAMS TABLE ─── */
+  .teams-table {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    overflow: hidden;
+  }
+
+  .table-head {
+    display: grid;
+    grid-template-columns: 50px 60px 1.5fr 2fr 130px 100px 130px;
+    padding: 12px 18px;
+    background: rgba(0,0,0,0.3);
+    border-bottom: 1px solid var(--line);
+    align-items: center;
+  }
+
+  .table-head .th {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.62rem;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+
+  .team-row {
+    display: grid;
+    grid-template-columns: 50px 60px 1.5fr 2fr 130px 100px 130px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--line);
+    align-items: center;
+    transition: background 0.2s;
+  }
+
+  .team-row:last-child { border-bottom: none; }
+
+  .team-row:hover {
+    background: rgba(232,33,43,0.04);
+  }
+
+  .team-row.no-sector {
+    border-left: 2px solid var(--gold);
+  }
+
+  /* checkbox */
+  .row-check {
+    width: 18px; height: 18px;
+    border: 2px solid var(--line-bright);
+    background: rgba(0,0,0,0.3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .row-check.checked {
+    background: var(--red);
+    border-color: var(--red);
+  }
+
+  .row-check.checked::after {
+    content: '✓';
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  /* number */
+  .row-num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 1.15rem;
+    color: var(--dim2);
+  }
+
+  /* team name */
+  .row-team {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--white);
+    letter-spacing: 0.5px;
+  }
+
+  /* members */
+  .row-members {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.88rem;
+    color: var(--off);
+  }
+
+  .members-avatars {
+    display: flex;
+    gap: -8px;
+  }
+
+  .member-avatar {
+    width: 26px; height: 26px;
+    background: linear-gradient(135deg, var(--red-dim) 0%, rgba(232,33,43,0.05) 100%);
+    border: 1px solid var(--line-bright);
+    color: var(--red);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 0.78rem;
+    margin-left: -6px;
+    flex-shrink: 0;
+  }
+
+  .member-avatar:first-child { margin-left: 0; }
+
+  /* sector */
+  .sector-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.72rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    background: var(--red-dim);
+    border: 1px solid rgba(232,33,43,0.4);
+    color: var(--red);
+    clip-path: polygon(5px 0%, 100% 0%, calc(100% - 5px) 100%, 0% 100%);
+  }
+
+  .sector-badge.empty {
+    background: rgba(240,165,0,0.1);
+    border-color: rgba(240,165,0,0.4);
+    color: var(--gold);
+  }
+
+  /* poste */
+  .poste-num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--white);
+  }
+
+  .poste-num.empty {
+    color: var(--dim2);
+  }
+
+  /* actions */
+  .row-actions {
+    display: flex;
+    gap: 6px;
+    justify-content: flex-end;
+  }
+
+  .icon-btn {
+    width: 30px; height: 30px;
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--dim);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    font-size: 0.85rem;
+  }
+
+  .icon-btn:hover {
+    color: var(--white);
+    border-color: var(--line-bright);
+    background: var(--panel);
+  }
+
+  .icon-btn.delete:hover {
+    color: var(--red);
+    border-color: var(--red);
+  }
+
+  .icon-btn.edit:hover {
+    color: var(--blue);
+    border-color: var(--blue);
+  }
+
+  /* ─── EMPTY STATE ─── */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--dim);
+  }
+
+  .empty-icon {
+    font-size: 3rem;
+    color: var(--dim2);
+    margin-bottom: 12px;
+  }
+
+  .empty-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 1.4rem;
+    color: var(--white);
+    margin-bottom: 6px;
+  }
+
+  /* ─── BULK ACTIONS BAR ─── */
+  .bulk-bar {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(232,33,43,0.08);
+    border: 1px solid rgba(232,33,43,0.3);
+    padding: 12px 18px;
+    margin-bottom: 14px;
+    animation: slideIn 0.2s ease;
+  }
+
+  .bulk-bar.visible { display: flex; }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .bulk-info {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--white);
+  }
+
+  .bulk-info .count {
+    color: var(--red);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-style: italic;
+    font-size: 1rem;
+  }
+
+  .bulk-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  /* ─── MODAL ─── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(6, 5, 4, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+
+  .modal-overlay.active {
+    display: flex;
+    opacity: 1;
+  }
+
+  .modal {
+    position: relative;
+    background: linear-gradient(140deg, var(--panel) 0%, var(--panel-2) 100%);
+    border: 1px solid var(--line-bright);
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 32px 32px 28px;
+    clip-path: polygon(20px 0%, 100% 0%, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0% 100%, 0% 20px);
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+  }
+
+  .modal-overlay.active .modal { transform: scale(1); }
+
+  .modal::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 90px; height: 2px;
+    background: var(--red);
+    box-shadow: 0 0 15px var(--red-glow);
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 16px; right: 18px;
+    width: 28px; height: 28px;
+    background: transparent;
+    border: 1px solid var(--line-bright);
+    color: var(--dim);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .modal-close:hover {
+    border-color: var(--red);
+    color: var(--red);
+  }
+
+  .modal-eyebrow {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .modal-eyebrow::before {
+    content: '';
+    width: 24px; height: 1px;
+    background: var(--red);
+  }
+
+  .modal-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 1.7rem;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .modal-title .accent { color: var(--red); }
+
+  .modal-sub {
+    color: var(--dim);
+    font-size: 0.9rem;
+    margin-bottom: 22px;
+  }
+
+  /* ─── ATTRIBUTION MODAL ─── */
+  .form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 22px;
+  }
+
+  .form-actions .btn-primary { flex: 1; justify-content: center; }
+
+  /* ─── MOBILE ─── */
+  @media (max-width: 1100px) {
+    .add-form { grid-template-columns: 1fr 1fr; }
+    .table-head, .team-row {
+      grid-template-columns: 40px 1fr 60px;
+      grid-template-areas:
+        "check team actions"
+        "check members actions"
+        "check sector actions"
+        "check poste actions";
+      gap: 4px;
+      padding: 12px 14px;
+    }
+    .table-head .th:nth-child(2),
+    .table-head .th:nth-child(5),
+    .table-head .th:nth-child(6) { display: none; }
+    .row-num { display: none; }
+    .row-team { font-size: 1.05rem; }
+  }
+
+  @media (max-width: 800px) {
+    .app { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .main { padding: 20px; }
+    .progress-card { grid-template-columns: 1fr; }
+  }
+
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--line-bright); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--dim2); }
+</style>
+</head>
+<body>
+
+<div class="bg-atmosphere"></div>
+<div class="bg-grid"></div>
+
+<div class="app">
+
+  <!-- ═══════ SIDEBAR ═══════ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <a href="carpstrike-index.html" style="display:inline-block;text-decoration:none" title="Accueil du prototype"><svg class="cs-logo" width="125" height="30" viewBox="0 0 540 130" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="CarpStrike" style="display:block">
+<path d="M10 70 L 70 70 L 80 70 L 88 54 L 98 90 L 108 70 L 150 70 L 165 70 L 178 38 L 192 104 L 206 70 L 250 70 L 262 70 L 275 14 L 290 120 L 305 70 L 330 70 L 345 70 L 356 50 L 367 88 L 377 70 L 430 70 L 445 70 L 456 56 L 466 84 L 476 70 L 530 70" stroke="#e8212b" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="270" y="84" font-family="'Barlow Condensed', sans-serif" font-size="56" font-weight="900" font-style="italic" fill="#f4f0eb" text-anchor="middle" stroke="#0a0908" stroke-width="7" paint-order="stroke">CARP<tspan fill="#e8212b">STRIKE</tspan></text>
+</svg></a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Mon enduro</div>
+      <a class="nav-item" href="carpstrike-dashboard.html">
+        <div class="icon">⊞</div>
+        Tableau de bord
+      </a>
+      <a class="nav-item" href="carpstrike-classement-live.html">
+        <div class="icon">⚑</div>
+        Classement live
+      </a>
+      <a class="nav-item" href="carpstrike-validations.html">
+        <div class="icon">⚐</div>
+        Validations
+      </a>
+      <a class="nav-item active" href="carpstrike-equipes.html">
+        <div class="icon">▤</div>
+        Équipes
+        <span class="badge">12</span>
+      </a>
+      <a class="nav-item" href="carpstrike-dashboard.html">
+        <div class="icon">◫</div>
+        Secteurs
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Gestion</div>
+      <a class="nav-item" href="carpstrike-commissaires.html">
+        <div class="icon">★</div>
+        Commissaires
+      </a>
+      <a class="nav-item" href="carpstrike-communication.html">
+        <div class="icon">◎</div>
+        Communication
+      </a>
+      <a class="nav-item" href="carpstrike-parametres.html">
+        <div class="icon">⚙</div>
+        Paramètres
+      </a>
+    </div>
+
+    <div class="sidebar-user">
+      <div class="user-card">
+        <div class="user-avatar">M</div>
+        <div>
+          <div class="user-name">Maxime D.</div>
+          <div class="user-role">Organisateur</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════ MAIN CONTENT ═══════ -->
+  <main class="main">
+
+    <!-- TOP BAR -->
+    <div class="topbar">
+      <div class="breadcrumb">
+        <a href="#">Mes enduros</a>
+        <span class="sep">/</span>
+        <a href="#">Grand Enduro du Lac Bleu</a>
+        <span class="sep">/</span>
+        <span class="current">Équipes</span>
+      </div>
+    </div>
+
+    <!-- PAGE HEADER -->
+    <div class="page-head">
+      <div>
+        <div class="page-eyebrow">Mode gestion seule · Inscriptions externes</div>
+        <h1 class="page-title">Gestion des <span class="accent">équipes</span></h1>
+      </div>
+      <div class="page-actions">
+        <button class="btn btn-ghost">📥 Importer CSV</button>
+        <button class="btn btn-ghost">📤 Exporter</button>
+      </div>
+    </div>
+
+    <!-- INFO ALERT -->
+    <div class="alert-info">
+      <div class="alert-info-icon">ℹ</div>
+      <div class="alert-info-text">
+        Vous avez choisi le mode <strong>"Gestion seule"</strong>. Saisissez ici les équipes que vous avez inscrites manuellement (par téléphone, email ou sur place). Le jour de l'enduro, après le <strong>tirage au sort physique</strong> effectué par les pêcheurs, vous pourrez attribuer le secteur et le numéro de poste à chaque équipe en cliquant sur l'icône ✎.
+      </div>
+    </div>
+
+    <!-- PROGRESS CARD -->
+    <div class="progress-card">
+      <div class="progress-info">
+        <div class="progress-head">
+          <div class="progress-label">Équipes saisies</div>
+          <div class="progress-count">12<span class="total"> / 24</span></div>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill"></div>
+        </div>
+        <div class="progress-meta">12 places restantes · 8 équipes ont déjà un poste attribué</div>
+      </div>
+      <div class="progress-actions">
+        <button class="btn btn-ghost btn-small">Modifier le quota</button>
+      </div>
+    </div>
+
+    <!-- ADD TEAM FORM -->
+    <div class="add-card">
+      <div class="add-card-head">
+        <div class="add-card-title">
+          <div class="bar"></div>
+          Ajouter une équipe
+        </div>
+      </div>
+
+      <div class="add-form">
+        <div class="field">
+          <label>Nom de l'équipe</label>
+          <input type="text" id="new-team" placeholder="Ex : Les Pêcheurs du Dimanche" onkeydown="if(event.key==='Enter') addTeam()">
+        </div>
+        <div class="field">
+          <label>Pêcheur 1 — Prénom Nom</label>
+          <input type="text" id="new-p1" placeholder="Jean Dupont" onkeydown="if(event.key==='Enter') addTeam()">
+        </div>
+        <div class="field">
+          <label>Pêcheur 2 — Prénom Nom</label>
+          <input type="text" id="new-p2" placeholder="Pierre Martin" onkeydown="if(event.key==='Enter') addTeam()">
+        </div>
+        <div class="field">
+          <label>Téléphone</label>
+          <input type="tel" id="new-phone" placeholder="06 12 34 56 78" onkeydown="if(event.key==='Enter') addTeam()">
+        </div>
+        <button class="add-btn" onclick="addTeam()">＋ Ajouter</button>
+      </div>
+
+      <div class="add-options">
+        <div class="add-options-info">
+          💡 Astuce : appuyez sur <kbd>Entrée</kbd> pour ajouter rapidement
+        </div>
+        <div class="add-options-actions">
+          <button class="btn btn-ghost btn-small">+ Ajouter détails (email, adresse...)</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- BULK ACTIONS BAR -->
+    <div class="bulk-bar" id="bulk-bar">
+      <div class="bulk-info"><span class="count" id="bulk-count">0</span> équipe(s) sélectionnée(s)</div>
+      <div class="bulk-actions">
+        <button class="btn btn-ghost btn-small">Attribuer secteur</button>
+        <button class="btn btn-ghost btn-small">Exporter</button>
+        <button class="btn btn-ghost btn-small" style="color: var(--red); border-color: rgba(232,33,43,0.4);">Supprimer</button>
+      </div>
+    </div>
+
+    <!-- FILTER BAR -->
+    <div class="filter-bar">
+      <div class="filter-search">
+        <input type="text" placeholder="Rechercher une équipe ou un pêcheur...">
+      </div>
+      <div class="filter-chips">
+        <div class="filter-chip active">Toutes (12)</div>
+        <div class="filter-chip">Sans secteur (4)</div>
+        <div class="filter-chip">Secteur A (2)</div>
+        <div class="filter-chip">Secteur B (2)</div>
+        <div class="filter-chip">Secteur C (2)</div>
+        <div class="filter-chip">Secteur D (2)</div>
+      </div>
+    </div>
+
+    <!-- TEAMS TABLE -->
+    <div class="teams-table">
+      <div class="table-head">
+        <div class="th"></div>
+        <div class="th">N°</div>
+        <div class="th">Nom de l'équipe</div>
+        <div class="th">Pêcheurs</div>
+        <div class="th">Secteur</div>
+        <div class="th">Poste</div>
+        <div class="th" style="text-align:right;">Actions</div>
+      </div>
+
+      <div class="team-row">
+        <div class="row-check" onclick="toggleCheck(this)"></div>
+        <div class="row-num">01</div>
+        <div class="row-team">Martin & Dupont</div>
+        <div class="row-members">
+          <div class="members-avatars">
+            <div class="member-avatar">JM</div>
+            <div class="member-avatar">PD</div>
+          </div>
+          <span>Jean Martin · Pierre Dupont</span>
+        </div>
+        <div><span class="sector-badge">A</span></div>
+        <div class="poste-num">07</div>
+        <div class="row-actions">
+          <button class="icon-btn edit" title="Modifier">✎</button>
+          <button class="icon-btn delete" title="Supprimer">✕</button>
+        </div>
+      </div>
+
+      <div class="team-row">
+        <div class="row-check" onclick="toggleCheck(this)"></div>
+        <div class="row-num">02</div>
+        <div class="row-team">Leroy & Bernard</div>
+        <div class="row-members">
+          <div class="members-avatars">
+            <div class="member-avatar">SL</div>
+            <div class="member-avatar">FB</div>
+          </div>
+          <span>Sébastien Leroy · François Bernard</span>
+        </div>
+        <div><span class="sector-badge">B</span></div>
+        <div class="poste-num">12</div>
+        <div class="row-actions">
+          <button class="icon-btn edit" title="Modifier">✎</button>
+          <button class="icon-btn delete" title="Supprimer">✕</button>
+        </div>
+      </div>
+
+      <div class="team-row">
+        <div class="row-check" onclick="toggleCheck(this)"></div>
+        <div class="row-num">03</div>
+        <div class="row-team">Petit & Moreau</div>
+        <div class="row-members">
+          <div class="members-avatars">
+            <div class="member-avatar">AP</div>
+            <div class="member-avatar">JM</div>
+          </div>
+          <span>Antoine Petit · Julien Moreau</span>
+        </div>
+        <div><span class="sector-badge">A</span></div>
+        <div class="poste-num">03</div>
+        <div class="row-actions">
+          <button class="icon-btn edit" title="Modifier">✎</button>
+          <button class="icon-btn delete" title="Supprimer">✕</button>
+        </div>
+      </div>
+
+      <div class="team-row">
+        <div class="row-check" onclick="toggleCheck(this)"></div>
+        <div class="row-num">04</div>
+        <div class="row-team">Simon & Garcia</div>
+        <div class="row-members">
+          <div class="members-avatars">
+            <div class="member-avatar">DS</div>
+            <div class="member-avatar">RG</div>
+          </div>
+          <span>David Simon · Rafael Garcia</span>
+        </div>
+        <div><span class="sector-badge">C</span></div>
+        <div class="poste-num">08</div>
+        <div class="row-actions">
+          <button class="icon-btn edit" title="Modifier">✎</button>
+          <button class="icon-btn delete" title="Supprimer">✕</button>
+        </div>
+      </div>
+
+      <div class="team-row">
+        <div class="row-check" onclick="toggleCheck(this)"></div>
+        <div class="row-num">05</div>
+        <div class="row-team">Fontaine & Roux</div>
+        <div class="row-members">
+          <div class="members-avatars">
+            <div class="member-avatar">PF</div>
+            <div class="member-avatar">MR</div>
+          </div>
+          <span>Paul Fontaine · Marc Roux</span>
+        </div>
+        <div><span class="sector-badge">B</span></div>
+        <div class="poste-num">05</div>
+        <div class="row-actions">
+          <button class="icon-btn edit" title="Modifier">✎</button>
+          <button class="icon-btn delete" title="Supprimer">✕</button>
+        </div>
+      </div>
+
+      <div class="team-row">
+        <div class="row-check" onclick="toggleCheck(this)"></div>
+        <div class="row-num">06</div>
+        <div class="row-team">Lambert & Faure</div>
+        <div class="row-members">
+          <div class="members-avatars">
+            <div class="member-avatar">TL</div>
+            <div class="member-avatar">EF</div>
+          </div>
+          <span>Thomas Lambert · Eric Faure</span>
+        </div>
+        <div><span class="sector-badge">D</span></div>
+        <div class="poste-num">02</div>
+        <div class="row-actions">
+          <button class="icon-btn edit" title="Modifier">✎</button>
+          <button class="icon-btn delete" title="Supprimer">✕</button>
+        </div>
+      </div>
+
+      <div class="team-row">
+        <div class="row-check" onclick="toggleCheck(this)"></div>
+        <div class="row-num">07</div>
+        <div class="row-team">Bonnet & Vidal</div>
+        <div class="row-members">
+          <div class="members-avatars">
+            <div class="member-avatar">LB</div>
+            <div class="member-avatar">NV</div>
+          </div>
+          <span>Lucas Bonnet · Nicolas Vidal</span>
+        </div>
+        <div><span class="sector-badge">D</span></div>
+        <div class="poste-num">06</div>
+        <div class="row-actions">
+          <button class="icon-btn edit" title="Modifier">✎</button>
+          <button class="icon-btn delete" title="Supprimer">✕</button>
+        </div>
+      </div>
+
+      <div class="team-row">
+        <div class="row-check" onclick="toggleCheck(this)"></div>
+        <div class="row-num">08</div>
+        <div class="row-team">Carpe Hunters 65</div>
+        <div class="row-members">
+          <div class="members-avatars">
+            <div class="member-avatar">VC</div>
+            <div class="member-avatar">OD</div>
+          </div>
+          <span>Vincent Caron · Olivier Duval</span>
+        </div>
+        <div><span class="sector-badge">C</span></div>
+        <div class="poste-num">11</div>
+        <div class="row-actions">
+          <button class="icon-btn edit" title="Modifier">✎</button>
+          <button class="icon-btn delete" title="Supprimer">✕</button>
+        </div>
+      </div>
+
+      <div class="team-row no-sector">
+        <div class="row-check" onclick="toggleCheck(this)"></div>
+        <div class="row-num">09</div>
+        <div class="row-team">Les Karpistes</div>
+        <div class="row-members">
+          <div class="members-avatars">
+            <div class="member-avatar">AM</div>
+            <div class="member-avatar">CB</div>
+          </div>
+          <span>Alex Morel · Cédric Blanc</span>
+        </div>
+        <div><span class="sector-badge empty">À attribuer</span></div>
+        <div class="poste-num empty">—</div>
+        <div class="row-actions">
+          <button class="icon-btn edit" title="Modifier">✎</button>
+          <button class="icon-btn delete" title="Supprimer">✕</button>
+        </div>
+      </div>
+
+      <div class="team-row no-sector">
+        <div class="row-check" onclick="toggleCheck(this)"></div>
+        <div class="row-num">10</div>
+        <div class="row-team">Big Carp Crew</div>
+        <div class="row-members">
+          <div class="members-avatars">
+            <div class="member-avatar">RG</div>
+            <div class="member-avatar">SP</div>
+          </div>
+          <span>Rémi Gauthier · Steve Perez</span>
+        </div>
+        <div><span class="sector-badge empty">À attribuer</span></div>
+        <div class="poste-num empty">—</div>
+        <div class="row-actions">
+          <button class="icon-btn edit" title="Modifier">✎</button>
+          <button class="icon-btn delete" title="Supprimer">✕</button>
+        </div>
+      </div>
+
+      <div class="team-row no-sector">
+        <div class="row-check" onclick="toggleCheck(this)"></div>
+        <div class="row-num">11</div>
+        <div class="row-team">Team Aquaviva</div>
+        <div class="row-members">
+          <div class="members-avatars">
+            <div class="member-avatar">DR</div>
+            <div class="member-avatar">FH</div>
+          </div>
+          <span>Damien Roche · Florent Henry</span>
+        </div>
+        <div><span class="sector-badge empty">À attribuer</span></div>
+        <div class="poste-num empty">—</div>
+        <div class="row-actions">
+          <button class="icon-btn edit" title="Modifier">✎</button>
+          <button class="icon-btn delete" title="Supprimer">✕</button>
+        </div>
+      </div>
+
+      <div class="team-row no-sector">
+        <div class="row-check" onclick="toggleCheck(this)"></div>
+        <div class="row-num">12</div>
+        <div class="row-team">Pyrénées Carpe Club</div>
+        <div class="row-members">
+          <div class="members-avatars">
+            <div class="member-avatar">MJ</div>
+            <div class="member-avatar">YP</div>
+          </div>
+          <span>Mickaël Jacquot · Yann Picard</span>
+        </div>
+        <div><span class="sector-badge empty">À attribuer</span></div>
+        <div class="poste-num empty">—</div>
+        <div class="row-actions">
+          <button class="icon-btn edit" title="Modifier">✎</button>
+          <button class="icon-btn delete" title="Supprimer">✕</button>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+</div>
+
+<!-- ═══════ MODAL ATTRIBUTION SECTEUR / POSTE ═══════ -->
+<div class="modal-overlay" id="modal-attribution">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-attribution')">✕</button>
+
+    <div class="modal-eyebrow">Attribution après tirage au sort</div>
+    <h2 class="modal-title">Attribuer un <span class="accent">poste</span></h2>
+    <p class="modal-sub" id="attribution-team-sub">Renseignez le secteur et le numéro de poste obtenus au tirage au sort.</p>
+
+    <div style="background: rgba(0,0,0,0.4); border: 1px solid var(--line); padding: 14px 18px; margin-bottom: 18px;">
+      <div style="font-family: 'Rajdhani', sans-serif; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); margin-bottom: 4px;">
+        Équipe
+      </div>
+      <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-style: italic; font-size: 1.3rem; letter-spacing: 0.5px;" id="attribution-team-name">
+        —
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+      <div class="field">
+        <label>Secteur</label>
+        <select id="attribution-sector">
+          <option value="">— Sans secteur —</option>
+          <option>A</option>
+          <option>B</option>
+          <option>C</option>
+          <option>D</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>N° de poste</label>
+        <input type="text" id="attribution-poste" placeholder="Ex : 07" maxlength="3">
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-attribution')">Annuler</button>
+      <button class="btn btn-primary" onclick="saveAttribution()">Valider l'attribution</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Add team
+  let teamCount = 12;
+
+  function addTeam() {
+    const name = document.getElementById('new-team').value.trim();
+    const p1 = document.getElementById('new-p1').value.trim();
+    const p2 = document.getElementById('new-p2').value.trim();
+    const phone = document.getElementById('new-phone').value.trim();
+
+    if (!name || !p1) {
+      alert('Le nom de l\'équipe et au moins un pêcheur sont requis');
+      return;
+    }
+
+    teamCount++;
+    const initials1 = p1.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+    const initials2 = p2 ? p2.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) : '?';
+    const members = p2 ? `${p1} · ${p2}` : p1;
+
+    const newRow = document.createElement('div');
+    newRow.className = 'team-row no-sector';
+    newRow.innerHTML = `
+      <div class="row-check" onclick="toggleCheck(this)"></div>
+      <div class="row-num">${String(teamCount).padStart(2, '0')}</div>
+      <div class="row-team">${name}</div>
+      <div class="row-members">
+        <div class="members-avatars">
+          <div class="member-avatar">${initials1}</div>
+          ${p2 ? `<div class="member-avatar">${initials2}</div>` : ''}
+        </div>
+        <span>${members}</span>
+      </div>
+      <div><span class="sector-badge empty">À attribuer</span></div>
+      <div class="poste-num empty">—</div>
+      <div class="row-actions">
+        <button class="icon-btn edit" title="Modifier">✎</button>
+        <button class="icon-btn delete" title="Supprimer" onclick="this.closest('.team-row').remove()">✕</button>
+      </div>
+    `;
+
+    document.querySelector('.teams-table').appendChild(newRow);
+
+    // 🔄 Ajoute aussi dans le localStorage pour synchro avec le lancer de précision
+    let storageTeams = [];
+    const data = localStorage.getItem(STORAGE_KEY);
+    if (data) {
+      try { storageTeams = JSON.parse(data); } catch (e) { storageTeams = []; }
+    }
+    if (!storageTeams.find(t => t.name === name)) {
+      storageTeams.push({
+        id: storageTeams.length + 1,
+        name: name,
+        members: members,
+        throw1: null,
+        throw2: null,
+        sector: '',
+        poste: ''
+      });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(storageTeams));
+    }
+
+    // Bind the new edit button
+    newRow.querySelector('.icon-btn.edit').addEventListener('click', e => {
+      openAttribution(e.currentTarget);
+    });
+
+    // Reset form
+    document.getElementById('new-team').value = '';
+    document.getElementById('new-p1').value = '';
+    document.getElementById('new-p2').value = '';
+    document.getElementById('new-phone').value = '';
+    document.getElementById('new-team').focus();
+
+    // Brief flash animation
+    newRow.style.background = 'rgba(232,33,43,0.15)';
+    setTimeout(() => {
+      newRow.style.transition = 'background 0.6s';
+      newRow.style.background = '';
+    }, 100);
+  }
+
+  // Toggle row check
+  function toggleCheck(el) {
+    el.classList.toggle('checked');
+    updateBulkBar();
+  }
+
+  function updateBulkBar() {
+    const checked = document.querySelectorAll('.row-check.checked').length;
+    const bar = document.getElementById('bulk-bar');
+    document.getElementById('bulk-count').textContent = checked;
+    if (checked > 0) {
+      bar.classList.add('visible');
+    } else {
+      bar.classList.remove('visible');
+    }
+  }
+
+  // Filter chips
+  document.querySelectorAll('.filter-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+    });
+  });
+
+  // Modals
+  function openModal(id) {
+    document.getElementById(id).classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  document.querySelectorAll('.modal-overlay').forEach(o => {
+    o.addEventListener('click', e => { if (e.target === o) closeModal(o.id); });
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.modal-overlay.active').forEach(m => closeModal(m.id));
+    }
+  });
+
+  // ═════════════════════════════════════════
+  // SYNC AVEC LE LANCER DE PRÉCISION
+  // ═════════════════════════════════════════
+
+  const STORAGE_KEY = 'carpstrike-precision-teams';
+
+  // Charge les attributions depuis le localStorage et applique aux lignes
+  function syncFromStorage() {
+    const data = localStorage.getItem(STORAGE_KEY);
+    if (!data) return;
+
+    let teams;
+    try {
+      teams = JSON.parse(data);
+    } catch (e) {
+      console.warn('Données localStorage invalides');
+      return;
+    }
+
+    document.querySelectorAll('.team-row').forEach(row => {
+      const nameEl = row.querySelector('.row-team');
+      if (!nameEl) return;
+      const name = nameEl.textContent.trim();
+
+      const team = teams.find(t => t.name === name);
+      if (!team) return;
+
+      const sectorBadge = row.querySelector('.sector-badge');
+      const posteEl = row.querySelector('.poste-num');
+
+      if (team.sector) {
+        sectorBadge.textContent = team.sector;
+        sectorBadge.classList.remove('empty');
+        row.classList.remove('no-sector');
+      }
+      if (team.poste) {
+        posteEl.textContent = team.poste;
+        posteEl.classList.remove('empty');
+      }
+    });
+
+    updateAttributionCounter();
+  }
+
+  function updateStorageForTeam(teamName, sector, poste) {
+    let teams = [];
+    const data = localStorage.getItem(STORAGE_KEY);
+    if (data) {
+      try { teams = JSON.parse(data); } catch (e) { teams = []; }
+    }
+
+    const existing = teams.find(t => t.name === teamName);
+    if (existing) {
+      existing.sector = sector;
+      existing.poste = poste;
+    } else {
+      teams.push({
+        id: teams.length + 1,
+        name: teamName,
+        members: '',
+        throw1: null,
+        throw2: null,
+        sector: sector,
+        poste: poste
+      });
+    }
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(teams));
+  }
+
+  function updateAttributionCounter() {
+    const allRows = document.querySelectorAll('.team-row');
+    let assigned = 0;
+    let unassigned = 0;
+    const sectorCounts = { A: 0, B: 0, C: 0, D: 0 };
+
+    allRows.forEach(row => {
+      const sectorBadge = row.querySelector('.sector-badge');
+      const sector = sectorBadge && !sectorBadge.classList.contains('empty')
+        ? sectorBadge.textContent.trim()
+        : '';
+      const posteEl = row.querySelector('.poste-num');
+      const hasPoste = posteEl && !posteEl.classList.contains('empty');
+
+      if (sector || hasPoste) {
+        assigned++;
+        if (sectorCounts[sector] !== undefined) sectorCounts[sector]++;
+      } else {
+        unassigned++;
+      }
+    });
+
+    // Met à jour la barre de progression
+    const progressFill = document.querySelector('.progress-fill');
+    const progressMeta = document.querySelector('.progress-meta');
+    if (progressFill && allRows.length > 0) {
+      progressFill.style.width = (assigned / allRows.length * 100) + '%';
+    }
+    if (progressMeta) {
+      progressMeta.textContent = `${unassigned} équipe(s) sans poste · ${assigned} équipe(s) ont déjà un poste attribué`;
+    }
+
+    // Met à jour les filter chips
+    document.querySelectorAll('.filter-chip').forEach(chip => {
+      const text = chip.textContent.trim();
+      if (text.startsWith('Toutes')) chip.textContent = `Toutes (${allRows.length})`;
+      else if (text.startsWith('Sans secteur')) chip.textContent = `Sans secteur (${unassigned})`;
+      else if (text.startsWith('Secteur A')) chip.textContent = `Secteur A (${sectorCounts.A})`;
+      else if (text.startsWith('Secteur B')) chip.textContent = `Secteur B (${sectorCounts.B})`;
+      else if (text.startsWith('Secteur C')) chip.textContent = `Secteur C (${sectorCounts.C})`;
+      else if (text.startsWith('Secteur D')) chip.textContent = `Secteur D (${sectorCounts.D})`;
+    });
+  }
+
+  // ─── Edit / Attribution ─── 
+  let currentEditRow = null;
+
+  function openAttribution(btn) {
+    const row = btn.closest('.team-row');
+    currentEditRow = row;
+
+    const teamName = row.querySelector('.row-team').textContent;
+    const sectorBadge = row.querySelector('.sector-badge');
+    const posteEl = row.querySelector('.poste-num');
+
+    document.getElementById('attribution-team-name').textContent = teamName;
+
+    const currentSector = sectorBadge.classList.contains('empty') ? '' : sectorBadge.textContent.trim();
+    const currentPoste = posteEl.classList.contains('empty') ? '' : posteEl.textContent.trim();
+
+    document.getElementById('attribution-sector').value = currentSector;
+    document.getElementById('attribution-poste').value = currentPoste;
+
+    openModal('modal-attribution');
+  }
+
+  function saveAttribution() {
+    if (!currentEditRow) return;
+
+    const sector = document.getElementById('attribution-sector').value.trim();
+    const posteRaw = document.getElementById('attribution-poste').value.trim();
+    const poste = posteRaw ? posteRaw.padStart(2, '0') : '';
+
+    const teamName = currentEditRow.querySelector('.row-team').textContent;
+    const sectorBadge = currentEditRow.querySelector('.sector-badge');
+    const posteEl = currentEditRow.querySelector('.poste-num');
+
+    if (sector) {
+      sectorBadge.textContent = sector;
+      sectorBadge.classList.remove('empty');
+      currentEditRow.classList.remove('no-sector');
+    } else {
+      sectorBadge.textContent = 'À attribuer';
+      sectorBadge.classList.add('empty');
+      currentEditRow.classList.add('no-sector');
+    }
+
+    if (poste) {
+      posteEl.textContent = poste;
+      posteEl.classList.remove('empty');
+    } else {
+      posteEl.textContent = '—';
+      posteEl.classList.add('empty');
+    }
+
+    // 🔄 Synchronise avec le localStorage
+    updateStorageForTeam(teamName, sector, poste);
+    updateAttributionCounter();
+
+    // Brief flash
+    currentEditRow.style.background = 'rgba(0,200,80,0.15)';
+    setTimeout(() => {
+      currentEditRow.style.transition = 'background 0.6s';
+      currentEditRow.style.background = '';
+    }, 100);
+
+    closeModal('modal-attribution');
+    currentEditRow = null;
+  }
+
+  // Bind edit buttons to attribution modal
+  document.querySelectorAll('.icon-btn.edit').forEach(btn => {
+    btn.addEventListener('click', () => openAttribution(btn));
+  });
+
+  // Bind delete buttons (sync with localStorage)
+  function bindDeleteButton(btn) {
+    btn.addEventListener('click', e => {
+      const row = e.currentTarget.closest('.team-row');
+      if (!row) return;
+      const teamName = row.querySelector('.row-team').textContent.trim();
+      if (!confirm(`Supprimer l'équipe "${teamName}" ?`)) return;
+
+      // Retire du localStorage
+      let storageTeams = [];
+      const data = localStorage.getItem(STORAGE_KEY);
+      if (data) {
+        try { storageTeams = JSON.parse(data); } catch (e) { storageTeams = []; }
+      }
+      storageTeams = storageTeams.filter(t => t.name !== teamName);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(storageTeams));
+
+      row.remove();
+      updateAttributionCounter();
+    });
+  }
+
+  document.querySelectorAll('.icon-btn.delete').forEach(bindDeleteButton);
+
+  // 🔄 Sync au chargement et lors de changements
+  syncFromStorage();
+  window.addEventListener('focus', syncFromStorage);
+  window.addEventListener('storage', e => {
+    if (e.key === STORAGE_KEY) syncFromStorage();
+  });
+</script>
+
+</body>
+</html>

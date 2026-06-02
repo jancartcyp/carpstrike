@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Commissaires — Grand Enduro du Lac Bleu</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,900;1,700;1,900&family=Barlow:wght@300;400;500;600;700&family=Rajdhani:wght@500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #e8212b;
+    --red-bright: #ff2d3a;
+    --red-dim: rgba(232,33,43,0.15);
+    --red-glow: rgba(232,33,43,0.4);
+    --white: #f4f0eb;
+    --off: #c8c0b4;
+    --dim: rgba(244,240,235,0.6);
+    --dim2: rgba(244,240,235,0.3);
+    --dark: #0a0908;
+    --darker: #050403;
+    --panel: #141310;
+    --panel-2: #1a1814;
+    --line: rgba(244,240,235,0.07);
+    --line-bright: rgba(244,240,235,0.15);
+    --gold: #f0a500;
+    --green: #00c850;
+    --blue: #4a9eff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--darker);
+    font-family: 'Barlow', sans-serif;
+    color: var(--white);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .bg-atmosphere {
+    position: fixed; inset: 0; z-index: -2;
+    background:
+      radial-gradient(ellipse 60% 40% at 0% 0%, rgba(232,33,43,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse 60% 60% at 100% 100%, rgba(232,33,43,0.05) 0%, transparent 50%),
+      linear-gradient(180deg, #0a0908 0%, #060504 100%);
+  }
+
+  .bg-grid {
+    position: fixed; inset: 0; z-index: -1;
+    background-image:
+      linear-gradient(rgba(244,240,235,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(244,240,235,0.02) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, #000 0%, transparent 80%);
+  }
+
+  .app {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    min-height: 100vh;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    background: var(--dark);
+    border-right: 1px solid var(--line);
+    padding: 24px 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar-logo {
+    display: flex; align-items: center;
+    padding: 0 22px 24px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 18px;
+  }
+
+  .logo-carp { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-style: italic; font-size: 1.4rem; color: var(--white); letter-spacing: 1px; line-height: 1; }
+  .logo-strike { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-style: italic; font-size: 1.4rem; color: var(--red); letter-spacing: 1px; line-height: 1; text-shadow: 0 0 15px var(--red-glow); }
+  .logo-slash { width: 3px; height: 18px; background: var(--red); transform: skewX(-10deg); margin: 0 7px; box-shadow: 0 0 8px var(--red-glow); }
+
+  .nav-section { padding: 0 14px 18px; }
+  .nav-section-title { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 0.62rem; letter-spacing: 3px; text-transform: uppercase; color: var(--dim2); padding: 0 10px 8px; }
+
+  .nav-item {
+    display: flex; align-items: center; gap: 11px;
+    padding: 10px 12px;
+    color: var(--dim);
+    text-decoration: none;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600; font-size: 0.88rem;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+    cursor: pointer;
+    position: relative;
+    margin-bottom: 2px;
+  }
+
+  .nav-item:hover { color: var(--white); background: rgba(244,240,235,0.03); }
+  .nav-item.active { color: var(--white); background: var(--red-dim); }
+  .nav-item.active::before { content: ''; position: absolute; left: 0; top: 6px; bottom: 6px; width: 2px; background: var(--red); box-shadow: 0 0 8px var(--red-glow); }
+  .nav-item .icon { width: 18px; height: 18px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+  .nav-item .badge { margin-left: auto; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 0.65rem; background: var(--red); color: #fff; padding: 1px 6px; letter-spacing: 1px; }
+
+  .sidebar-user { margin: auto 14px 0; padding: 14px 14px 0; border-top: 1px solid var(--line); }
+  .user-card { display: flex; align-items: center; gap: 10px; padding: 10px; background: var(--panel); border: 1px solid var(--line); }
+  .user-avatar { width: 32px; height: 32px; background: linear-gradient(135deg, var(--red) 0%, #8a1820 100%); color: #fff; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-style: italic; font-size: 0.95rem; flex-shrink: 0; }
+  .user-name { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 0.82rem; color: var(--white); }
+  .user-role { font-size: 0.68rem; color: var(--dim); letter-spacing: 1px; text-transform: uppercase; }
+
+  /* MAIN */
+  .main { padding: 28px 36px 50px; max-width: 1400px; }
+
+  .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; gap: 20px; }
+  .breadcrumb { display: flex; align-items: center; gap: 8px; font-family: 'Rajdhani', sans-serif; font-size: 0.78rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--dim); }
+  .breadcrumb a { color: var(--dim); text-decoration: none; transition: color 0.2s; }
+  .breadcrumb a:hover { color: var(--white); }
+  .breadcrumb .sep { color: var(--dim2); }
+  .breadcrumb .current { color: var(--white); }
+
+  .page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 22px; flex-wrap: wrap; }
+  .page-eyebrow { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 0.72rem; letter-spacing: 4px; text-transform: uppercase; color: var(--red); margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+  .page-eyebrow::before { content: ''; width: 24px; height: 1px; background: var(--red); }
+  .page-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-style: italic; font-size: 2.4rem; line-height: 1; letter-spacing: -1px; }
+  .page-title .accent { color: var(--red); }
+  .page-actions { display: flex; gap: 10px; }
+
+  /* BUTTONS */
+  .btn { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-style: italic; font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; padding: 10px 22px; border: none; cursor: pointer; transition: all 0.2s; color: inherit; background: none; display: inline-flex; align-items: center; gap: 8px; }
+  .btn-primary { background: var(--red); color: #fff; clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%); box-shadow: 0 0 15px var(--red-glow); }
+  .btn-primary:hover { background: var(--red-bright); box-shadow: 0 0 25px var(--red-glow); }
+  .btn-ghost { color: var(--white); border: 1px solid var(--line-bright); clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%); }
+  .btn-ghost:hover { border-color: var(--white); background: rgba(244,240,235,0.05); }
+  .btn-small { padding: 6px 14px; font-size: 0.74rem; }
+  .btn-large { padding: 14px 28px; font-size: 0.95rem; }
+
+  /* INFO ALERT */
+  .alert-info {
+    background: rgba(74,158,255,0.06);
+    border: 1px solid rgba(74,158,255,0.25);
+    border-left: 3px solid var(--blue);
+    padding: 14px 18px; margin-bottom: 22px;
+    display: flex; align-items: flex-start; gap: 12px;
+  }
+  .alert-info-icon { color: var(--blue); font-size: 1.2rem; flex-shrink: 0; }
+  .alert-info-text { font-size: 0.9rem; color: var(--off); line-height: 1.5; }
+  .alert-info-text strong { color: var(--white); }
+
+  /* ENDURO BADGE */
+  .enduro-badge {
+    background: linear-gradient(140deg, var(--panel) 0%, var(--panel-2) 100%);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--red);
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  .enduro-badge-info { display: flex; align-items: center; gap: 12px; }
+
+  .enduro-badge-icon {
+    width: 36px; height: 36px;
+    background: var(--red-dim);
+    border: 1px solid var(--red);
+    color: var(--red);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+    clip-path: polygon(7px 0%, 100% 0%, calc(100% - 7px) 100%, 0% 100%);
+  }
+
+  .enduro-badge-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-style: italic;
+    font-size: 1.15rem;
+    letter-spacing: 0.5px;
+  }
+
+  .enduro-badge-dates {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.75rem;
+    color: var(--dim);
+    letter-spacing: 1px;
+    margin-top: 2px;
+  }
+
+  .enduro-badge-status {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.72rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--green);
+    display: flex; align-items: center; gap: 6px;
+    padding: 4px 10px;
+    border: 1px solid rgba(0,200,80,0.3);
+    background: rgba(0,200,80,0.06);
+  }
+
+  .enduro-badge-status::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+    box-shadow: 0 0 6px var(--green);
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  /* STATS */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 22px;
+  }
+
+  .stat-card {
+    background: linear-gradient(140deg, var(--panel) 0%, var(--panel-2) 100%);
+    border: 1px solid var(--line);
+    padding: 16px 18px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent, var(--red));
+  }
+
+  .stat-card.green::before { --accent: var(--green); }
+  .stat-card.gold::before { --accent: var(--gold); }
+  .stat-card.red::before { --accent: var(--red); }
+  .stat-card.blue::before { --accent: var(--blue); }
+
+  .stat-top {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .stat-icon {
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.95rem;
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  }
+
+  .stat-card.green .stat-icon { background: rgba(0,200,80,0.12); color: var(--green); }
+  .stat-card.gold .stat-icon { background: rgba(240,165,0,0.12); color: var(--gold); }
+  .stat-card.red .stat-icon { background: var(--red-dim); color: var(--red); }
+  .stat-card.blue .stat-icon { background: rgba(74,158,255,0.12); color: var(--blue); }
+
+  .stat-val {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900; font-style: italic;
+    font-size: 2rem; line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-val .unit {
+    font-size: 0.95rem;
+    color: var(--dim);
+    font-weight: 400;
+  }
+
+  .stat-lbl {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+
+  /* COMMISSAIRES TABLE */
+  .comm-table {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    overflow: hidden;
+  }
+
+  .table-head {
+    display: grid;
+    grid-template-columns: 50px 1.4fr 1.4fr 130px 110px 90px 140px;
+    padding: 12px 22px;
+    background: rgba(0,0,0,0.3);
+    border-bottom: 1px solid var(--line);
+    align-items: center;
+    gap: 12px;
+  }
+
+  .table-head .th {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.62rem;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+
+  .comm-row {
+    display: grid;
+    grid-template-columns: 50px 1.4fr 1.4fr 130px 110px 90px 140px;
+    padding: 16px 22px;
+    border-bottom: 1px solid var(--line);
+    align-items: center;
+    transition: background 0.2s;
+    gap: 12px;
+  }
+
+  .comm-row:last-child { border-bottom: none; }
+  .comm-row:hover { background: rgba(232,33,43,0.04); }
+
+  .comm-row.disabled { opacity: 0.5; }
+
+  .comm-num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900; font-style: italic;
+    font-size: 1.15rem;
+    color: var(--dim2);
+  }
+
+  .comm-info { display: flex; align-items: center; gap: 12px; }
+
+  .comm-avatar {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, var(--red-dim) 0%, rgba(232,33,43,0.05) 100%);
+    border: 1px solid var(--line-bright);
+    color: var(--red);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-style: italic;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+  }
+
+  .comm-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--white);
+    letter-spacing: 0.3px;
+  }
+
+  .comm-email {
+    font-size: 0.75rem;
+    color: var(--dim);
+    margin-top: 2px;
+  }
+
+  /* CREDENTIALS */
+  .credentials {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--line);
+    padding: 6px 10px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--off);
+    display: flex; align-items: center; gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+  }
+
+  .credentials:hover {
+    border-color: var(--red);
+    color: var(--white);
+  }
+
+  .credentials-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.6rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--dim);
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .credentials-value {
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  .credentials-text { flex: 1; }
+
+  .credentials-copy {
+    color: var(--red);
+    font-size: 0.85rem;
+  }
+
+  /* SECTOR ASSIGNMENT */
+  .sector-tag {
+    display: inline-flex;
+    align-items: center;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    background: var(--red-dim);
+    border: 1px solid rgba(232,33,43,0.4);
+    color: var(--red);
+    clip-path: polygon(5px 0%, 100% 0%, calc(100% - 5px) 100%, 0% 100%);
+  }
+
+  .sector-tag.empty {
+    background: rgba(255,255,255,0.04);
+    border-color: var(--line);
+    color: var(--dim);
+  }
+
+  /* STATUS BADGE */
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    clip-path: polygon(5px 0%, 100% 0%, calc(100% - 5px) 100%, 0% 100%);
+  }
+
+  .status-badge.active {
+    background: rgba(0,200,80,0.12);
+    border: 1px solid rgba(0,200,80,0.4);
+    color: var(--green);
+  }
+
+  .status-badge.disabled {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--line);
+    color: var(--dim);
+  }
+
+  .status-badge.pending {
+    background: rgba(240,165,0,0.12);
+    border: 1px solid rgba(240,165,0,0.4);
+    color: var(--gold);
+  }
+
+  .status-badge .dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .status-badge.active .dot {
+    animation: pulse 1.5s ease-in-out infinite;
+    box-shadow: 0 0 4px currentColor;
+  }
+
+  /* ACTIONS */
+  .row-actions {
+    display: flex;
+    gap: 6px;
+    justify-content: flex-end;
+  }
+
+  .icon-btn {
+    width: 30px; height: 30px;
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--dim);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+    font-size: 0.85rem;
+  }
+
+  .icon-btn:hover {
+    color: var(--white);
+    border-color: var(--line-bright);
+    background: var(--panel);
+  }
+
+  .icon-btn.share:hover { color: var(--blue); border-color: var(--blue); }
+  .icon-btn.regenerate:hover { color: var(--gold); border-color: var(--gold); }
+  .icon-btn.toggle:hover { color: var(--white); border-color: var(--white); }
+  .icon-btn.delete:hover { color: var(--red); border-color: var(--red); }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(6,5,4,0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 200;
+    display: none;
+    align-items: center; justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+  .modal-overlay.active { display: flex; opacity: 1; }
+
+  .modal {
+    position: relative;
+    background: linear-gradient(140deg, var(--panel) 0%, var(--panel-2) 100%);
+    border: 1px solid var(--line-bright);
+    width: 100%;
+    max-width: 540px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 32px 32px 28px;
+    clip-path: polygon(20px 0%, 100% 0%, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0% 100%, 0% 20px);
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+  }
+
+  .modal-overlay.active .modal { transform: scale(1); }
+
+  .modal::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 90px; height: 2px;
+    background: var(--red);
+    box-shadow: 0 0 15px var(--red-glow);
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 16px; right: 18px;
+    width: 28px; height: 28px;
+    background: transparent;
+    border: 1px solid var(--line-bright);
+    color: var(--dim);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .modal-close:hover { border-color: var(--red); color: var(--red); }
+
+  .modal-eyebrow {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 8px;
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .modal-eyebrow::before {
+    content: ''; width: 24px; height: 1px; background: var(--red);
+  }
+
+  .modal-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900; font-style: italic;
+    font-size: 1.7rem;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .modal-title .accent { color: var(--red); }
+
+  .modal-sub {
+    color: var(--dim);
+    font-size: 0.9rem;
+    margin-bottom: 22px;
+  }
+
+  /* FORM */
+  .field { display: flex; flex-direction: column; margin-bottom: 14px; }
+  .field:last-of-type { margin-bottom: 0; }
+
+  .field label {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 6px;
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  .field label .req {
+    color: var(--red); font-size: 0.9rem;
+  }
+
+  .field label .optional {
+    font-size: 0.6rem;
+    color: var(--dim2);
+    text-transform: none;
+    letter-spacing: 1px;
+    margin-left: auto;
+    font-weight: 500;
+  }
+
+  .field input, .field select {
+    width: 100%;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid var(--line);
+    padding: 11px 13px;
+    color: var(--white);
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.88rem;
+    transition: all 0.2s;
+    outline: none;
+  }
+
+  .field input:focus, .field select:focus {
+    border-color: var(--red);
+    background: rgba(0,0,0,0.6);
+    box-shadow: 0 0 0 3px var(--red-dim);
+  }
+
+  .field select {
+    cursor: pointer;
+    appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23e8212b' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+  }
+
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  /* GENERATED CREDENTIALS BOX */
+  .gen-box {
+    background: linear-gradient(140deg, rgba(232,33,43,0.06) 0%, rgba(232,33,43,0.02) 100%);
+    border: 1px solid rgba(232,33,43,0.3);
+    border-left: 3px solid var(--red);
+    padding: 18px 20px;
+    margin: 18px 0;
+  }
+
+  .gen-box-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .gen-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid var(--line);
+    margin-bottom: 8px;
+  }
+
+  .gen-row:last-child { margin-bottom: 0; }
+
+  .gen-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--dim);
+    width: 90px;
+    flex-shrink: 0;
+  }
+
+  .gen-value {
+    flex: 1;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.92rem;
+    color: var(--white);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    word-break: break-all;
+  }
+
+  .gen-copy-btn {
+    background: var(--red-dim);
+    color: var(--red);
+    border: 1px solid var(--red);
+    padding: 4px 10px;
+    cursor: pointer;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.65rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    clip-path: polygon(5px 0%, 100% 0%, calc(100% - 5px) 100%, 0% 100%);
+  }
+
+  .gen-copy-btn:hover {
+    background: var(--red);
+    color: #fff;
+  }
+
+  .gen-copy-btn.copied {
+    background: var(--green);
+    color: #fff;
+    border-color: var(--green);
+  }
+
+  .share-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+
+  .share-btn {
+    flex: 1;
+    min-width: 120px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 10px 14px;
+    color: var(--white);
+    cursor: pointer;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.72rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+
+  .share-btn:hover {
+    border-color: var(--red);
+    color: var(--red);
+  }
+
+  /* TIPS */
+  .tips-box {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--line);
+    padding: 14px 16px;
+    margin-top: 18px;
+    font-size: 0.82rem;
+    color: var(--dim);
+    line-height: 1.5;
+  }
+
+  .tips-box strong { color: var(--white); }
+
+  /* FORM ACTIONS */
+  .form-actions { display: flex; gap: 10px; margin-top: 22px; }
+  .form-actions .btn-primary { flex: 1; justify-content: center; }
+
+  /* SECURITY INFO */
+  .security-info {
+    margin-bottom: 22px;
+    padding: 14px 18px;
+    background: rgba(0,200,80,0.04);
+    border: 1px solid rgba(0,200,80,0.2);
+    border-left: 3px solid var(--green);
+    display: flex; align-items: flex-start; gap: 12px;
+    font-size: 0.85rem;
+    color: var(--off);
+    line-height: 1.5;
+  }
+
+  .security-info-icon {
+    color: var(--green);
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  .security-info strong { color: var(--white); }
+
+  /* RESPONSIVE */
+  @media (max-width: 1100px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .table-head, .comm-row {
+      grid-template-columns: 40px 1fr 90px;
+      padding: 12px 14px;
+    }
+    .table-head .th:nth-child(3),
+    .table-head .th:nth-child(4),
+    .table-head .th:nth-child(5),
+    .table-head .th:nth-child(6) { display: none; }
+    .comm-row > div:nth-child(3),
+    .comm-row > div:nth-child(4),
+    .comm-row > div:nth-child(5),
+    .comm-row > div:nth-child(6) { display: none; }
+    .row-actions { justify-content: flex-end; }
+  }
+
+  @media (max-width: 800px) {
+    .app { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .main { padding: 20px; }
+    .stats-grid { grid-template-columns: 1fr; }
+    .page-actions { flex-wrap: wrap; }
+  }
+
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--line-bright); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--dim2); }
+</style>
+</head>
+<body>
+
+<div class="bg-atmosphere"></div>
+<div class="bg-grid"></div>
+
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <a href="carpstrike-index.html" style="display:inline-block;text-decoration:none" title="Accueil du prototype"><svg class="cs-logo" width="125" height="30" viewBox="0 0 540 130" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="CarpStrike" style="display:block">
+<path d="M10 70 L 70 70 L 80 70 L 88 54 L 98 90 L 108 70 L 150 70 L 165 70 L 178 38 L 192 104 L 206 70 L 250 70 L 262 70 L 275 14 L 290 120 L 305 70 L 330 70 L 345 70 L 356 50 L 367 88 L 377 70 L 430 70 L 445 70 L 456 56 L 466 84 L 476 70 L 530 70" stroke="#e8212b" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="270" y="84" font-family="'Barlow Condensed', sans-serif" font-size="56" font-weight="900" font-style="italic" fill="#f4f0eb" text-anchor="middle" stroke="#0a0908" stroke-width="7" paint-order="stroke">CARP<tspan fill="#e8212b">STRIKE</tspan></text>
+</svg></a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Mon enduro</div>
+      <a class="nav-item" href="carpstrike-dashboard.html"><div class="icon">⊞</div>Tableau de bord</a>
+      <a class="nav-item" href="carpstrike-classement-live.html"><div class="icon">⚑</div>Classement live</a>
+      <a class="nav-item" href="carpstrike-validations.html"><div class="icon">⚐</div>Validations</a>
+      <a class="nav-item" href="carpstrike-equipes.html"><div class="icon">▤</div>Équipes</a>
+      <a class="nav-item" href="carpstrike-lancer-precision.html"><div class="icon">🎯</div>Lancer de précision</a>
+      <a class="nav-item" href="carpstrike-dashboard.html"><div class="icon">◫</div>Secteurs</a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Gestion</div>
+      <a class="nav-item active" href="carpstrike-commissaires.html"><div class="icon">★</div>Commissaires<span class="badge" id="comm-count-badge">4</span></a>
+      <a class="nav-item" href="carpstrike-communication.html"><div class="icon">◎</div>Communication</a>
+      <a class="nav-item" href="carpstrike-parametres.html"><div class="icon">⚙</div>Paramètres</a>
+    </div>
+
+    <div class="sidebar-user">
+      <div class="user-card">
+        <div class="user-avatar">M</div>
+        <div>
+          <div class="user-name">Maxime D.</div>
+          <div class="user-role">Organisateur</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <div class="topbar">
+      <div class="breadcrumb">
+        <a href="#">Mes enduros</a>
+        <span class="sep">/</span>
+        <a href="#">Grand Enduro du Lac Bleu</a>
+        <span class="sep">/</span>
+        <span class="current">Commissaires</span>
+      </div>
+    </div>
+
+    <div class="page-head">
+      <div>
+        <div class="page-eyebrow">★ Accès commissaires</div>
+        <h1 class="page-title">Gestion des <span class="accent">commissaires</span></h1>
+      </div>
+      <div class="page-actions">
+        <button class="btn btn-ghost">📤 Exporter</button>
+        <button class="btn btn-primary" onclick="openCreateModal()">＋ Ajouter un commissaire</button>
+      </div>
+    </div>
+
+    <!-- ENDURO BADGE -->
+    <div class="enduro-badge">
+      <div class="enduro-badge-info">
+        <div class="enduro-badge-icon">🎣</div>
+        <div>
+          <div class="enduro-badge-name">Grand Enduro du Lac Bleu</div>
+          <div class="enduro-badge-dates">28 — 30 mai 2026 · Étang de Tournay</div>
+        </div>
+      </div>
+      <div class="enduro-badge-status">Enduro actif</div>
+    </div>
+
+    <!-- INFO ALERT -->
+    <div class="alert-info">
+      <div class="alert-info-icon">ℹ</div>
+      <div class="alert-info-text">
+        Les commissaires ont des accès <strong>uniques</strong> à cet enduro. Chaque identifiant et mot de passe sont générés automatiquement et ne donnent accès qu'à l'application de validation des prises pour le <strong>Grand Enduro du Lac Bleu</strong>. <strong>Les commissaires peuvent saisir des prises jusqu'à la clôture officielle</strong> par l'organisateur (par défaut 2h après la fin du décompte, pour permettre de finaliser les dernières pesées).
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-grid">
+      <div class="stat-card green">
+        <div class="stat-top">
+          <div class="stat-icon">★</div>
+          <div style="font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 0.7rem; color: var(--green); letter-spacing: 1px;">ACTIFS</div>
+        </div>
+        <div class="stat-val">4</div>
+        <div class="stat-lbl">Commissaires</div>
+      </div>
+
+      <div class="stat-card blue">
+        <div class="stat-top">
+          <div class="stat-icon">◫</div>
+          <div style="font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 0.7rem; color: var(--blue); letter-spacing: 1px;">COUVERTS</div>
+        </div>
+        <div class="stat-val">4<span class="unit">/4</span></div>
+        <div class="stat-lbl">Secteurs assignés</div>
+      </div>
+
+      <div class="stat-card red">
+        <div class="stat-top">
+          <div class="stat-icon">⚐</div>
+          <div style="font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 0.7rem; color: var(--green); letter-spacing: 1px;">▲ Aujourd'hui</div>
+        </div>
+        <div class="stat-val">187</div>
+        <div class="stat-lbl">Prises validées</div>
+      </div>
+
+      <div class="stat-card gold">
+        <div class="stat-top">
+          <div class="stat-icon">⏱</div>
+          <div style="font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 0.7rem; color: var(--green); letter-spacing: 1px;">EN COURS</div>
+        </div>
+        <div class="stat-val">Actif</div>
+        <div class="stat-lbl">Jusqu'à clôture</div>
+      </div>
+    </div>
+
+    <!-- COMMISSAIRES TABLE -->
+    <div class="comm-table">
+      <div class="table-head">
+        <div class="th">N°</div>
+        <div class="th">Commissaire</div>
+        <div class="th">Identifiants</div>
+        <div class="th">Secteur</div>
+        <div class="th">Statut</div>
+        <div class="th" style="text-align:center;">Prises</div>
+        <div class="th" style="text-align:right;">Actions</div>
+      </div>
+
+      <div id="comm-list">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ═══════ MODAL CRÉATION COMMISSAIRE ═══════ -->
+<div class="modal-overlay" id="modal-create">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-create')">✕</button>
+
+    <div class="modal-eyebrow">Nouveau commissaire</div>
+    <h2 class="modal-title">Créer un <span class="accent">accès</span></h2>
+    <p class="modal-sub">Renseignez les informations du commissaire. Un identifiant et un mot de passe uniques seront générés pour cet enduro.</p>
+
+    <div id="create-form">
+      <div class="field-row">
+        <div class="field">
+          <label>Prénom <span class="req">*</span></label>
+          <input type="text" id="comm-firstname" placeholder="Pierre">
+        </div>
+        <div class="field">
+          <label>Nom <span class="req">*</span></label>
+          <input type="text" id="comm-lastname" placeholder="Martin">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Email <span class="optional">facultatif</span></label>
+        <input type="email" id="comm-email" placeholder="pierre.martin@email.fr">
+      </div>
+
+      <div class="field">
+        <label>Téléphone <span class="optional">facultatif</span></label>
+        <input type="tel" id="comm-phone" placeholder="06 12 34 56 78">
+      </div>
+
+      <div class="field">
+        <label>Secteur attribué <span class="req">*</span></label>
+        <select id="comm-sector">
+          <option value="">Choisir un secteur...</option>
+          <option value="A">Secteur A (6 équipes)</option>
+          <option value="B">Secteur B (6 équipes)</option>
+          <option value="C">Secteur C (6 équipes)</option>
+          <option value="D">Secteur D (6 équipes)</option>
+          <option value="all">Tous les secteurs (super-commissaire)</option>
+        </select>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-ghost" onclick="closeModal('modal-create')">Annuler</button>
+        <button class="btn btn-primary" onclick="createCommissaire()">Générer les identifiants →</button>
+      </div>
+    </div>
+
+    <!-- Generated credentials (shown after creation) -->
+    <div id="create-result" style="display: none;">
+      <div class="security-info">
+        <div class="security-info-icon">🔒</div>
+        <div>
+          <strong>Accès créé avec succès !</strong><br>
+          Ces identifiants sont <strong>uniques à cet enduro</strong> et expireront automatiquement à la fin de la compétition. Communiquez-les au commissaire de manière sécurisée.
+        </div>
+      </div>
+
+      <div class="gen-box">
+        <div class="gen-box-title">🔑 Identifiants générés</div>
+
+        <div class="gen-row">
+          <div class="gen-label">Identifiant</div>
+          <div class="gen-value" id="gen-username">pmartin.lacbleu26</div>
+          <button class="gen-copy-btn" onclick="copyValue(this, 'gen-username')">Copier</button>
+        </div>
+
+        <div class="gen-row">
+          <div class="gen-label">Mot de passe</div>
+          <div class="gen-value" id="gen-password">K7m-Ph2x-9Qr5</div>
+          <button class="gen-copy-btn" onclick="copyValue(this, 'gen-password')">Copier</button>
+        </div>
+
+        <div class="gen-row">
+          <div class="gen-label">Lien direct</div>
+          <div class="gen-value" id="gen-link">commissaire.carpstrike.fr/lacbleu26</div>
+          <button class="gen-copy-btn" onclick="copyValue(this, 'gen-link')">Copier</button>
+        </div>
+      </div>
+
+      <div class="share-actions">
+        <button class="share-btn" onclick="copyAll()">📋 Copier tout</button>
+        <button class="share-btn">📧 Envoyer par email</button>
+        <button class="share-btn">📱 SMS</button>
+        <button class="share-btn">📲 QR Code</button>
+      </div>
+
+      <div class="tips-box">
+        <strong>⚠ Important :</strong> Pour des raisons de sécurité, le mot de passe ne pourra plus être affiché après cette fenêtre. Si le commissaire perd ses identifiants, vous pourrez régénérer un nouveau mot de passe.
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="finishCreate()" style="width: 100%; justify-content: center;">✓ J'ai noté les identifiants</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ MODAL VOIR/REGEN IDENTIFIANTS ═══════ -->
+<div class="modal-overlay" id="modal-share">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-share')">✕</button>
+
+    <div class="modal-eyebrow">Partager les accès</div>
+    <h2 class="modal-title">Identifiants de <span class="accent" id="share-name">—</span></h2>
+    <p class="modal-sub" id="share-sub">Secteur attribué : <strong style="color: var(--white);" id="share-sector">—</strong></p>
+
+    <div class="gen-box">
+      <div class="gen-box-title">🔑 Accès commissaire</div>
+
+      <div class="gen-row">
+        <div class="gen-label">Identifiant</div>
+        <div class="gen-value" id="share-username">—</div>
+        <button class="gen-copy-btn" onclick="copyValue(this, 'share-username')">Copier</button>
+      </div>
+
+      <div class="gen-row">
+        <div class="gen-label">Mot de passe</div>
+        <div class="gen-value" id="share-password">●●●●●●●●●●●●</div>
+        <button class="gen-copy-btn" onclick="togglePassword(this)">Afficher</button>
+      </div>
+
+      <div class="gen-row">
+        <div class="gen-label">Lien direct</div>
+        <div class="gen-value" id="share-link">commissaire.carpstrike.fr/lacbleu26</div>
+        <button class="gen-copy-btn" onclick="copyValue(this, 'share-link')">Copier</button>
+      </div>
+    </div>
+
+    <div class="share-actions">
+      <button class="share-btn">📧 Envoyer par email</button>
+      <button class="share-btn">📱 SMS</button>
+      <button class="share-btn">📲 QR Code</button>
+      <button class="share-btn" style="border-color: rgba(240,165,0,0.4); color: var(--gold);" onclick="regeneratePassword()">🔄 Régénérer</button>
+    </div>
+
+    <div class="tips-box">
+      <strong>⏱ Valide jusqu'à :</strong> Clôture de l'enduro par l'organisateur<br>
+      <strong>🔒 Accès limité :</strong> Cet identifiant ne fonctionne que pour le Grand Enduro du Lac Bleu.
+    </div>
+
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-share')" style="flex: 1; justify-content: center;">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ═════════════════════════════════════════
+  // DATA
+  // ═════════════════════════════════════════
+  const COMM_STORAGE_KEY = 'carpstrike-commissaires';
+  const enduroSlug = 'lacbleu26';
+  const enduroEndDate = 'la clôture officielle de l\'enduro par l\'organisateur';
+
+  const initialCommissaires = [
+    {
+      id: 1,
+      firstname: 'Pierre',
+      lastname: 'Martin',
+      email: 'pierre.martin@email.fr',
+      phone: '06 12 34 56 78',
+      sector: 'A',
+      username: 'pmartin.lacbleu26',
+      password: 'K7m-Ph2x-9Qr5',
+      status: 'active',
+      validationsCount: 52,
+      createdAt: '2026-05-25T10:00:00Z'
+    },
+    {
+      id: 2,
+      firstname: 'Julien',
+      lastname: 'Roux',
+      email: 'j.roux@email.fr',
+      phone: '06 23 45 67 89',
+      sector: 'B',
+      username: 'jroux.lacbleu26',
+      password: 'L8n-Qj3y-2Rs6',
+      status: 'active',
+      validationsCount: 48,
+      createdAt: '2026-05-25T10:15:00Z'
+    },
+    {
+      id: 3,
+      firstname: 'Sophie',
+      lastname: 'Bernard',
+      email: 's.bernard@email.fr',
+      phone: '06 34 56 78 90',
+      sector: 'C',
+      username: 'sbernard.lacbleu26',
+      password: 'M9p-Rk4z-3St7',
+      status: 'active',
+      validationsCount: 44,
+      createdAt: '2026-05-25T10:30:00Z'
+    },
+    {
+      id: 4,
+      firstname: 'Thomas',
+      lastname: 'Garcia',
+      email: 't.garcia@email.fr',
+      phone: '06 45 67 89 01',
+      sector: 'D',
+      username: 'tgarcia.lacbleu26',
+      password: 'N0q-Sl5a-4Tu8',
+      status: 'active',
+      validationsCount: 43,
+      createdAt: '2026-05-25T10:45:00Z'
+    }
+  ];
+
+  let commissaires = JSON.parse(localStorage.getItem(COMM_STORAGE_KEY)) || initialCommissaires;
+
+  function saveData() {
+    localStorage.setItem(COMM_STORAGE_KEY, JSON.stringify(commissaires));
+    document.getElementById('comm-count-badge').textContent = commissaires.filter(c => c.status === 'active').length;
+  }
+
+  // ═════════════════════════════════════════
+  // RENDER
+  // ═════════════════════════════════════════
+  function renderList() {
+    const list = document.getElementById('comm-list');
+
+    if (commissaires.length === 0) {
+      list.innerHTML = `
+        <div style="padding: 50px 20px; text-align: center; color: var(--dim);">
+          <div style="font-size: 2.5rem; color: var(--dim2); margin-bottom: 10px;">★</div>
+          <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-style: italic; font-size: 1.3rem; color: var(--white); margin-bottom: 4px;">Aucun commissaire</div>
+          <div style="font-size: 0.9rem;">Ajoutez un commissaire pour leur donner accès à la validation des prises.</div>
+        </div>
+      `;
+      return;
+    }
+
+    list.innerHTML = commissaires.map((comm, idx) => {
+      const initials = (comm.firstname[0] + comm.lastname[0]).toUpperCase();
+      const sectorLabel = comm.sector === 'all' ? 'TOUS' : comm.sector;
+      const isDisabled = comm.status === 'disabled';
+      const statusBadge = isDisabled
+        ? '<span class="status-badge disabled"><span class="dot"></span>Désactivé</span>'
+        : '<span class="status-badge active"><span class="dot"></span>Actif</span>';
+
+      return `
+        <div class="comm-row ${isDisabled ? 'disabled' : ''}">
+          <div class="comm-num">${String(idx + 1).padStart(2, '0')}</div>
+          <div class="comm-info">
+            <div class="comm-avatar">${initials}</div>
+            <div>
+              <div class="comm-name">${comm.firstname} ${comm.lastname}</div>
+              <div class="comm-email">${comm.email || comm.phone || '—'}</div>
+            </div>
+          </div>
+          <div onclick="openShare(${comm.id})" style="cursor: pointer;">
+            <div class="credentials">
+              <div style="flex:1;">
+                <div class="credentials-label">Identifiant</div>
+                <div class="credentials-text">${comm.username}</div>
+              </div>
+              <div class="credentials-copy">👁</div>
+            </div>
+          </div>
+          <div><span class="sector-tag">Secteur ${sectorLabel}</span></div>
+          <div>${statusBadge}</div>
+          <div style="text-align:center; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-style: italic; font-size: 1.1rem; color: ${comm.validationsCount > 0 ? 'var(--white)' : 'var(--dim2)'};">
+            ${comm.validationsCount || '—'}
+          </div>
+          <div class="row-actions">
+            <button class="icon-btn share" title="Voir / Partager" onclick="openShare(${comm.id})">📤</button>
+            <button class="icon-btn regenerate" title="Régénérer mot de passe" onclick="regeneratePasswordFor(${comm.id})">🔄</button>
+            <button class="icon-btn toggle" title="${isDisabled ? 'Réactiver' : 'Désactiver'}" onclick="toggleCommissaire(${comm.id})">${isDisabled ? '▶' : '⏸'}</button>
+            <button class="icon-btn delete" title="Supprimer" onclick="deleteCommissaire(${comm.id})">✕</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    saveData();
+  }
+
+  // ═════════════════════════════════════════
+  // CREATE
+  // ═════════════════════════════════════════
+  function openCreateModal() {
+    document.getElementById('create-form').style.display = 'block';
+    document.getElementById('create-result').style.display = 'none';
+    document.getElementById('comm-firstname').value = '';
+    document.getElementById('comm-lastname').value = '';
+    document.getElementById('comm-email').value = '';
+    document.getElementById('comm-phone').value = '';
+    document.getElementById('comm-sector').value = '';
+    openModal('modal-create');
+    setTimeout(() => document.getElementById('comm-firstname').focus(), 100);
+  }
+
+  function generatePassword() {
+    // Génère un mot de passe lisible : 3 segments de 4 caractères séparés par des tirets
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+    let segments = [];
+    for (let i = 0; i < 3; i++) {
+      let seg = '';
+      for (let j = 0; j < 4; j++) {
+        seg += chars[Math.floor(Math.random() * chars.length)];
+      }
+      segments.push(seg);
+    }
+    return segments.join('-');
+  }
+
+  function generateUsername(firstname, lastname) {
+    const base = (firstname[0] + lastname).toLowerCase().replace(/[^a-z]/g, '');
+    return `${base}.${enduroSlug}`;
+  }
+
+  function createCommissaire() {
+    const firstname = document.getElementById('comm-firstname').value.trim();
+    const lastname = document.getElementById('comm-lastname').value.trim();
+    const email = document.getElementById('comm-email').value.trim();
+    const phone = document.getElementById('comm-phone').value.trim();
+    const sector = document.getElementById('comm-sector').value;
+
+    if (!firstname || !lastname || !sector) {
+      alert('Veuillez renseigner prénom, nom et secteur.');
+      return;
+    }
+
+    const newCommissaire = {
+      id: Date.now(),
+      firstname,
+      lastname,
+      email,
+      phone,
+      sector,
+      username: generateUsername(firstname, lastname),
+      password: generatePassword(),
+      status: 'active',
+      validationsCount: 0,
+      createdAt: new Date().toISOString()
+    };
+
+    commissaires.push(newCommissaire);
+
+    // Affiche les credentials générés
+    document.getElementById('create-form').style.display = 'none';
+    document.getElementById('create-result').style.display = 'block';
+    document.getElementById('gen-username').textContent = newCommissaire.username;
+    document.getElementById('gen-password').textContent = newCommissaire.password;
+    document.getElementById('gen-link').textContent = `commissaire.carpstrike.fr/${enduroSlug}`;
+
+    saveData();
+  }
+
+  function finishCreate() {
+    closeModal('modal-create');
+    renderList();
+  }
+
+  // ═════════════════════════════════════════
+  // SHARE / VIEW
+  // ═════════════════════════════════════════
+  let currentShareId = null;
+  let passwordRevealed = false;
+
+  function openShare(id) {
+    const comm = commissaires.find(c => c.id === id);
+    if (!comm) return;
+    currentShareId = id;
+    passwordRevealed = false;
+
+    document.getElementById('share-name').textContent = `${comm.firstname} ${comm.lastname}`;
+    const sectorLabel = comm.sector === 'all' ? 'Tous les secteurs' : `Secteur ${comm.sector}`;
+    document.getElementById('share-sector').textContent = sectorLabel;
+    document.getElementById('share-username').textContent = comm.username;
+    document.getElementById('share-password').textContent = '●●●●●●●●●●●●';
+    document.getElementById('share-link').textContent = `commissaire.carpstrike.fr/${enduroSlug}`;
+
+    // Reset password toggle button
+    const passwordBtn = document.querySelector('#modal-share .gen-row:nth-child(3) .gen-copy-btn');
+    if (passwordBtn) passwordBtn.textContent = 'Afficher';
+
+    openModal('modal-share');
+  }
+
+  function togglePassword(btn) {
+    if (!currentShareId) return;
+    const comm = commissaires.find(c => c.id === currentShareId);
+    if (!comm) return;
+    passwordRevealed = !passwordRevealed;
+    const el = document.getElementById('share-password');
+    if (passwordRevealed) {
+      el.textContent = comm.password;
+      btn.textContent = 'Copier';
+      btn.onclick = () => copyValue(btn, 'share-password');
+    } else {
+      el.textContent = '●●●●●●●●●●●●';
+      btn.textContent = 'Afficher';
+      btn.onclick = () => togglePassword(btn);
+    }
+  }
+
+  function regeneratePasswordFor(id) {
+    if (!confirm('Régénérer un nouveau mot de passe ?\n\nL\'ancien mot de passe ne fonctionnera plus immédiatement.')) return;
+    const comm = commissaires.find(c => c.id === id);
+    if (!comm) return;
+    comm.password = generatePassword();
+    saveData();
+    alert(`✓ Nouveau mot de passe pour ${comm.firstname} ${comm.lastname} :\n\n${comm.password}\n\nCommuniquez-le au commissaire.`);
+  }
+
+  function regeneratePassword() {
+    if (currentShareId) regeneratePasswordFor(currentShareId);
+    const comm = commissaires.find(c => c.id === currentShareId);
+    if (comm) {
+      document.getElementById('share-password').textContent = comm.password;
+      passwordRevealed = true;
+      const btn = document.querySelector('#modal-share .gen-row:nth-child(3) .gen-copy-btn');
+      if (btn) { btn.textContent = 'Copier'; btn.onclick = () => copyValue(btn, 'share-password'); }
+    }
+  }
+
+  function toggleCommissaire(id) {
+    const comm = commissaires.find(c => c.id === id);
+    if (!comm) return;
+    const action = comm.status === 'active' ? 'désactiver' : 'réactiver';
+    if (!confirm(`Voulez-vous vraiment ${action} l'accès de ${comm.firstname} ${comm.lastname} ?`)) return;
+    comm.status = comm.status === 'active' ? 'disabled' : 'active';
+    renderList();
+  }
+
+  function deleteCommissaire(id) {
+    const comm = commissaires.find(c => c.id === id);
+    if (!comm) return;
+    if (!confirm(`Supprimer définitivement l'accès de ${comm.firstname} ${comm.lastname} ?\n\nCe commissaire ne pourra plus se connecter à l'application.`)) return;
+    commissaires = commissaires.filter(c => c.id !== id);
+    renderList();
+  }
+
+  // ═════════════════════════════════════════
+  // COPY
+  // ═════════════════════════════════════════
+  function copyValue(btn, elementId) {
+    const text = document.getElementById(elementId).textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const originalText = btn.textContent;
+      btn.textContent = '✓ Copié';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = originalText;
+        btn.classList.remove('copied');
+      }, 1500);
+    }).catch(() => {
+      alert('Impossible de copier. Sélectionnez manuellement : ' + text);
+    });
+  }
+
+  function copyAll() {
+    const username = document.getElementById('gen-username').textContent;
+    const password = document.getElementById('gen-password').textContent;
+    const link = document.getElementById('gen-link').textContent;
+    const text = `🎣 Accès commissaire — Grand Enduro du Lac Bleu
+
+🔗 Lien : ${link}
+👤 Identifiant : ${username}
+🔑 Mot de passe : ${password}
+
+⏱ Valide jusqu'à la fin de l'enduro (${enduroEndDate}).`;
+    navigator.clipboard.writeText(text).then(() => {
+      alert('✓ Tous les identifiants ont été copiés !');
+    });
+  }
+
+  // ═════════════════════════════════════════
+  // MODAL HELPERS
+  // ═════════════════════════════════════════
+  function openModal(id) {
+    document.getElementById(id).classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  document.querySelectorAll('.modal-overlay').forEach(o => {
+    o.addEventListener('click', e => { if (e.target === o) closeModal(o.id); });
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.modal-overlay.active').forEach(m => closeModal(m.id));
+    }
+  });
+
+  // Init
+  renderList();
+</script>
+
+</body>
+</html>
