@@ -8,13 +8,13 @@
 
 ## Phase 0 — Fondations (setup projet)
 
-- [ ] Initialiser Next.js 15 (TypeScript, App Router, Tailwind)
-- [ ] Configurer ESLint + Prettier + Vitest
-- [ ] Créer le projet Supabase, configurer `.env.local` (URL, clés)
-- [ ] Installer et configurer Prisma, connecter à Supabase
-- [ ] Transposer le design system des maquettes dans `tailwind.config.ts` (couleurs, polices) + `globals.css`
-- [ ] Créer le composant `<Logo />` à partir de `/mockups/carpstrike-logo.svg`
-- [ ] Mettre en place le layout de base + police (Barlow Condensed, Rajdhani, Barlow via next/font)
+- [x] Initialiser Next.js 15 (TypeScript, App Router, Tailwind)
+- [x] Configurer ESLint + Prettier + Vitest
+- [x] Créer le projet Supabase, configurer `.env.local` (URL, clés)
+- [x] Installer et configurer Prisma, connecter à Supabase
+- [x] Transposer le design system des maquettes dans `tailwind.config.ts` (couleurs, polices) + `globals.css`
+- [x] Créer le composant `<Logo />` à partir de `/mockups/carpstrike-logo.svg`
+- [x] Mettre en place le layout de base + police (Barlow Condensed, Rajdhani, Barlow via next/font)
 
 **Critère de fin :** `npm run dev` affiche une page d'accueil vide stylée avec le logo.
 
@@ -22,10 +22,10 @@
 
 ## Phase 1 — Modèle de données
 
-- [ ] Écrire le schéma Prisma complet (toutes les entités de @SPEC.md section 3)
-- [ ] Générer et appliquer la première migration
-- [ ] Créer des seeds de test (1 organisateur, 1 enduro LIVE avec secteurs/équipes/prises, 1 pêcheur)
-- [ ] Vérifier dans Prisma Studio que les relations sont correctes
+- [x] Écrire le schéma Prisma complet (toutes les entités de @SPEC.md section 3)
+- [x] Générer et appliquer la première migration
+- [x] Créer des seeds de test (1 organisateur, 1 enduro LIVE avec secteurs/équipes/prises, 1 pêcheur)
+- [x] Vérifier dans Prisma Studio que les relations sont correctes
 
 **Critère de fin :** la DB est peuplée, les relations testées.
 
