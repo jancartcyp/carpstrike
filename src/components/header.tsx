@@ -1,6 +1,10 @@
 import Link from 'next/link'
+import { logout } from '@/app/actions/auth'
+import { getCurrentUser } from '@/lib/auth/dal'
 
-export function Header() {
+export async function Header() {
+  const user = await getCurrentUser()
+
   return (
     <header
       style={{
@@ -106,12 +110,37 @@ export function Header() {
 
         {/* CTA */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Link href="/connexion" className="btn btn-ghost" style={{ fontSize: '0.85rem' }}>
-            Connexion
-          </Link>
-          <Link href="/inscription" className="btn btn-primary" style={{ fontSize: '0.85rem' }}>
-            Créer un enduro
-          </Link>
+          {user ? (
+            <>
+              <Link
+                href={user.role === 'ORGANIZER' ? '/dashboard' : '/profil'}
+                style={{
+                  fontFamily: 'var(--font-rajdhani), sans-serif',
+                  fontWeight: 600,
+                  fontSize: '0.85rem',
+                  letterSpacing: 1,
+                  color: 'var(--white)',
+                  textDecoration: 'none',
+                }}
+              >
+                {user.firstName}
+              </Link>
+              <form action={logout}>
+                <button type="submit" className="btn btn-ghost" style={{ fontSize: '0.85rem' }}>
+                  Déconnexion
+                </button>
+              </form>
+            </>
+          ) : (
+            <>
+              <Link href="/connexion" className="btn btn-ghost" style={{ fontSize: '0.85rem' }}>
+                Connexion
+              </Link>
+              <Link href="/inscription" className="btn btn-primary" style={{ fontSize: '0.85rem' }}>
+                Créer un compte
+              </Link>
+            </>
+          )}
         </div>
       </nav>
     </header>
