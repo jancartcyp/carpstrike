@@ -33,10 +33,10 @@
 
 ## Phase 2 — Authentification
 
-- [ ] Intégrer Supabase Auth (inscription, connexion, déconnexion)
-- [ ] Page de connexion + inscription (rôle ORGANIZER ou FISHERMAN)
-- [ ] Middleware de protection des routes selon le rôle
-- [ ] Helper `getCurrentUser()` côté serveur
+- [x] Intégrer Supabase Auth (inscription, connexion, déconnexion)
+- [x] Page de connexion + inscription (rôle ORGANIZER ou FISHERMAN)
+- [x] Middleware de protection des routes selon le rôle
+- [x] Helper `getCurrentUser()` côté serveur
 
 **Critère de fin :** on peut créer un compte, se connecter, les routes protégées le sont.
 
