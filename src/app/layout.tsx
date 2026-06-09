@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Barlow, Barlow_Condensed, Rajdhani } from 'next/font/google'
+import { Footer } from '@/components/footer'
 import { Header } from '@/components/header'
 import './globals.css'
 
@@ -43,6 +44,7 @@ export default function RootLayout({
         <div className="bg-grid" />
         <Header />
         <main style={{ position: 'relative', zIndex: 1 }}>{children}</main>
+        <Footer />
       </body>
     </html>
   )
