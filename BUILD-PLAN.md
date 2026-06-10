@@ -44,9 +44,9 @@
 
 ## Phase 3 — Pages publiques (lecture seule)
 
-- [ ] Landing → maquette `carpstrike-app.html`
-- [ ] Recherche d'enduros avec filtres → `carpstrike-recherche.html` (données réelles depuis la DB)
-- [ ] Page publique d'un enduro → `carpstrike-enduro-page.html`
+- [x] Landing → maquette `carpstrike-app.html`
+- [x] Recherche d'enduros avec filtres → `carpstrike-recherche.html` (données réelles depuis la DB)
+- [x] Page publique d'un enduro → `carpstrike-enduro-page.html`
 - [ ] Pages Tarifs / FAQ / Contact → maquettes correspondantes (statiques)
 
 **Critère de fin :** un visiteur peut parcourir les enduros publiés et leurs détails.
