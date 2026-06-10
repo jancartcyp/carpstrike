@@ -95,6 +95,12 @@ body {
   mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
 }
 
+/* ─── Utilitaire d'accent (mot mis en valeur dans les titres) ─── */
+.accent {
+  color: var(--red);
+  text-shadow: 0 0 25px var(--red-glow);
+}
+
 /* ─── Boutons ─── */
 .btn {
   display: inline-flex;
