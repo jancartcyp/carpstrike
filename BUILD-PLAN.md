@@ -55,14 +55,16 @@
 
 ## Phase 4 — Espace organisateur : création & gestion d'enduro
 
+> ⚠️ **Lancement gratuit** : CarpStrike démarre 100 % gratuit (découverte/test), paiements Stripe **reportés**. Construire la création/gestion d'enduro **sans étape de paiement** ; le choix de mode reste une distinction fonctionnelle (gestion seule vs inscriptions), mais sans frais. Réactiver Stripe lors d'une phase « Paiements » ultérieure.
+
 - [ ] Assistant de création d'enduro (multi-étapes) → flow de `carpstrike-app.html`
-- [ ] Choix du mode : MANAGED_ONLY (20 €) ou WITH_REGISTRATION (50 €)
-- [ ] Paiement des frais organisateur via Stripe Checkout
+- [ ] Choix du mode : MANAGED_ONLY ou WITH_REGISTRATION (gratuit pendant le lancement)
+- [ ] ~~Paiement des frais organisateur via Stripe Checkout~~ → **différé** (lancement gratuit)
 - [ ] Dashboard organisateur → `carpstrike-dashboard.html`
 - [ ] Page Paramètres (édition, sections verrouillées si LIVE, zone de danger) → `carpstrike-parametres.html`
 - [ ] Gestion des secteurs
 
-**Critère de fin :** un organisateur crée et paie un enduro, le voit dans son dashboard.
+**Critère de fin :** un organisateur crée un enduro (gratuitement) et le voit dans son dashboard.
 
 ---
 
@@ -72,10 +74,10 @@
 - [ ] Mode WITH_REGISTRATION : formulaire public de demande → `carpstrike-inscription.html`
 - [ ] Page organisateur des demandes (accepter/refuser) → `carpstrike-demandes.html`
 - [ ] Implémenter le workflow complet de @SPEC.md 4.1 (statuts, deadline 7j, liste d'attente)
-- [ ] Page paiement pêcheur (Stripe) → `carpstrike-paiement.html`
+- [ ] ~~Page paiement pêcheur (Stripe)~~ → **différé** (lancement gratuit) ; confirmation d'équipe sans paiement en ligne
 - [ ] Emails de notification (validation, refus, relance paiement) via Resend
 
-**Critère de fin :** le cycle demande → validation → paiement → équipe confirmée fonctionne de bout en bout.
+**Critère de fin :** le cycle demande → validation → confirmation d'équipe fonctionne de bout en bout (paiement en ligne différé au lancement gratuit).
 
 ---
 

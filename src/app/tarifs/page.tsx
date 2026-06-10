@@ -10,20 +10,20 @@ export const metadata: Metadata = {
 
 const MINI_FAQ = [
   {
-    q: 'Le tarif est-il vraiment unique ?',
-    a: 'Oui. Vous payez 20 € ou 50 € une seule fois, au moment de créer votre enduro. Aucun abonnement, aucun frais caché, aucune reconduction.',
+    q: 'Combien ça coûte aujourd’hui ?',
+    a: 'Rien. CarpStrike est entièrement gratuit pendant sa phase de lancement : créez et gérez autant d’enduros que vous voulez, sans payer. Une tarification simple (20 € ou 50 € par enduro) sera introduite plus tard, et annoncée à l’avance.',
   },
   {
     q: 'Prenez-vous une commission sur les inscriptions ?',
-    a: 'Non, jamais. Même en formule « Avec inscriptions », vous conservez 100 % des frais d’inscription payés par les pêcheurs. CarpStrike ne se rémunère que sur le tarif de l’enduro.',
+    a: 'Non, jamais. Vous conservez 100 % des frais d’inscription payés par les pêcheurs. CarpStrike ne se rémunérera, à terme, que sur un tarif fixe par enduro — jamais en pourcentage de vos inscriptions.',
   },
   {
     q: 'C’est gratuit pour les pêcheurs ?',
     a: 'Totalement. Les pêcheurs créent un compte et s’inscrivent gratuitement. Ils ne règlent que les frais d’inscription que vous fixez pour votre enduro.',
   },
   {
-    q: 'Et si j’annule mon enduro ?',
-    a: 'Si vous annulez avant le début de l’enduro, les 20 € ou 50 € vous sont intégralement remboursés. La météo et les imprévus font partie du jeu.',
+    q: 'Que se passe-t-il quand la tarification arrivera ?',
+    a: 'Vous serez prévenu bien à l’avance. Les enduros déjà créés pendant la phase gratuite ne seront pas facturés rétroactivement.',
   },
 ]
 
@@ -36,8 +36,9 @@ export default function TarifsPage() {
           Simple et <span className="accent">sans surprise</span>
         </h1>
         <p className={styles.heroSub}>
-          Pas d’abonnement, pas d’engagement. Vous payez une seule fois, par enduro. Deux formules
-          selon vos besoins.
+          CarpStrike est <strong>gratuit pendant son lancement</strong> : créez et gérez vos enduros
+          sans rien payer, et découvrez toutes les fonctionnalités. Une tarification simple arrivera
+          plus tard.
         </p>
       </div>
 
@@ -45,9 +46,9 @@ export default function TarifsPage() {
         <div className={styles.freeBanner}>
           <div className={styles.freeBannerIcon}>✓</div>
           <div className={styles.freeBannerText}>
-            <strong>Gratuit pour les pêcheurs · 0 % de commission.</strong> Les pêcheurs ne paient
-            que leur inscription à l’enduro, fixée par vous. CarpStrike ne prélève rien dessus —
-            vous gardez 100 % des frais.
+            <strong>Offre de lancement : tout est gratuit.</strong> Profitez de l’ensemble des
+            fonctionnalités sans frais pendant la phase de découverte. Les pêcheurs ne paient jamais
+            de commission, et vous gardez 100 % des frais d’inscription que vous fixez.
           </div>
         </div>
 
@@ -59,14 +60,14 @@ export default function TarifsPage() {
               Vous gérez les inscriptions de votre côté. CarpStrike s’occupe du reste.
             </div>
             <div className={styles.planPrice}>
-              <span className="currency">€</span>
-              <span className="amount">20</span>
-              <span className="per">/ enduro</span>
+              <span className="amount">Gratuit</span>
             </div>
-            <div className={styles.planPriceNote}>Paiement unique, à la création de l’enduro</div>
+            <div className={styles.planPriceNote}>
+              Pendant le lancement · tarif normal 20 € / enduro à terme
+            </div>
             <div className={styles.planCta}>
               <Link href="/inscription" className="btn btn-ghost">
-                Choisir Gestion seule
+                Commencer gratuitement
               </Link>
             </div>
             <ul className={styles.planFeatures}>
@@ -108,14 +109,14 @@ export default function TarifsPage() {
               CarpStrike.
             </div>
             <div className={styles.planPrice}>
-              <span className="currency">€</span>
-              <span className="amount">50</span>
-              <span className="per">/ enduro</span>
+              <span className="amount">Gratuit</span>
             </div>
-            <div className={styles.planPriceNote}>Paiement unique, à la création de l’enduro</div>
+            <div className={styles.planPriceNote}>
+              Pendant le lancement · tarif normal 50 € / enduro à terme
+            </div>
             <div className={styles.planCta}>
               <Link href="/inscription" className="btn btn-primary">
-                Choisir Avec inscriptions
+                Commencer gratuitement
               </Link>
             </div>
             <ul className={styles.planFeatures}>
@@ -169,7 +170,7 @@ export default function TarifsPage() {
             Prêt à lancer votre <span className="accent">enduro</span> ?
           </div>
           <div className={styles.ctaBandSub}>
-            Créez-le maintenant, choisissez votre formule à la fin.
+            Créez-le maintenant — c’est gratuit pendant le lancement.
           </div>
           <div className={styles.ctaBandActions}>
             <Link href="/inscription" className="btn btn-primary">
