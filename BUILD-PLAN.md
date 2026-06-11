@@ -83,12 +83,12 @@
 
 ## Phase 6 — Commissaires & saisie des prises
 
-- [ ] Page organisateur de gestion des commissaires (génération identifiants) → `carpstrike-commissaires.html`
-- [ ] Auth commissaire spécifique (username/password générés, pas de compte User)
-- [ ] App mobile commissaire (login, saisie prise + photo, historique) → `carpstrike-commissaire-app.html`
-- [ ] Upload photo vers Supabase Storage
-- [ ] Validation maille minimum à la saisie (@SPEC.md 4.3)
-- [ ] Page validations organisateur (contester/annuler) → `carpstrike-validations.html`
+- [x] Page organisateur de gestion des commissaires (génération identifiants) → `carpstrike-commissaires.html`
+- [x] Auth commissaire spécifique (username/password générés, pas de compte User)
+- [x] App mobile commissaire (login, saisie prise + photo, historique) → `carpstrike-commissaire-app.html`
+- [x] Upload photo vers Supabase Storage
+- [x] Validation maille minimum à la saisie (@SPEC.md 4.3)
+- [x] Page validations organisateur (contester/annuler) → `carpstrike-validations.html`
 
 **Critère de fin :** un commissaire se connecte et enregistre une prise avec photo.
 
