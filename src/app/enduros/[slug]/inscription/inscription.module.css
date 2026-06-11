@@ -1,0 +1,371 @@
+/* Page d'inscription publique — styles scopés (transposés de carpstrike-inscription.html, sans paiement) */
+
+.page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px;
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 28px;
+}
+
+/* ─── Récap latéral ─── */
+.summary {
+  position: sticky;
+  top: 92px;
+  align-self: start;
+}
+.summaryCard {
+  background: linear-gradient(140deg, var(--panel) 0%, var(--panel-2) 100%);
+  border: 1px solid var(--line-bright);
+  position: relative;
+}
+.summaryCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 80px;
+  height: 2px;
+  background: var(--red);
+  box-shadow: 0 0 12px var(--red-glow);
+}
+.summaryHero {
+  padding: 22px 24px 18px;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 100%, rgba(20, 60, 80, 0.4) 0%, transparent 60%),
+    linear-gradient(180deg, #0a1620 0%, #0d2435 100%);
+  border-bottom: 1px solid var(--line);
+}
+.summaryCat {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-rajdhani), sans-serif;
+  font-weight: 700;
+  font-size: 0.62rem;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--red);
+  background: var(--red-dim);
+  border: 1px solid rgba(232, 33, 43, 0.4);
+  padding: 3px 8px;
+  margin-bottom: 12px;
+}
+.summaryName {
+  font-family: var(--font-barlow-condensed), sans-serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 1.5rem;
+  line-height: 1;
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+}
+.summaryMeta {
+  font-size: 0.78rem;
+  color: var(--dim);
+  line-height: 1.5;
+}
+.summaryBody {
+  padding: 18px 24px 22px;
+}
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  font-size: 0.85rem;
+}
+.summaryRow + .summaryRow {
+  border-top: 1px solid var(--line);
+}
+.summaryRowLabel {
+  color: var(--dim);
+  font-family: var(--font-rajdhani), sans-serif;
+  font-weight: 600;
+}
+.summaryRowValue {
+  color: var(--white);
+  font-weight: 600;
+}
+.summaryAvail {
+  margin-top: 16px;
+  padding: 12px 14px;
+  background: rgba(232, 33, 43, 0.06);
+  border: 1px solid rgba(232, 33, 43, 0.2);
+  border-left: 3px solid var(--red);
+  font-size: 0.82rem;
+}
+.summaryAvail strong {
+  color: var(--white);
+}
+
+/* ─── Formulaire ─── */
+.formMain {
+  background: linear-gradient(140deg, var(--panel) 0%, var(--panel-2) 100%);
+  border: 1px solid var(--line);
+  padding: 32px 36px 30px;
+}
+.stepBar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-rajdhani), sans-serif;
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--dim2);
+}
+.stepNum {
+  width: 24px;
+  height: 24px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  color: var(--dim2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  flex-shrink: 0;
+}
+.step.active,
+.step.done {
+  color: var(--white);
+}
+.step.active .stepNum,
+.step.done .stepNum {
+  background: var(--red);
+  border-color: var(--red);
+  color: #fff;
+  box-shadow: 0 0 12px var(--red-glow);
+}
+.stepLine {
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+  min-width: 12px;
+}
+
+.formEyebrow {
+  font-family: var(--font-rajdhani), sans-serif;
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 8px;
+}
+.formTitle {
+  font-family: var(--font-barlow-condensed), sans-serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 1.9rem;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.formSub {
+  color: var(--dim);
+  font-size: 0.92rem;
+  margin-bottom: 24px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 14px;
+}
+.fieldRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.fieldRow .field {
+  margin-bottom: 0;
+}
+.field label {
+  font-family: var(--font-rajdhani), sans-serif;
+  font-weight: 600;
+  font-size: 0.72rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 6px;
+}
+.field label .req {
+  color: var(--red);
+}
+.field label .optional {
+  font-size: 0.6rem;
+  color: var(--dim2);
+  text-transform: none;
+  letter-spacing: 1px;
+  margin-left: 6px;
+}
+.field input,
+.field textarea {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--line);
+  padding: 11px 13px;
+  color: var(--white);
+  font-family: var(--font-barlow), sans-serif;
+  font-size: 0.9rem;
+  outline: none;
+  transition: all 0.2s;
+}
+.field input:focus,
+.field textarea:focus {
+  border-color: var(--red);
+  background: rgba(0, 0, 0, 0.6);
+  box-shadow: 0 0 0 3px var(--red-dim);
+}
+.field input::placeholder,
+.field textarea::placeholder {
+  color: var(--dim2);
+}
+.fieldError {
+  color: var(--red-bright);
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+.block {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--line);
+  padding: 20px 22px 14px;
+  margin-bottom: 14px;
+}
+.block.captain {
+  border-color: rgba(232, 33, 43, 0.3);
+  background: rgba(232, 33, 43, 0.04);
+}
+.blockTitle {
+  font-family: var(--font-barlow-condensed), sans-serif;
+  font-weight: 700;
+  font-style: italic;
+  font-size: 1.1rem;
+  letter-spacing: 0.5px;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.reglementBox {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--line);
+  padding: 18px 20px;
+  margin-bottom: 16px;
+  max-height: 240px;
+  overflow-y: auto;
+  font-size: 0.85rem;
+  color: var(--off);
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+.checkLine {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--line);
+  cursor: pointer;
+  user-select: none;
+}
+.checkLine input {
+  margin-top: 3px;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--red);
+  flex-shrink: 0;
+}
+.checkText {
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+.checkText strong {
+  color: var(--white);
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+.actions .grow {
+  flex: 1;
+}
+
+/* ─── Confirmation ─── */
+.confirmation {
+  text-align: center;
+  padding: 16px 0;
+}
+.confirmationIcon {
+  width: 72px;
+  height: 72px;
+  background: var(--gold);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  margin-bottom: 18px;
+  box-shadow: 0 0 40px rgba(240, 165, 0, 0.5);
+  clip-path: polygon(15px 0%, 100% 0%, calc(100% - 15px) 100%, 0% 100%);
+}
+.confirmationTitle {
+  font-family: var(--font-barlow-condensed), sans-serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 2rem;
+  line-height: 1;
+  margin-bottom: 10px;
+}
+.confirmationDesc {
+  color: var(--dim);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 22px;
+  max-width: 440px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.statusMsg {
+  padding: 10px 14px;
+  font-size: 0.88rem;
+  margin-bottom: 16px;
+  background: var(--red-dim);
+  border: 1px solid var(--red);
+  color: var(--white);
+}
+
+@media (max-width: 900px) {
+  .page {
+    grid-template-columns: 1fr;
+    padding: 20px;
+  }
+  .summary {
+    position: static;
+    order: -1;
+  }
+  .formMain {
+    padding: 24px 22px;
+  }
+  .fieldRow {
+    grid-template-columns: 1fr;
+  }
+}

@@ -97,7 +97,7 @@ export default async function EnduroPage({ params }: { params: Promise<{ slug: s
 
             <div className={styles.heroActions}>
               {!isLive && enduro.mode === 'WITH_REGISTRATION' && (
-                <Link href="/inscription" className="btn btn-primary btn-large">
+                <Link href={`/enduros/${enduro.slug}/inscription`} className="btn btn-primary btn-large">
                   S’inscrire{priceEuros ? ` — ${priceEuros} €` : ''}
                 </Link>
               )}
@@ -173,7 +173,7 @@ export default async function EnduroPage({ params }: { params: Promise<{ slug: s
             </div>
 
             {!isLive && enduro.mode === 'WITH_REGISTRATION' ? (
-              <Link href="/inscription" className={`btn btn-primary ${styles.infoCta}`}>
+              <Link href={`/enduros/${enduro.slug}/inscription`} className={`btn btn-primary ${styles.infoCta}`}>
                 Réserver mon binôme →
               </Link>
             ) : (
@@ -270,7 +270,7 @@ export default async function EnduroPage({ params }: { params: Promise<{ slug: s
                 </li>
               </ul>
               {!isLive && enduro.mode === 'WITH_REGISTRATION' ? (
-                <Link href="/inscription" className={`btn btn-primary ${styles.priceCta}`}>
+                <Link href={`/enduros/${enduro.slug}/inscription`} className={`btn btn-primary ${styles.priceCta}`}>
                   Réserver maintenant →
                 </Link>
               ) : (
@@ -371,7 +371,7 @@ export default async function EnduroPage({ params }: { params: Promise<{ slug: s
           </p>
           <div className={styles.finalCtaActions}>
             {!isLive && enduro.mode === 'WITH_REGISTRATION' && enduro.spotsLeft > 0 ? (
-              <Link href="/inscription" className="btn btn-primary btn-large">
+              <Link href={`/enduros/${enduro.slug}/inscription`} className="btn btn-primary btn-large">
                 S’inscrire{priceEuros ? ` — ${priceEuros} €` : ''}
               </Link>
             ) : (

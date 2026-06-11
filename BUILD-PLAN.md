@@ -70,12 +70,12 @@
 
 ## Phase 5 — Équipes & inscriptions
 
-- [ ] Mode MANAGED_ONLY : saisie manuelle des équipes → `carpstrike-equipes.html`
-- [ ] Mode WITH_REGISTRATION : formulaire public de demande → `carpstrike-inscription.html`
-- [ ] Page organisateur des demandes (accepter/refuser) → `carpstrike-demandes.html`
-- [ ] Implémenter le workflow complet de @SPEC.md 4.1 (statuts, deadline 7j, liste d'attente)
-- [ ] ~~Page paiement pêcheur (Stripe)~~ → **différé** (lancement gratuit) ; confirmation d'équipe sans paiement en ligne
-- [ ] Emails de notification (validation, refus, relance paiement) via Resend
+- [x] Mode MANAGED_ONLY : saisie manuelle des équipes → `carpstrike-equipes.html`
+- [x] Mode WITH_REGISTRATION : formulaire public de demande → `carpstrike-inscription.html`
+- [x] Page organisateur des demandes (accepter/refuser) → `carpstrike-demandes.html`
+- [x] Workflow @SPEC.md 4.1 adapté gratuit (PENDING → APPROVED = équipe CONFIRMED, WAITLIST si complet, REJECTED + motif ; pas de deadline 7j car pas de paiement)
+- [x] ~~Page paiement pêcheur (Stripe)~~ → **différé** (lancement gratuit) ; confirmation d'équipe sans paiement en ligne
+- [ ] ~~Emails de notification via Resend~~ → **différé en Phase 9** (Resend non configuré)
 
 **Critère de fin :** le cycle demande → validation → confirmation d'équipe fonctionne de bout en bout (paiement en ligne différé au lancement gratuit).
 

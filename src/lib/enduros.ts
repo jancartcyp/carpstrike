@@ -180,3 +180,39 @@ export const getEnduroBySlug = cache(async (slug: string) => {
 })
 
 export type EnduroDetail = NonNullable<Awaited<ReturnType<typeof getEnduroBySlug>>>
+
+/**
+ * Données publiques pour le formulaire d'inscription (mode WITH_REGISTRATION).
+ * Renvoie `null` si l'enduro n'accepte pas d'inscriptions en ligne.
+ */
+export const getEnduroForRegistration = cache(async (slug: string) => {
+  const enduro = await prisma.enduro.findFirst({
+    where: { slug, status: 'PUBLISHED', mode: 'WITH_REGISTRATION' },
+    select: {
+      id: true,
+      slug: true,
+      name: true,
+      locationName: true,
+      postalCode: true,
+      startAt: true,
+      endAt: true,
+      durationHours: true,
+      maxTeams: true,
+      maxFishersPerTeam: true,
+      registrationFee: true,
+      rulesText: true,
+    },
+  })
+
+  if (!enduro) return null
+
+  const confirmedTeams = await prisma.team.count({
+    where: { enduroId: enduro.id, status: 'CONFIRMED' },
+  })
+
+  return { ...enduro, confirmedTeams, spotsLeft: Math.max(0, enduro.maxTeams - confirmedTeams) }
+})
+
+export type EnduroForRegistration = NonNullable<
+  Awaited<ReturnType<typeof getEnduroForRegistration>>
+>

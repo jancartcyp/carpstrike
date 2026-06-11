@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { requireRole } from '@/lib/auth/dal'
+import { requireOwnedEnduro } from '@/lib/auth/owner'
 import { prisma } from '@/lib/prisma'
 import { uniqueEnduroSlug } from '@/lib/slug'
 import {
@@ -37,13 +38,6 @@ function revalidateEnduro(slug?: string) {
   revalidatePath('/dashboard')
   revalidatePath('/enduros')
   if (slug) revalidatePath(`/enduros/${slug}`)
-}
-
-/** Charge un enduro en vérifiant la propriété ; redirige si introuvable/non autorisé. */
-async function requireOwnedEnduro(enduroId: string, organizerId: string) {
-  const enduro = await prisma.enduro.findFirst({ where: { id: enduroId, organizerId } })
-  if (!enduro) redirect('/dashboard')
-  return enduro
 }
 
 // ─────────────────────────────────────────────

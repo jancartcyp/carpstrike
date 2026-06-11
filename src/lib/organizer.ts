@@ -47,3 +47,25 @@ export const getOrganizerEnduro = cache(async (id: string, organizerId: string) 
 })
 
 export type OrganizerEnduro = NonNullable<Awaited<ReturnType<typeof getOrganizerEnduro>>>
+
+/** Équipes d'un enduro (avec membres et secteur) pour la gestion organisateur. */
+export async function getEnduroTeams(enduroId: string) {
+  return prisma.team.findMany({
+    where: { enduroId },
+    orderBy: [{ status: 'asc' }, { createdAt: 'asc' }],
+    include: {
+      members: { orderBy: { isCaptain: 'desc' } },
+      sector: { select: { id: true, name: true, color: true } },
+    },
+  })
+}
+export type EnduroTeam = Awaited<ReturnType<typeof getEnduroTeams>>[number]
+
+/** Demandes d'inscription d'un enduro (mode WITH_REGISTRATION). */
+export async function getEnduroRequests(enduroId: string) {
+  return prisma.registrationRequest.findMany({
+    where: { enduroId },
+    orderBy: { requestedAt: 'desc' },
+  })
+}
+export type EnduroRequest = Awaited<ReturnType<typeof getEnduroRequests>>[number]

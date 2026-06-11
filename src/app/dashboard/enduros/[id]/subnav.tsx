@@ -4,14 +4,16 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import styles from '../../dashboard.module.css'
 
-export function SubNav({ enduroId }: { enduroId: string }) {
+export function SubNav({ enduroId, mode }: { enduroId: string; mode: string }) {
   const pathname = usePathname()
   const base = `/dashboard/enduros/${enduroId}`
 
   const items = [
     { href: base, label: 'Aperçu' },
-    { href: `${base}/parametres`, label: 'Paramètres' },
+    { href: `${base}/equipes`, label: 'Équipes' },
+    ...(mode === 'WITH_REGISTRATION' ? [{ href: `${base}/demandes`, label: 'Demandes' }] : []),
     { href: `${base}/secteurs`, label: 'Secteurs' },
+    { href: `${base}/parametres`, label: 'Paramètres' },
   ]
 
   return (
@@ -28,9 +30,6 @@ export function SubNav({ enduroId }: { enduroId: string }) {
           </Link>
         )
       })}
-      <span className={`${styles.subNavItem} ${styles.disabled}`}>
-        Équipes<span className={styles.subNavSoon}>bientôt</span>
-      </span>
       <span className={`${styles.subNavItem} ${styles.disabled}`}>
         Commissaires<span className={styles.subNavSoon}>bientôt</span>
       </span>
