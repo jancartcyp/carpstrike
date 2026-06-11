@@ -71,11 +71,18 @@ export const equipesSchema = z.object({
     .max(10, { error: '10 pêcheurs max par équipe' }),
 })
 
+// Case à cocher HTML : 'on' si cochée, absente sinon.
+const checkbox = z.preprocess(
+  (v) => v === 'on' || v === 'true' || v === true || v === '1',
+  z.boolean()
+)
+
 export const reglesSchema = z.object({
   minWeightKg: z.coerce
     .number({ error: 'Poids invalide' })
     .min(0, { error: 'Poids invalide' })
     .max(100, { error: 'Maille trop élevée' }),
+  requirePhoto: checkbox,
 })
 
 export const inscriptionsSchema = z.object({
@@ -131,7 +138,7 @@ export const SECTION_FIELDS: Record<SectionKey, string[]> = {
   dates: ['startAt', 'endAt', 'durationHours'],
   lieu: ['locationName', 'address', 'postalCode'],
   equipes: ['maxTeams', 'maxFishersPerTeam'],
-  regles: ['minWeightKg'],
+  regles: ['minWeightKg', 'requirePhoto'],
   inscriptions: ['registrationFee', 'prizePool'],
   presentation: ['theme', 'rulesText'],
 }

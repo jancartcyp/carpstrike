@@ -63,6 +63,7 @@ export async function createEnduro(
     maxTeams: formData.get('maxTeams'),
     maxFishersPerTeam: formData.get('maxFishersPerTeam'),
     minWeightKg: formData.get('minWeightKg'),
+    requirePhoto: formData.get('requirePhoto'),
     registrationFee: formData.get('registrationFee'),
     prizePool: formData.get('prizePool'),
     theme: formData.get('theme'),
@@ -96,6 +97,7 @@ export async function createEnduro(
       registrationFee: eurosToCents(d.registrationFee),
       prizePool: d.prizePool !== undefined ? eurosToCents(d.prizePool) : null,
       minWeightKg: d.minWeightKg,
+      requirePhoto: d.requirePhoto,
       theme: d.theme ?? null,
       rulesText: d.rulesText ?? null,
       sectors: {
@@ -167,6 +169,7 @@ export async function updateEnduroSection(
       break
     case 'regles':
       update.minWeightKg = data.minWeightKg
+      update.requirePhoto = data.requirePhoto
       break
     case 'inscriptions':
       update.registrationFee = eurosToCents(data.registrationFee as number)

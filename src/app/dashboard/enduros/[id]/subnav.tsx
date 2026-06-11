@@ -13,6 +13,8 @@ export function SubNav({ enduroId, mode }: { enduroId: string; mode: string }) {
     { href: `${base}/equipes`, label: 'Équipes' },
     ...(mode === 'WITH_REGISTRATION' ? [{ href: `${base}/demandes`, label: 'Demandes' }] : []),
     { href: `${base}/secteurs`, label: 'Secteurs' },
+    { href: `${base}/commissaires`, label: 'Commissaires' },
+    { href: `${base}/validations`, label: 'Validations' },
     { href: `${base}/parametres`, label: 'Paramètres' },
   ]
 
@@ -30,9 +32,6 @@ export function SubNav({ enduroId, mode }: { enduroId: string; mode: string }) {
           </Link>
         )
       })}
-      <span className={`${styles.subNavItem} ${styles.disabled}`}>
-        Commissaires<span className={styles.subNavSoon}>bientôt</span>
-      </span>
       <span className={`${styles.subNavItem} ${styles.disabled}`}>
         Classement<span className={styles.subNavSoon}>bientôt</span>
       </span>

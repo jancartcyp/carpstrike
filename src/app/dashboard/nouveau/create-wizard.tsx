@@ -333,9 +333,23 @@ export function CreateWizard() {
           />
           {err('minWeightKg') && <p className={styles.fieldError}>{err('minWeightKg')}</p>}
           <p className={styles.fieldHelper}>
-            Les prises sous ce poids ne seront pas comptabilisées au classement.
+            Les prises sous ce poids seront refusées à la saisie.
           </p>
         </div>
+        <label
+          className={styles.field}
+          style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}
+        >
+          <input
+            type="checkbox"
+            name="requirePhoto"
+            defaultChecked
+            style={{ width: 18, height: 18, accentColor: 'var(--red)' }}
+          />
+          <span style={{ fontSize: '0.9rem', color: 'var(--white)' }}>
+            Photo obligatoire à la saisie d’une prise
+          </span>
+        </label>
       </div>
 
       {/* ÉTAPE 6 — INSCRIPTIONS */}

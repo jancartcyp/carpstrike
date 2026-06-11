@@ -69,3 +69,26 @@ export async function getEnduroRequests(enduroId: string) {
   })
 }
 export type EnduroRequest = Awaited<ReturnType<typeof getEnduroRequests>>[number]
+
+/** Commissaires d'un enduro (avec nombre de prises saisies). */
+export async function getEnduroCommissaires(enduroId: string) {
+  return prisma.commissaire.findMany({
+    where: { enduroId },
+    orderBy: { createdAt: 'asc' },
+    include: { _count: { select: { catches: true } } },
+  })
+}
+export type EnduroCommissaire = Awaited<ReturnType<typeof getEnduroCommissaires>>[number]
+
+/** Prises d'un enduro pour la page validations (équipe, secteur, commissaire). */
+export async function getEnduroCatches(enduroId: string) {
+  return prisma.catch.findMany({
+    where: { enduroId },
+    orderBy: { caughtAt: 'desc' },
+    include: {
+      team: { select: { name: true, pegNumber: true, sector: { select: { name: true } } } },
+      commissaire: { select: { displayName: true } },
+    },
+  })
+}
+export type EnduroCatch = Awaited<ReturnType<typeof getEnduroCatches>>[number]

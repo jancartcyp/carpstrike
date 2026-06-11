@@ -146,6 +146,7 @@ model Enduro {
   theme             String?
   rulesText         String?
   minWeightKg       Float        @default(3.0) // maille minimum
+  requirePhoto      Boolean      @default(true) // photo obligatoire à la saisie d'une prise
   createdAt         DateTime     @default(now())
 
   sectors              Sector[]
@@ -233,7 +234,7 @@ model Catch {
   commissaire   Commissaire @relation(fields: [commissaireId], references: [id])
   weightKg      Float
   species       Species
-  photoUrl      String
+  photoUrl      String? // facultatif si l'organisateur n'exige pas la photo
   caughtAt      DateTime    @default(now())
   status        CatchStatus @default(VALID)
   note          String?

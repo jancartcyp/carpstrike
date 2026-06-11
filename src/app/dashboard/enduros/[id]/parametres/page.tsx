@@ -207,9 +207,23 @@ export default async function ParametresPage({
             defaultValue={enduro.minWeightKg}
           />
           <p className={styles.fieldHelper}>
-            Les prises sous ce poids ne sont pas comptabilisées au classement.
+            Les prises sous ce poids sont refusées à la saisie.
           </p>
         </div>
+        <label
+          className={styles.field}
+          style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}
+        >
+          <input
+            type="checkbox"
+            name="requirePhoto"
+            defaultChecked={enduro.requirePhoto}
+            style={{ width: 18, height: 18, accentColor: 'var(--red)' }}
+          />
+          <span style={{ fontSize: '0.9rem', color: 'var(--white)' }}>
+            Photo obligatoire pour valider une prise
+          </span>
+        </label>
       </SectionForm>
 
       {/* 6 — Inscriptions */}

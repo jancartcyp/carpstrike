@@ -1,0 +1,614 @@
+/* App commissaire — mobile-first (transposée de carpstrike-commissaire-app.html) */
+
+.phone {
+  max-width: 460px;
+  margin: 0 auto;
+  min-height: 100vh;
+  position: relative;
+  padding-bottom: 80px;
+}
+
+/* ─── Login ─── */
+.loginWrap {
+  padding: 48px 24px;
+  max-width: 460px;
+  margin: 0 auto;
+}
+.loginLogo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 28px;
+}
+.loginEyebrow {
+  font-family: var(--font-rajdhani), sans-serif;
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--red);
+  text-align: center;
+  margin-bottom: 8px;
+}
+.loginTitle {
+  font-family: var(--font-barlow-condensed), sans-serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 2rem;
+  line-height: 1;
+  text-align: center;
+  margin-bottom: 8px;
+}
+.loginSub {
+  color: var(--dim);
+  font-size: 0.9rem;
+  text-align: center;
+  margin-bottom: 26px;
+  line-height: 1.5;
+}
+.loginCard {
+  background: linear-gradient(140deg, var(--panel) 0%, var(--panel-2) 100%);
+  border: 1px solid var(--line-bright);
+  padding: 24px 22px;
+}
+.loginError {
+  background: var(--red-dim);
+  border: 1px solid var(--red);
+  color: var(--white);
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  margin-bottom: 16px;
+}
+
+/* ─── Champs ─── */
+.field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+}
+.field label {
+  font-family: var(--font-rajdhani), sans-serif;
+  font-weight: 600;
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 6px;
+}
+.field input,
+.field textarea {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--line);
+  padding: 13px 14px;
+  color: var(--white);
+  font-family: var(--font-barlow), sans-serif;
+  font-size: 1rem;
+  outline: none;
+}
+.field input:focus,
+.field textarea:focus {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px var(--red-dim);
+}
+.btnBlock {
+  width: 100%;
+  justify-content: center;
+  padding: 14px;
+}
+
+/* ─── Status bar ─── */
+.statusBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(10, 9, 8, 0.6);
+}
+.statusInfo {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-rajdhani), sans-serif;
+  font-weight: 700;
+  font-size: 0.68rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--red);
+}
+.statusDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--red);
+  box-shadow: 0 0 8px var(--red);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+/* ─── Home ─── */
+.homeHeader {
+  padding: 18px 18px 0;
+}
+.homeGreet {
+  color: var(--dim);
+  font-size: 0.9rem;
+}
+.homeName {
+  font-family: var(--font-barlow-condensed), sans-serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 1.8rem;
+  line-height: 1;
+  margin: 2px 0 6px;
+}
+.homeTag {
+  font-family: var(--font-rajdhani), sans-serif;
+  font-size: 0.78rem;
+  color: var(--off);
+}
+.quickStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 16px 18px;
+}
+.quickStat {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  padding: 14px 8px;
+  text-align: center;
+}
+.quickStatVal {
+  font-family: var(--font-barlow-condensed), sans-serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+.quickStatVal.accent {
+  color: var(--red);
+}
+.quickStatLbl {
+  font-family: var(--font-rajdhani), sans-serif;
+  font-size: 0.62rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-top: 5px;
+}
+.ctaMain {
+  margin: 6px 18px 18px;
+  background:
+    radial-gradient(ellipse at top right, rgba(232, 33, 43, 0.2) 0%, transparent 60%),
+    linear-gradient(140deg, var(--panel) 0%, var(--panel-2) 100%);
+  border: 1px solid var(--red);
+  padding: 22px 20px;
+  cursor: pointer;
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  clip-path: polygon(14px 0%, 100% 0%, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0% 100%, 0% 14px);
+}
+.ctaMainEyebrow {
+  font-family: var(--font-rajdhani), sans-serif;
+  font-weight: 700;
+  font-size: 0.65rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 8px;
+}
+.ctaMainTitle {
+  font-family: var(--font-barlow-condensed), sans-serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 1.6rem;
+  line-height: 1.05;
+  margin-bottom: 6px;
+}
+.ctaMainSub {
+  color: var(--dim);
+  font-size: 0.85rem;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 18px;
+  font-family: var(--font-barlow-condensed), sans-serif;
+  font-weight: 700;
+  font-style: italic;
+  font-size: 1.1rem;
+}
+.sectionTitle .bar {
+  width: 4px;
+  height: 18px;
+  background: var(--red);
+  box-shadow: 0 0 8px var(--red-glow);
+}
+
+/* ─── Screen head ─── */
+.screenHead {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.backBtn {
+  width: 36px;
+  height: 36px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--line-bright);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.screenTitle {
+  font-family: var(--font-barlow-condensed), sans-serif;
+  font-weight: 700;
+  font-style: italic;
+  font-size: 1.2rem;
+  flex: 1;
+}
+
+/* ─── Sélection équipe ─── */
+.searchBar {
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--line);
+}
+.searchBar input {
+  width: 100%;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  padding: 12px 14px;
+  color: var(--white);
+  font-size: 0.95rem;
+  outline: none;
+}
+.teamCard {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  padding: 14px 16px;
+  margin: 8px 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: calc(100% - 36px);
+  text-align: left;
+  color: inherit;
+}
+.teamCard:active {
+  background: var(--red-dim);
+  border-color: var(--red);
+}
+.teamCardPoste {
+  width: 42px;
+  height: 42px;
+  background: var(--red-dim);
+  border: 1px solid var(--red);
+  color: var(--red);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-barlow-condensed), sans-serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+  clip-path: polygon(7px 0%, 100% 0%, calc(100% - 7px) 100%, 0% 100%);
+}
+.teamCardName {
+  font-family: var(--font-rajdhani), sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+.teamCardMeta {
+  font-size: 0.72rem;
+  color: var(--dim);
+  margin-top: 2px;
+}
+
+/* ─── Saisie prise ─── */
+.catchForm {
+  padding: 18px;
+}
+.selectedTeam {
+  background: linear-gradient(140deg, var(--panel) 0%, var(--panel-2) 100%);
+  border: 1px solid var(--line-bright);
+  border-left: 3px solid var(--red);
+  padding: 14px 16px;
+  margin-bottom: 18px;
+}
+.selectedTeamName {
+  font-family: var(--font-barlow-condensed), sans-serif;
+  font-weight: 700;
+  font-style: italic;
+  font-size: 1.2rem;
+}
+.selectedTeamMeta {
+  font-size: 0.78rem;
+  color: var(--dim);
+  margin-top: 2px;
+}
+.weightCard {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  padding: 18px;
+  margin-bottom: 18px;
+  text-align: center;
+}
+.weightLabel {
+  font-family: var(--font-rajdhani), sans-serif;
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 10px;
+}
+.weightInputWrap {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8px;
+}
+.weightInputWrap input {
+  width: 160px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid var(--line-bright);
+  color: var(--white);
+  font-family: var(--font-barlow-condensed), sans-serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 3rem;
+  text-align: center;
+  outline: none;
+}
+.weightInputWrap input:focus {
+  border-color: var(--red);
+}
+.weightUnit {
+  font-family: var(--font-barlow-condensed), sans-serif;
+  font-weight: 700;
+  font-style: italic;
+  font-size: 1.4rem;
+  color: var(--dim);
+}
+.weightHelper {
+  font-size: 0.75rem;
+  color: var(--dim);
+  margin-top: 10px;
+}
+.weightHelper.under {
+  color: var(--red);
+}
+.quickWeights {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 12px;
+}
+.quickWeight {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--line);
+  color: var(--off);
+  padding: 7px 12px;
+  cursor: pointer;
+  font-family: var(--font-rajdhani), sans-serif;
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+.quickWeight:active {
+  background: var(--red-dim);
+  border-color: var(--red);
+  color: var(--red);
+}
+.speciesRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.speciesPill {
+  font-family: var(--font-rajdhani), sans-serif;
+  font-weight: 700;
+  font-size: 0.8rem;
+  padding: 8px 14px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--line);
+  color: var(--dim);
+  cursor: pointer;
+}
+.speciesPill.active {
+  background: var(--red-dim);
+  border-color: var(--red);
+  color: var(--red);
+}
+.photoUpload {
+  position: relative;
+  border: 1px dashed var(--line-bright);
+  background: rgba(0, 0, 0, 0.3);
+  padding: 22px;
+  text-align: center;
+  cursor: pointer;
+}
+.photoUpload input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.photoIcon {
+  font-size: 1.8rem;
+}
+.photoTitle {
+  font-family: var(--font-rajdhani), sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-top: 6px;
+}
+.photoSub {
+  font-size: 0.75rem;
+  color: var(--dim);
+  margin-top: 2px;
+}
+.photoName {
+  color: var(--green);
+  font-size: 0.85rem;
+  margin-top: 8px;
+}
+.submitActions {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.statusMsg {
+  padding: 10px 14px;
+  font-size: 0.88rem;
+  margin-bottom: 14px;
+  background: var(--red-dim);
+  border: 1px solid var(--red);
+  color: var(--white);
+}
+
+/* ─── Succès ─── */
+.success {
+  padding: 40px 24px;
+  text-align: center;
+}
+.successIcon {
+  width: 84px;
+  height: 84px;
+  background: var(--green);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.6rem;
+  margin-bottom: 18px;
+  box-shadow: 0 0 40px rgba(0, 200, 80, 0.5);
+  clip-path: polygon(16px 0%, 100% 0%, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0% 100%, 0% 16px);
+}
+.successTitle {
+  font-family: var(--font-barlow-condensed), sans-serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 1.8rem;
+  margin-bottom: 8px;
+}
+.successDesc {
+  color: var(--dim);
+  font-size: 0.92rem;
+  margin-bottom: 22px;
+  line-height: 1.5;
+}
+
+/* ─── Historique ─── */
+.historyItem {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  padding: 12px 14px;
+  margin: 8px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.historyIcon {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  clip-path: polygon(7px 0%, 100% 0%, calc(100% - 7px) 100%, 0% 100%);
+}
+.historyIcon.valid {
+  background: rgba(0, 200, 80, 0.12);
+  color: var(--green);
+}
+.historyIcon.other {
+  background: rgba(232, 33, 43, 0.12);
+  color: var(--red);
+}
+.historyInfo {
+  flex: 1;
+  min-width: 0;
+}
+.historyTeam {
+  font-family: var(--font-rajdhani), sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.historyMeta {
+  font-size: 0.7rem;
+  color: var(--dim);
+  margin-top: 2px;
+}
+.historyWeight {
+  font-family: var(--font-barlow-condensed), sans-serif;
+  font-weight: 700;
+  font-style: italic;
+  font-size: 1.05rem;
+}
+
+/* ─── Bottom nav ─── */
+.bottomNav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-width: 460px;
+  margin: 0 auto;
+  background: rgba(10, 9, 8, 0.96);
+  backdrop-filter: blur(16px);
+  border-top: 1px solid var(--line);
+  padding: 8px 0 12px;
+  display: flex;
+  justify-content: space-around;
+  z-index: 50;
+}
+.navItem {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px;
+  color: var(--dim);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-rajdhani), sans-serif;
+  font-weight: 700;
+  font-size: 0.6rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+.navItem.active {
+  color: var(--red);
+}
+.navIco {
+  font-size: 1.3rem;
+}
+.topLogout {
+  background: none;
+  border: 1px solid var(--line-bright);
+  color: var(--dim);
+  font-family: var(--font-rajdhani), sans-serif;
+  font-weight: 700;
+  font-size: 0.65rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  cursor: pointer;
+}
