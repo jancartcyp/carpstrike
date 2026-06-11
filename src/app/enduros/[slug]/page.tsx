@@ -102,7 +102,7 @@ export default async function EnduroPage({ params }: { params: Promise<{ slug: s
                 </Link>
               )}
               {isLive && (
-                <Link href={`/classements`} className="btn btn-primary btn-large">
+                <Link href={`/enduros/${enduro.slug}/classement`} className="btn btn-primary btn-large">
                   Suivre le classement →
                 </Link>
               )}
@@ -177,7 +177,7 @@ export default async function EnduroPage({ params }: { params: Promise<{ slug: s
                 Réserver mon binôme →
               </Link>
             ) : (
-              <Link href={`/classements`} className={`btn btn-primary ${styles.infoCta}`}>
+              <Link href={`/enduros/${enduro.slug}/classement`} className={`btn btn-primary ${styles.infoCta}`}>
                 {isLive ? 'Voir le classement live →' : 'Voir l’enduro →'}
               </Link>
             )}

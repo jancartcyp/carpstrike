@@ -96,10 +96,10 @@
 
 ## Phase 7 — Classement live (temps réel)
 
-- [ ] Implémenter l'algo de rotation de secteurs (@SPEC.md 4.2, réf. JS dans la maquette)
-- [ ] Page classement live publique → `carpstrike-classement-live.html`
-- [ ] Abonnement Supabase Realtime sur les `Catch` (mise à jour instantanée)
-- [ ] Stats par secteur, podium, plus grosses prises
+- [x] Implémenter l'algo de rotation de secteurs (@SPEC.md 4.2, réf. JS dans la maquette) — testé (Vitest)
+- [x] Page classement live publique → `carpstrike-classement-live.html`
+- [x] ~~Abonnement Supabase Realtime sur les `Catch`~~ → **rafraîchissement auto par polling (~10s)** ; Realtime instantané (publication + RLS) = amélioration ultérieure
+- [x] Stats par secteur, podium, plus grosses prises
 
 **Critère de fin :** une prise saisie par un commissaire apparaît en direct dans le classement public.
 
