@@ -57,12 +57,12 @@
 
 > ⚠️ **Lancement gratuit** : CarpStrike démarre 100 % gratuit (découverte/test), paiements Stripe **reportés**. Construire la création/gestion d'enduro **sans étape de paiement** ; le choix de mode reste une distinction fonctionnelle (gestion seule vs inscriptions), mais sans frais. Réactiver Stripe lors d'une phase « Paiements » ultérieure.
 
-- [ ] Assistant de création d'enduro (multi-étapes) → flow de `carpstrike-app.html`
-- [ ] Choix du mode : MANAGED_ONLY ou WITH_REGISTRATION (gratuit pendant le lancement)
-- [ ] ~~Paiement des frais organisateur via Stripe Checkout~~ → **différé** (lancement gratuit)
-- [ ] Dashboard organisateur → `carpstrike-dashboard.html`
-- [ ] Page Paramètres (édition, sections verrouillées si LIVE, zone de danger) → `carpstrike-parametres.html`
-- [ ] Gestion des secteurs
+- [x] Assistant de création d'enduro (multi-étapes) → flow de `carpstrike-app.html`
+- [x] Choix du mode : MANAGED_ONLY ou WITH_REGISTRATION (gratuit pendant le lancement)
+- [x] ~~Paiement des frais organisateur via Stripe Checkout~~ → **différé** (lancement gratuit)
+- [x] Dashboard organisateur → `carpstrike-dashboard.html`
+- [x] Page Paramètres (édition, sections verrouillées si LIVE, zone de danger) → `carpstrike-parametres.html`
+- [x] Gestion des secteurs
 
 **Critère de fin :** un organisateur crée un enduro (gratuitement) et le voit dans son dashboard.
 
