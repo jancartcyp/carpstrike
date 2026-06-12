@@ -72,6 +72,7 @@ export async function Header() {
 
         {/* Navigation */}
         <ul
+          className="header-nav-links"
           style={{
             display: 'flex',
             gap: 4,

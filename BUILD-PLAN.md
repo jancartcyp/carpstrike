@@ -119,13 +119,13 @@
 
 ## Phase 9 — Communication & finitions
 
-- [ ] Centre de communication organisateur → `carpstrike-communication.html`
-- [ ] Envoi multi-destinataires (email + notif in-app)
-- [ ] Responsive mobile sur toutes les pages
-- [ ] Gestion des erreurs, états de chargement, pages 404/500
-- [ ] Tests end-to-end des parcours critiques (inscription, paiement, saisie prise)
+- [x] Centre de communication organisateur → `carpstrike-communication.html`
+- [x] Envoi multi-destinataires : **notif in-app** (annonces ALL affichées sur la page publique) ; ~~email~~ → **différé** (Resend)
+- [x] Responsive mobile sur toutes les pages (CSS Modules + media queries ; header condensé)
+- [x] Gestion des erreurs, états de chargement, pages 404/500 (not-found.tsx, error.tsx, loading.tsx)
+- [ ] ~~Tests end-to-end (Playwright)~~ → **différé** (couvert par Vitest unitaire + vérifs runtime ciblées)
 
-**Critère de fin :** l'app est complète, testée, prête pour un déploiement de test.
+**Critère de fin :** l'app est complète et utilisable pour un lancement de test (email réel + e2e différés).
 
 ---
 

@@ -15,6 +15,7 @@ export function SubNav({ enduroId, mode }: { enduroId: string; mode: string }) {
     { href: `${base}/secteurs`, label: 'Secteurs' },
     { href: `${base}/commissaires`, label: 'Commissaires' },
     { href: `${base}/validations`, label: 'Validations' },
+    { href: `${base}/communication`, label: 'Communication' },
     { href: `${base}/parametres`, label: 'Paramètres' },
   ]
 

@@ -825,6 +825,12 @@ body {
 }
 
 /* ─── RESPONSIVE ─── */
+@media (max-width: 860px) {
+  /* Sur mobile, on masque la nav centrale du header (logo + CTA restent). */
+  .header-nav-links {
+    display: none !important;
+  }
+}
 @media (max-width: 900px) {
   .hero-content {
     grid-template-columns: 1fr;

@@ -80,6 +80,15 @@ export async function getEnduroCommissaires(enduroId: string) {
 }
 export type EnduroCommissaire = Awaited<ReturnType<typeof getEnduroCommissaires>>[number]
 
+/** Annonces (communications) d'un enduro pour l'historique organisateur. */
+export async function getEnduroCommunications(enduroId: string) {
+  return prisma.communication.findMany({
+    where: { enduroId },
+    orderBy: { createdAt: 'desc' },
+  })
+}
+export type EnduroCommunication = Awaited<ReturnType<typeof getEnduroCommunications>>[number]
+
 /** Prises d'un enduro pour la page validations (équipe, secteur, commissaire). */
 export async function getEnduroCatches(enduroId: string) {
   return prisma.catch.findMany({

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { type EnduroDetail, getEnduroBySlug } from '@/lib/enduros'
+import { type EnduroDetail, getEnduroBySlug, getPublicAnnouncements } from '@/lib/enduros'
 import { Countdown } from './countdown'
 import styles from './enduro.module.css'
 
@@ -51,6 +51,7 @@ export default async function EnduroPage({ params }: { params: Promise<{ slug: s
 
   if (!enduro) notFound()
 
+  const announcements = await getPublicAnnouncements(enduro.id)
   const isLive = enduro.status === 'LIVE'
   const priceEuros = formatEuros(enduro.registrationFee)
   const prizeEuros = formatEuros(enduro.prizePool)
@@ -193,6 +194,55 @@ export default async function EnduroPage({ params }: { params: Promise<{ slug: s
           </aside>
         </div>
       </section>
+
+      {/* ═══════ ANNONCES ═══════ */}
+      {announcements.length > 0 && (
+        <section className={styles.section}>
+          <div className={styles.sectionEyebrow}>Du côté de l’organisateur</div>
+          <h2 className={styles.sectionTitle}>
+            Annonces <span className="accent">officielles</span>
+          </h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {announcements.map((a) => {
+              const color =
+                a.priority === 'HIGH'
+                  ? 'var(--red)'
+                  : a.priority === 'NORMAL'
+                    ? 'var(--gold)'
+                    : 'var(--blue)'
+              return (
+                <div
+                  key={a.id}
+                  style={{
+                    background: 'linear-gradient(140deg, var(--panel) 0%, var(--panel-2) 100%)',
+                    border: '1px solid var(--line)',
+                    borderLeft: `3px solid ${color}`,
+                    padding: '16px 20px',
+                  }}
+                >
+                  <div
+                    style={{
+                      fontFamily: 'var(--font-barlow-condensed)',
+                      fontWeight: 700,
+                      fontStyle: 'italic',
+                      fontSize: '1.2rem',
+                      marginBottom: 4,
+                    }}
+                  >
+                    {a.subject}
+                  </div>
+                  <div style={{ color: 'var(--off)', fontSize: '0.92rem', lineHeight: 1.6, whiteSpace: 'pre-line' }}>
+                    {a.body}
+                  </div>
+                  <div style={{ color: 'var(--dim)', fontSize: '0.72rem', marginTop: 8 }}>
+                    {longDate.format(a.createdAt)}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </section>
+      )}
 
       {/* ═══════ DÉTAILS ═══════ */}
       <section className={styles.section} id="details">

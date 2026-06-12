@@ -216,3 +216,14 @@ export const getEnduroForRegistration = cache(async (slug: string) => {
 export type EnduroForRegistration = NonNullable<
   Awaited<ReturnType<typeof getEnduroForRegistration>>
 >
+
+/** Annonces publiques (recipients ALL) d'un enduro, pour affichage sur la page publique. */
+export async function getPublicAnnouncements(enduroId: string) {
+  return prisma.communication.findMany({
+    where: { enduroId, recipients: 'ALL' },
+    orderBy: { createdAt: 'desc' },
+    take: 10,
+    select: { id: true, subject: true, body: true, priority: true, createdAt: true },
+  })
+}
+export type PublicAnnouncement = Awaited<ReturnType<typeof getPublicAnnouncements>>[number]
