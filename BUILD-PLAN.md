@@ -107,13 +107,13 @@
 
 ## Phase 8 — Lancer de précision & résultats
 
-- [ ] Module lancer de précision → `carpstrike-lancer-precision.html` (@SPEC.md 4.6)
-- [ ] Clôture officielle de l'enduro par l'organisateur
-- [ ] Page résultats finaux → `carpstrike-resultats.html`
-- [ ] Génération des certificats PDF (stockés dans Supabase Storage)
-- [ ] Profil pêcheur (stats, historique, trophées) → `carpstrike-profil-pecheur.html`
+- [ ] ~~Module lancer de précision~~ → **différé** (nécessite un modèle Prisma + migration) — `carpstrike-lancer-precision.html` (@SPEC.md 4.6)
+- [x] Clôture officielle de l'enduro par l'organisateur (zone de danger Phase 4 → FINISHED)
+- [x] Page résultats finaux → `carpstrike-resultats.html`
+- [ ] ~~Génération des certificats PDF~~ → **différé** (lib PDF + Storage) ; placeholder « bientôt » sur la page résultats
+- [x] Profil pêcheur (stats, historique, trophées) → `carpstrike-profil-pecheur.html`
 
-**Critère de fin :** un enduro peut être clôturé, les résultats et certificats sont générés.
+**Critère de fin :** un enduro peut être clôturé et ses résultats consultés (certificats PDF différés).
 
 ---
 

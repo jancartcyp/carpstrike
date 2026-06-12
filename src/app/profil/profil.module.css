@@ -1,0 +1,184 @@
+/* Profil pêcheur — styles scopés (transposés de carpstrike-profil-pecheur.html) */
+
+.wrap {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 32px 32px 70px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 26px;
+}
+.avatar {
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, var(--red) 0%, #8a1820 100%);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-barlow-condensed), sans-serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 1.6rem;
+  flex-shrink: 0;
+  clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+}
+.eyebrow {
+  font-family: var(--font-rajdhani), sans-serif;
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--red);
+}
+.name {
+  font-family: var(--font-barlow-condensed), sans-serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 2.2rem;
+  line-height: 1;
+  letter-spacing: -0.5px;
+}
+
+.statRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 28px;
+}
+.statCard {
+  background: linear-gradient(140deg, var(--panel) 0%, var(--panel-2) 100%);
+  border: 1px solid var(--line);
+  padding: 18px 20px;
+  position: relative;
+}
+.statCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent, var(--red));
+}
+.statVal {
+  font-family: var(--font-barlow-condensed), sans-serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 2rem;
+  line-height: 1;
+}
+.statVal .unit {
+  font-size: 0.85rem;
+  color: var(--dim);
+}
+.statLbl {
+  font-family: var(--font-rajdhani), sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-top: 5px;
+}
+
+.sectionTitle {
+  font-family: var(--font-barlow-condensed), sans-serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 1.4rem;
+  margin: 0 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sectionTitle .bar {
+  width: 4px;
+  height: 18px;
+  background: var(--red);
+  box-shadow: 0 0 8px var(--red-glow);
+}
+
+.histList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.histCard {
+  background: linear-gradient(140deg, var(--panel) 0%, var(--panel-2) 100%);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent, var(--line-bright));
+  padding: 16px 20px;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 16px;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.2s;
+}
+.histCard:hover {
+  border-color: var(--line-bright);
+}
+.histName {
+  font-family: var(--font-barlow-condensed), sans-serif;
+  font-weight: 700;
+  font-style: italic;
+  font-size: 1.2rem;
+}
+.histMeta {
+  font-size: 0.8rem;
+  color: var(--dim);
+  margin-top: 2px;
+}
+.histTotal {
+  font-family: var(--font-barlow-condensed), sans-serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 1.3rem;
+  text-align: right;
+}
+.histTotal .unit {
+  font-size: 0.7rem;
+  color: var(--dim);
+}
+.rankBadge {
+  font-family: var(--font-rajdhani), sans-serif;
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border: 1px solid var(--line-bright);
+  color: var(--dim);
+  white-space: nowrap;
+}
+.rankBadge.podium {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(240, 165, 0, 0.1);
+}
+
+.empty {
+  padding: 50px 24px;
+  text-align: center;
+  color: var(--dim);
+  border: 1px dashed var(--line-bright);
+  font-family: var(--font-rajdhani), sans-serif;
+  letter-spacing: 1px;
+}
+
+@media (max-width: 800px) {
+  .wrap {
+    padding: 24px 18px 50px;
+  }
+  .statRow {
+    grid-template-columns: 1fr 1fr;
+  }
+  .histCard {
+    grid-template-columns: 1fr auto;
+  }
+}

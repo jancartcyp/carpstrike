@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getEnduroRanking } from '@/lib/ranking'
 import styles from './classement.module.css'
@@ -48,6 +49,11 @@ export default async function ClassementPage({ params }: { params: Promise<{ slu
             {enduro.locationName} · {stats.teams} équipes · {stats.totalCatches} prises
           </div>
         </div>
+        {enduro.status === 'FINISHED' && (
+          <Link href={`/enduros/${enduro.slug}/resultats`} className="btn btn-primary">
+            🏆 Résultats finaux
+          </Link>
+        )}
       </div>
 
       {general.length === 0 ? (

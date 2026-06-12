@@ -147,3 +147,96 @@ export async function getEnduroRanking(slug: string) {
 }
 
 export type EnduroRanking = NonNullable<Awaited<ReturnType<typeof getEnduroRanking>>>
+
+const SPECIES_LABELS: Record<string, string> = {
+  COMMUNE: 'Commune',
+  MIROIR: 'Miroir',
+  CUIR: 'Cuir',
+  KOI: 'Koï',
+  AMOUR_BLANC: 'Amour blanc',
+}
+
+/** Résultats finaux d'un enduro CLÔTURÉ (FINISHED) : classement figé + espèces + galerie. */
+export async function getEnduroResults(slug: string) {
+  const enduro = await prisma.enduro.findFirst({
+    where: { slug, status: 'FINISHED' },
+    select: {
+      id: true,
+      slug: true,
+      name: true,
+      status: true,
+      locationName: true,
+      startAt: true,
+      endAt: true,
+      durationHours: true,
+      prizePool: true,
+    },
+  })
+  if (!enduro) return null
+
+  const teams = await prisma.team.findMany({
+    where: { enduroId: enduro.id, status: 'CONFIRMED' },
+    select: {
+      id: true,
+      name: true,
+      pegNumber: true,
+      sector: { select: { name: true } },
+      catches: {
+        where: { status: 'VALID' },
+        select: { weightKg: true, species: true, photoUrl: true },
+      },
+    },
+  })
+
+  const base = teams.map((t) => {
+    const weights = t.catches.map((c) => c.weightKg)
+    return {
+      id: t.id,
+      name: t.name,
+      sectorName: t.sector?.name ?? null,
+      pegNumber: t.pegNumber,
+      catches: weights.length,
+      biggest: weights.length ? Math.max(...weights) : 0,
+      total: weights.reduce((s, w) => s + w, 0),
+    }
+  })
+  const general = buildGeneralRanking(base)
+
+  // Répartition par espèce + galerie (prises avec photo).
+  const speciesCount = new Map<string, number>()
+  const gallery: { url: string; weightKg: number; team: string }[] = []
+  for (const t of teams) {
+    for (const c of t.catches) {
+      speciesCount.set(c.species, (speciesCount.get(c.species) ?? 0) + 1)
+      if (c.photoUrl) gallery.push({ url: c.photoUrl, weightKg: c.weightKg, team: t.name })
+    }
+  }
+  const species = [...speciesCount.entries()]
+    .map(([key, count]) => ({ key, label: SPECIES_LABELS[key] ?? key, count }))
+    .sort((a, b) => b.count - a.count)
+
+  gallery.sort((a, b) => b.weightKg - a.weightKg)
+
+  const totalKg = general.reduce((s, t) => s + t.total, 0)
+  const totalCatches = general.reduce((s, t) => s + t.catches, 0)
+  const biggestTeam = general.reduce<RankingTeam | null>(
+    (max, t) => (t.biggest > (max?.biggest ?? 0) ? t : max),
+    null
+  )
+
+  return {
+    enduro,
+    general,
+    podium: general.slice(0, 3),
+    species,
+    gallery: gallery.slice(0, 12),
+    stats: {
+      totalKg,
+      totalCatches,
+      teams: general.length,
+      biggestCatch: biggestTeam ? { team: biggestTeam.name, weightKg: biggestTeam.biggest } : null,
+    },
+  }
+}
+
+export type EnduroResults = NonNullable<Awaited<ReturnType<typeof getEnduroResults>>>

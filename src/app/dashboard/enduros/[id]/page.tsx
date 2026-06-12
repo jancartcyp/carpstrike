@@ -104,6 +104,16 @@ export default async function EnduroOverviewPage({
                 Voir la page publique →
               </Link>
             )}
+            {(enduro.status === 'LIVE' || enduro.status === 'FINISHED') && (
+              <Link href={`/enduros/${enduro.slug}/classement`} className="btn btn-ghost">
+                Classement
+              </Link>
+            )}
+            {enduro.status === 'FINISHED' && (
+              <Link href={`/enduros/${enduro.slug}/resultats`} className="btn btn-ghost">
+                🏆 Résultats
+              </Link>
+            )}
             <Link href={`/dashboard/enduros/${enduro.id}/parametres`} className="btn btn-ghost">
               Paramètres
             </Link>

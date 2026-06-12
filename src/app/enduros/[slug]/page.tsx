@@ -96,7 +96,7 @@ export default async function EnduroPage({ params }: { params: Promise<{ slug: s
             {enduro.description && <p className={styles.heroSubtitle}>{enduro.description}</p>}
 
             <div className={styles.heroActions}>
-              {!isLive && enduro.mode === 'WITH_REGISTRATION' && (
+              {enduro.status === 'PUBLISHED' && enduro.mode === 'WITH_REGISTRATION' && (
                 <Link href={`/enduros/${enduro.slug}/inscription`} className="btn btn-primary btn-large">
                   S’inscrire{priceEuros ? ` — ${priceEuros} €` : ''}
                 </Link>
@@ -104,6 +104,11 @@ export default async function EnduroPage({ params }: { params: Promise<{ slug: s
               {isLive && (
                 <Link href={`/enduros/${enduro.slug}/classement`} className="btn btn-primary btn-large">
                   Suivre le classement →
+                </Link>
+              )}
+              {enduro.status === 'FINISHED' && (
+                <Link href={`/enduros/${enduro.slug}/resultats`} className="btn btn-primary btn-large">
+                  🏆 Voir les résultats
                 </Link>
               )}
               <a href="#reglement" className="btn btn-ghost btn-large">
@@ -172,13 +177,17 @@ export default async function EnduroPage({ params }: { params: Promise<{ slug: s
               </div>
             </div>
 
-            {!isLive && enduro.mode === 'WITH_REGISTRATION' ? (
+            {enduro.status === 'PUBLISHED' && enduro.mode === 'WITH_REGISTRATION' ? (
               <Link href={`/enduros/${enduro.slug}/inscription`} className={`btn btn-primary ${styles.infoCta}`}>
                 Réserver mon binôme →
               </Link>
+            ) : enduro.status === 'FINISHED' ? (
+              <Link href={`/enduros/${enduro.slug}/resultats`} className={`btn btn-primary ${styles.infoCta}`}>
+                🏆 Voir les résultats →
+              </Link>
             ) : (
               <Link href={`/enduros/${enduro.slug}/classement`} className={`btn btn-primary ${styles.infoCta}`}>
-                {isLive ? 'Voir le classement live →' : 'Voir l’enduro →'}
+                {isLive ? 'Voir le classement live →' : 'Voir le classement →'}
               </Link>
             )}
           </aside>
