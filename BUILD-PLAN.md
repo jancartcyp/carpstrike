@@ -131,11 +131,13 @@
 
 ## Phase 10 — Déploiement
 
-- [ ] Configurer Vercel + variables d'environnement de production
-- [ ] Configurer Stripe en mode live
-- [ ] Migrations DB de production
-- [ ] Tests de fumée en production
-- [ ] Domaine + HTTPS
+> 🛠️ **Préparé** (voir `DEPLOY.md` + `.env.example`) : build prod validé (`next build` OK, routes dynamiques), checklist, doc des variables, `postinstall: prisma generate`. Les étapes ci-dessous restent à exécuter côté plateformes (Vercel/Supabase/DNS).
+
+- [ ] Configurer Vercel + variables d'environnement de production *(checklist prête — DEPLOY.md §1,5)*
+- [ ] ~~Configurer Stripe en mode live~~ → **différé** (lancement gratuit)
+- [ ] Migrations DB de production *(`npx prisma migrate deploy` — DEPLOY.md §2)*
+- [ ] Tests de fumée en production *(checklist — DEPLOY.md §6)*
+- [ ] Domaine + HTTPS *(DEPLOY.md §7)*
 
 **Critère de fin :** CarpStrike est en ligne et fonctionnel.
 
