@@ -7,6 +7,7 @@ import {
 } from '@/lib/commissaire/session'
 import { verifyPassword } from '@/lib/commissaire/password'
 import { prisma } from '@/lib/prisma'
+import { clientIp, rateLimit } from '@/lib/rate-limit'
 import { commissaireLoginSchema } from '@/lib/validations/catch'
 
 export type CommissaireLoginState = { message?: string } | undefined
@@ -15,6 +16,11 @@ export async function loginCommissaire(
   _prev: CommissaireLoginState,
   formData: FormData
 ): Promise<CommissaireLoginState> {
+  // Anti-brute-force : limite par IP.
+  if (!rateLimit(`clogin:${await clientIp()}`, 10, 5 * 60 * 1000)) {
+    return { message: 'Trop de tentatives. Réessayez dans quelques minutes.' }
+  }
+
   const parsed = commissaireLoginSchema.safeParse({
     username: formData.get('username'),
     password: formData.get('password'),

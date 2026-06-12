@@ -6,6 +6,7 @@ import type { Prisma } from '@/generated/prisma/client'
 import { requireRole } from '@/lib/auth/dal'
 import { requireOwnedEnduro } from '@/lib/auth/owner'
 import { prisma } from '@/lib/prisma'
+import { clientIp, rateLimit } from '@/lib/rate-limit'
 import type { EnduroFormState } from '@/lib/validations/enduro'
 import { type MemberInput, registrationSchema, rejectSchema } from '@/lib/validations/registration'
 
@@ -17,6 +18,11 @@ export async function submitRegistration(
   _prev: EnduroFormState,
   formData: FormData
 ): Promise<EnduroFormState> {
+  // Anti-spam : limite par IP (action publique, sans authentification).
+  if (!rateLimit(`reg:${await clientIp()}`, 5, 10 * 60 * 1000)) {
+    return { message: 'Trop de demandes envoyées. Réessayez dans quelques minutes.' }
+  }
+
   const enduroId = String(formData.get('enduroId') ?? '')
 
   // Construit la liste des membres depuis les champs indexés m0_*, m1_*.
@@ -52,6 +58,19 @@ export async function submitRegistration(
   })
   if (!enduro) {
     return { message: 'Les inscriptions en ligne ne sont pas ouvertes pour cet enduro.' }
+  }
+
+  // Anti-doublon : une seule demande en attente par nom d'équipe et par enduro.
+  const duplicate = await prisma.registrationRequest.findFirst({
+    where: {
+      enduroId: enduro.id,
+      status: 'PENDING',
+      teamName: { equals: parsed.data.teamName, mode: 'insensitive' },
+    },
+    select: { id: true },
+  })
+  if (duplicate) {
+    return { message: 'Une demande avec ce nom d’équipe est déjà en attente pour cet enduro.' }
   }
 
   const membersJson: Prisma.InputJsonValue = parsed.data.members.map((m) => ({

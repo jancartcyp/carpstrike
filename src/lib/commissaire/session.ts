@@ -2,22 +2,46 @@ import { createHmac, timingSafeEqual } from 'node:crypto'
 import { cookies } from 'next/headers'
 
 const COOKIE = 'cs_comm'
-// Clé de signature : la service role key reste strictement serveur (jamais exposée).
-const SECRET = process.env.SUPABASE_SERVICE_ROLE_KEY ?? 'carpstrike-dev-secret'
+const MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000 // 7 jours
 
-function sign(value: string): string {
-  return createHmac('sha256', SECRET).update(value).digest('hex')
+/**
+ * Clé de signature du cookie commissaire.
+ * Priorité à un secret dédié ; repli sur la service role key.
+ * En production, l'absence des deux est une **erreur fatale** (jamais de secret en dur).
+ */
+function getSecret(): string {
+  const secret = process.env.COMMISSAIRE_SESSION_SECRET ?? process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!secret) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error(
+        'Secret de session commissaire manquant (COMMISSAIRE_SESSION_SECRET ou SUPABASE_SERVICE_ROLE_KEY).'
+      )
+    }
+    return 'carpstrike-dev-only-secret'
+  }
+  return secret
 }
 
-/** Pose le cookie de session commissaire (httpOnly, signé). */
+function sign(value: string): string {
+  return createHmac('sha256', getSecret()).update(value).digest('hex')
+}
+
+function safeEqual(a: string, b: string): boolean {
+  const ba = Buffer.from(a)
+  const bb = Buffer.from(b)
+  return ba.length === bb.length && timingSafeEqual(ba, bb)
+}
+
+/** Pose le cookie de session commissaire (httpOnly, signé, horodaté). */
 export async function setCommissaireSession(commissaireId: string): Promise<void> {
   const store = await cookies()
-  store.set(COOKIE, `${commissaireId}.${sign(commissaireId)}`, {
+  const payload = `${commissaireId}.${Date.now()}`
+  store.set(COOKIE, `${payload}.${sign(payload)}`, {
     httpOnly: true,
     sameSite: 'lax',
     path: '/',
     secure: process.env.NODE_ENV === 'production',
-    maxAge: 60 * 60 * 24 * 7,
+    maxAge: MAX_AGE_MS / 1000,
   })
 }
 
@@ -26,18 +50,24 @@ export async function clearCommissaireSession(): Promise<void> {
   store.delete(COOKIE)
 }
 
-/** Renvoie l'id du commissaire si le cookie est présent et la signature valide. */
+/**
+ * Renvoie l'id du commissaire si le cookie est présent, la signature valide
+ * ET la session non expirée (horodatage signé). Sinon null.
+ */
 export async function getCommissaireIdFromCookie(): Promise<string | null> {
   const store = await cookies()
   const raw = store.get(COOKIE)?.value
   if (!raw) return null
-  const idx = raw.lastIndexOf('.')
-  if (idx <= 0) return null
-  const id = raw.slice(0, idx)
-  const sig = raw.slice(idx + 1)
-  const expected = sign(id)
-  const a = Buffer.from(sig)
-  const b = Buffer.from(expected)
-  if (a.length !== b.length || !timingSafeEqual(a, b)) return null
+
+  // Format : `<id>.<issuedAtMs>.<hmac>` (l'id cuid et le timestamp ne contiennent pas de point).
+  const parts = raw.split('.')
+  if (parts.length !== 3) return null
+  const [id, ts, sig] = parts
+
+  if (!safeEqual(sig, sign(`${id}.${ts}`))) return null
+
+  const issuedAt = Number(ts)
+  if (!Number.isFinite(issuedAt) || Date.now() - issuedAt > MAX_AGE_MS) return null
+
   return id
 }

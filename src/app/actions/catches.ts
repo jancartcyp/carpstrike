@@ -45,36 +45,54 @@ export async function submitCatch(
   }
 
   // Photo : upload si fournie ; obligatoire si l'organisateur l'exige.
+  const MAX_PHOTO_BYTES = 8 * 1024 * 1024 // 8 Mo
   let photoUrl: string | null = null
+  let uploadedPath: string | null = null
+  let admin: ReturnType<typeof createAdminClient> | null = null
   const photo = formData.get('photo')
   if (photo instanceof File && photo.size > 0) {
+    if (!photo.type.startsWith('image/')) {
+      return { message: 'Le fichier doit être une image.' }
+    }
+    if (photo.size > MAX_PHOTO_BYTES) {
+      return { message: 'Photo trop volumineuse (8 Mo maximum).' }
+    }
     const ext = (photo.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '')
     const path = `${enduro.id}/${randomUUID()}.${ext || 'jpg'}`
-    const admin = createAdminClient()
+    admin = createAdminClient()
     const buffer = Buffer.from(await photo.arrayBuffer())
     const { error } = await admin.storage
       .from(CATCHES_BUCKET)
-      .upload(path, buffer, { contentType: photo.type || 'image/jpeg', upsert: false })
+      .upload(path, buffer, { contentType: photo.type, upsert: false })
     if (error) {
       return { message: 'Échec de l’upload de la photo. Réessayez.' }
     }
+    uploadedPath = path
     photoUrl = admin.storage.from(CATCHES_BUCKET).getPublicUrl(path).data.publicUrl
   } else if (enduro.requirePhoto) {
     return { message: 'La photo est obligatoire pour cet enduro.' }
   }
 
-  await prisma.catch.create({
-    data: {
-      enduroId: enduro.id,
-      teamId,
-      commissaireId: commissaire.id,
-      weightKg,
-      species,
-      photoUrl,
-      status: 'VALID',
-      note: note ?? null,
-    },
-  })
+  try {
+    await prisma.catch.create({
+      data: {
+        enduroId: enduro.id,
+        teamId,
+        commissaireId: commissaire.id,
+        weightKg,
+        species,
+        photoUrl,
+        status: 'VALID',
+        note: note ?? null,
+      },
+    })
+  } catch (e) {
+    // Évite la photo orpheline si l'insertion échoue après l'upload.
+    if (admin && uploadedPath) {
+      await admin.storage.from(CATCHES_BUCKET).remove([uploadedPath])
+    }
+    throw e
+  }
 
   revalidatePath('/commissaire/app')
   revalidatePath(`/dashboard/enduros/${enduro.id}/validations`)
