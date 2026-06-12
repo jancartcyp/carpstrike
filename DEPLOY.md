@@ -18,6 +18,11 @@ d'après [`.env.example`](.env.example) :
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase → API | oui |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase → API | **non (serveur)** |
 | `DATABASE_URL` | Supabase → pooler **5432** | non |
+| `COMMISSAIRE_SESSION_SECRET` | généré (`openssl rand -hex 32`) — **stable** | **non (serveur)** |
+
+> La valeur de `COMMISSAIRE_SESSION_SECRET` utilisée en prod doit être **fixe** (la changer
+> déconnecte tous les commissaires). En local elle est déjà dans `.env.local` ; en prod, créer
+> une valeur dédiée dans Vercel. Si non renseignée en prod, l'app **refuse de démarrer** (fail-fast).
 
 > ⚠️ `SUPABASE_SERVICE_ROLE_KEY` sert aussi à **signer le cookie commissaire**. Si elle change
 > après déploiement, les sessions commissaires en cours sont invalidées (re-login). Garder stable.
