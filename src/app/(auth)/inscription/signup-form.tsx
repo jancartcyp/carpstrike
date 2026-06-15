@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useActionState, useState } from 'react'
+import { useActionState } from 'react'
 import { signup } from '@/app/actions/auth'
 
 const inputStyle: React.CSSProperties = {
@@ -26,11 +26,6 @@ const labelStyle: React.CSSProperties = {
   display: 'block',
 }
 
-const roles = [
-  { value: 'FISHERMAN', label: 'Pêcheur', desc: 'Je participe aux enduros' },
-  { value: 'ORGANIZER', label: 'Organisateur', desc: "J'organise des enduros" },
-] as const
-
 function FieldError({ messages }: { messages?: string[] }) {
   if (!messages?.length) return null
   return (
@@ -40,7 +35,6 @@ function FieldError({ messages }: { messages?: string[] }) {
 
 export function SignupForm() {
   const [state, action, pending] = useActionState(signup, undefined)
-  const [role, setRole] = useState<'FISHERMAN' | 'ORGANIZER'>('FISHERMAN')
 
   return (
     <form action={action} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
@@ -58,46 +52,10 @@ export function SignupForm() {
         </p>
       )}
 
-      {/* Sélection du rôle */}
-      <div>
-        <span style={labelStyle}>Je suis…</span>
-        <input type="hidden" name="role" value={role} />
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-          {roles.map((r) => {
-            const selected = role === r.value
-            return (
-              <button
-                type="button"
-                key={r.value}
-                onClick={() => setRole(r.value)}
-                style={{
-                  padding: '12px 10px',
-                  textAlign: 'left',
-                  cursor: 'pointer',
-                  background: selected ? 'var(--red-dim)' : 'var(--panel-2, #1a1814)',
-                  border: `1px solid ${selected ? 'var(--red)' : 'var(--line-bright)'}`,
-                  color: 'var(--white)',
-                }}
-              >
-                <span
-                  style={{
-                    fontFamily: 'var(--font-barlow-condensed)',
-                    fontWeight: 700,
-                    fontStyle: 'italic',
-                    textTransform: 'uppercase',
-                    fontSize: '1rem',
-                    display: 'block',
-                  }}
-                >
-                  {r.label}
-                </span>
-                <span style={{ fontSize: '0.75rem', color: 'var(--dim)' }}>{r.desc}</span>
-              </button>
-            )
-          })}
-        </div>
-        <FieldError messages={state?.errors?.role} />
-      </div>
+      <p style={{ fontSize: '0.85rem', color: 'var(--dim)', lineHeight: 1.5 }}>
+        Un seul compte pour tout faire : <strong style={{ color: 'var(--white)' }}>participer</strong>{' '}
+        aux enduros et en <strong style={{ color: 'var(--white)' }}>organiser</strong>.
+      </p>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
         <div>

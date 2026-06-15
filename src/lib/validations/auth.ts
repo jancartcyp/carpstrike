@@ -5,7 +5,6 @@ export const signupSchema = z.object({
   lastName: z.string().min(2, { error: 'Nom trop court' }).trim(),
   email: z.email({ error: 'Adresse email invalide' }).trim(),
   password: z.string().min(8, { error: 'Au moins 8 caractères' }),
-  role: z.enum(['ORGANIZER', 'FISHERMAN'], { error: 'Rôle invalide' }),
 })
 
 export const loginSchema = z.object({

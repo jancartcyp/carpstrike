@@ -8,9 +8,8 @@ import { NextResponse, type NextRequest } from 'next/server'
  *   sans appel DB — voir DAL pour les checks sécurisés)
  */
 
-// Routes nécessitant une authentification
-const ORGANIZER_ROUTES = ['/dashboard']
-const FISHERMAN_ROUTES = ['/profil']
+// Routes nécessitant une authentification (rôles fusionnés : tout compte y accède)
+const PROTECTED_ROUTES = ['/dashboard', '/profil']
 const AUTH_ROUTES = ['/connexion', '/inscription']
 
 export async function proxy(request: NextRequest) {
@@ -44,32 +43,21 @@ export async function proxy(request: NextRequest) {
   } = await supabase.auth.getUser()
 
   const path = request.nextUrl.pathname
-  const role = (user?.user_metadata?.role as string | undefined) ?? null
 
-  const isOrganizerRoute = ORGANIZER_ROUTES.some((r) => path.startsWith(r))
-  const isFishermanRoute = FISHERMAN_ROUTES.some((r) => path.startsWith(r))
+  const isProtectedRoute = PROTECTED_ROUTES.some((r) => path.startsWith(r))
   const isAuthRoute = AUTH_ROUTES.some((r) => path.startsWith(r))
 
   // Non authentifié sur une route protégée → /connexion
-  if (!user && (isOrganizerRoute || isFishermanRoute)) {
+  if (!user && isProtectedRoute) {
     const url = request.nextUrl.clone()
     url.pathname = '/connexion'
     url.searchParams.set('next', path)
     return NextResponse.redirect(url)
   }
 
-  // Authentifié mais mauvais rôle → accueil
-  if (user && isOrganizerRoute && role !== 'ORGANIZER') {
-    return NextResponse.redirect(new URL('/', request.url))
-  }
-  if (user && isFishermanRoute && role !== 'FISHERMAN') {
-    return NextResponse.redirect(new URL('/', request.url))
-  }
-
-  // Déjà connecté sur une page d'auth → tableau de bord selon le rôle
+  // Déjà connecté sur une page d'auth → tableau de bord
   if (user && isAuthRoute) {
-    const dest = role === 'ORGANIZER' ? '/dashboard' : '/profil'
-    return NextResponse.redirect(new URL(dest, request.url))
+    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
   return response

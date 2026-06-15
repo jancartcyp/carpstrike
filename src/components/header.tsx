@@ -18,6 +18,7 @@ export async function Header() {
       }}
     >
       <nav
+        className="app-header-bar"
         style={{
           maxWidth: 1280,
           margin: '0 auto',
@@ -111,11 +112,14 @@ export async function Header() {
         </ul>
 
         {/* CTA */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div className="app-header-cta" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           {user ? (
             <>
+              <Link href="/dashboard" className="btn btn-ghost" style={{ fontSize: '0.85rem' }}>
+                Organiser
+              </Link>
               <Link
-                href={user.role === 'ORGANIZER' ? '/dashboard' : '/profil'}
+                href="/profil"
                 style={{
                   fontFamily: 'var(--font-rajdhani), sans-serif',
                   fontWeight: 600,

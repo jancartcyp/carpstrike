@@ -1,12 +1,20 @@
 'use server'
 
+import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { createClient } from '@/lib/supabase/server'
 import { type AuthFormState, loginSchema, signupSchema } from '@/lib/validations/auth'
 
-function destForRole(role: string | null | undefined) {
-  return role === 'ORGANIZER' ? '/dashboard' : '/profil'
+// Rôles fusionnés : tout compte peut organiser ET participer. Valeur stockée par défaut.
+const DEFAULT_ROLE = 'FISHERMAN' as const
+
+async function siteOrigin() {
+  if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL
+  const h = await headers()
+  const proto = h.get('x-forwarded-proto') ?? 'https'
+  const host = h.get('host') ?? 'localhost:3000'
+  return `${proto}://${host}`
 }
 
 export async function signup(
@@ -18,20 +26,22 @@ export async function signup(
     lastName: formData.get('lastName'),
     email: formData.get('email'),
     password: formData.get('password'),
-    role: formData.get('role'),
   })
 
   if (!parsed.success) {
     return { errors: parsed.error.flatten().fieldErrors }
   }
 
-  const { firstName, lastName, email, password, role } = parsed.data
+  const { firstName, lastName, email, password } = parsed.data
   const supabase = await createClient()
 
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { role, firstName, lastName } },
+    options: {
+      data: { firstName, lastName },
+      emailRedirectTo: `${await siteOrigin()}/auth/confirm`,
+    },
   })
 
   if (error) {
@@ -42,14 +52,14 @@ export async function signup(
   if (data.user) {
     await prisma.user.upsert({
       where: { id: data.user.id },
-      update: { email, firstName, lastName, role },
-      create: { id: data.user.id, email, firstName, lastName, role },
+      update: { email, firstName, lastName },
+      create: { id: data.user.id, email, firstName, lastName, role: DEFAULT_ROLE },
     })
   }
 
   // Si confirmation email désactivée → session immédiate, on redirige.
   if (data.session) {
-    redirect(destForRole(role))
+    redirect('/dashboard')
   }
 
   // Sinon, confirmation requise.
@@ -74,14 +84,13 @@ export async function login(
   const { email, password } = parsed.data
   const supabase = await createClient()
 
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+  const { error } = await supabase.auth.signInWithPassword({ email, password })
 
   if (error) {
     return { message: 'Email ou mot de passe incorrect.' }
   }
 
-  const dbUser = await prisma.user.findUnique({ where: { id: data.user.id } })
-  redirect(destForRole(dbUser?.role))
+  redirect('/dashboard')
 }
 
 export async function logout() {

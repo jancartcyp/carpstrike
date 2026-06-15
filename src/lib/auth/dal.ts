@@ -30,9 +30,12 @@ export async function requireUser() {
   return user
 }
 
-/** Exige un utilisateur connecté avec un rôle précis, sinon redirige. */
-export async function requireRole(role: Role) {
-  const user = await requireUser()
-  if (user.role !== role) redirect('/')
-  return user
+/**
+ * Rôles fusionnés : tout utilisateur connecté peut organiser ET participer.
+ * `requireRole` ne fait plus que vérifier l'authentification (le paramètre de rôle
+ * est conservé pour compat des appels existants, mais ignoré).
+ */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function requireRole(_role?: Role) {
+  return requireUser()
 }
