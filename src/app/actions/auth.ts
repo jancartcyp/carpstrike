@@ -2,12 +2,8 @@
 
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { prisma } from '@/lib/prisma'
 import { createClient } from '@/lib/supabase/server'
 import { type AuthFormState, loginSchema, signupSchema } from '@/lib/validations/auth'
-
-// Rôles fusionnés : tout compte peut organiser ET participer. Valeur stockée par défaut.
-const DEFAULT_ROLE = 'FISHERMAN' as const
 
 async function siteOrigin() {
   if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL
@@ -48,14 +44,8 @@ export async function signup(
     return { message: error.message }
   }
 
-  // Crée l'utilisateur applicatif (table User) lié au même id que auth.users.
-  if (data.user) {
-    await prisma.user.upsert({
-      where: { id: data.user.id },
-      update: { email, firstName, lastName },
-      create: { id: data.user.id, email, firstName, lastName, role: DEFAULT_ROLE },
-    })
-  }
+  // La ligne applicative `User` est créée à la volée par getCurrentUser (auth/dal)
+  // à la première requête authentifiée — évite tout conflit d'unicité ici.
 
   // Si confirmation email désactivée → session immédiate, on redirige.
   if (data.session) {

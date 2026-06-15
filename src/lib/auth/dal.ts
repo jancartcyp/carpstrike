@@ -20,8 +20,50 @@ export const getCurrentUser = cache(async () => {
 
   if (!user) return null
 
-  return prisma.user.findUnique({ where: { id: user.id } })
+  const existing = await prisma.user.findUnique({ where: { id: user.id } })
+  if (existing) return existing
+
+  // Auto-réparation : compte Auth valide sans ligne applicative
+  // (ex. suppression manuelle côté Supabase, ou échec passé à l'inscription).
+  return ensureAppUser(user)
 })
+
+/**
+ * Crée la ligne `User` pour un compte Auth qui n'en a pas encore.
+ * Si l'email est déjà occupé par un ancien compte (orphelin dont l'utilisateur
+ * Auth a été supprimé), on récupère cet ancien compte : on repointe ses relations
+ * vers le nouvel id puis on le supprime — le tout dans une transaction.
+ */
+async function ensureAppUser(authUser: { id: string; email?: string; user_metadata?: Record<string, unknown> }) {
+  const email = authUser.email ?? `${authUser.id}@carpstrike.local`
+  const firstName = (authUser.user_metadata?.firstName as string | undefined) ?? ''
+  const lastName = (authUser.user_metadata?.lastName as string | undefined) ?? ''
+
+  return prisma.$transaction(async (tx) => {
+    const orphan = await tx.user.findUnique({ where: { email } })
+
+    if (orphan && orphan.id !== authUser.id) {
+      // Libère l'email, crée le nouveau compte, puis repointe les relations.
+      await tx.user.update({
+        where: { id: orphan.id },
+        data: { email: `ancien-${orphan.id}@carpstrike.invalid` },
+      })
+      const created = await tx.user.create({
+        data: { id: authUser.id, email, firstName, lastName, role: 'FISHERMAN' },
+      })
+      await tx.enduro.updateMany({ where: { organizerId: orphan.id }, data: { organizerId: authUser.id } })
+      await tx.teamMember.updateMany({ where: { userId: orphan.id }, data: { userId: authUser.id } })
+      await tx.payment.updateMany({ where: { userId: orphan.id }, data: { userId: authUser.id } })
+      await tx.communication.updateMany({ where: { sentById: orphan.id }, data: { sentById: authUser.id } })
+      await tx.user.delete({ where: { id: orphan.id } })
+      return created
+    }
+
+    return tx.user.create({
+      data: { id: authUser.id, email, firstName, lastName, role: 'FISHERMAN' },
+    })
+  })
+}
 
 /** Exige un utilisateur connecté, sinon redirige vers /connexion. */
 export async function requireUser() {
