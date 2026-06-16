@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Barlow, Barlow_Condensed, Rajdhani } from 'next/font/google'
 import { Footer } from '@/components/footer'
 import { Header } from '@/components/header'
+import { ScrollToTop } from '@/components/scroll-to-top'
 import './globals.css'
 
 const barlow = Barlow({
@@ -40,6 +41,7 @@ export default function RootLayout({
       className={`${barlow.variable} ${barlowCondensed.variable} ${rajdhani.variable}`}
     >
       <body>
+        <ScrollToTop />
         <div className="bg-atmosphere" />
         <div className="bg-grid" />
         <Header />

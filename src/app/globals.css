@@ -58,9 +58,8 @@
   padding: 0;
 }
 
-html {
-  scroll-behavior: smooth;
-}
+/* Pas de scroll-behavior:smooth global : il casse le retour-en-haut du App Router
+   (la page s'ouvrait en bas). Le défilement reste instantané et correct à chaque navigation. */
 
 body {
   background: var(--dark);
