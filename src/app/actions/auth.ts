@@ -13,6 +13,31 @@ async function siteOrigin() {
   return `${proto}://${host}`
 }
 
+// Traduit les erreurs d'inscription Supabase (messages renvoyés en anglais) en français lisible.
+// On se base d'abord sur le `code` stable, sinon sur le contenu du message.
+function frenchSignupError(error: { message: string; code?: string }): string {
+  const code = error.code ?? ''
+  const msg = error.message.toLowerCase()
+
+  if (code === 'user_already_exists' || msg.includes('already registered') || msg.includes('already been registered')) {
+    return 'Un compte existe déjà avec cette adresse email. Connecte-toi ou utilise « mot de passe oublié ».'
+  }
+  // Protection anti-mots de passe fuités (HaveIBeenPwned) + mots de passe trop faibles.
+  if (code === 'weak_password' || msg.includes('pwned') || msg.includes('breach') || msg.includes('data breach') || msg.includes('compromis') || msg.includes('weak')) {
+    return 'Ce mot de passe a déjà été exposé dans une fuite de données connue (ou est trop faible). Choisis-en un autre, plus robuste.'
+  }
+  if (code.includes('rate_limit') || msg.includes('rate limit') || msg.includes('too many')) {
+    return 'Trop de tentatives. Patiente quelques minutes avant de réessayer.'
+  }
+  if (code === 'signup_disabled' || msg.includes('signups not allowed') || msg.includes('signup is disabled')) {
+    return 'Les inscriptions sont momentanément désactivées. Réessaie plus tard.'
+  }
+  if (code === 'email_address_invalid' || (msg.includes('invalid') && msg.includes('email'))) {
+    return 'Cette adresse email est invalide. Vérifie-la et réessaie.'
+  }
+  return 'Impossible de créer le compte pour le moment. Vérifie tes informations et réessaie.'
+}
+
 export async function signup(
   _prevState: AuthFormState,
   formData: FormData
@@ -41,7 +66,7 @@ export async function signup(
   })
 
   if (error) {
-    return { message: error.message }
+    return { message: frenchSignupError(error) }
   }
 
   // La ligne applicative `User` est créée à la volée par getCurrentUser (auth/dal)
