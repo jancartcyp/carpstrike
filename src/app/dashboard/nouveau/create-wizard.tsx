@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState, useState } from 'react'
+import { useActionState, useEffect, useState } from 'react'
 import { createEnduro } from '@/app/actions/enduros'
 import styles from '../dashboard.module.css'
 
@@ -83,6 +83,11 @@ export function CreateWizard() {
 
   const set = (k: keyof FormValues, val: string) => setV((s) => ({ ...s, [k]: val }))
   const err = (k: string) => state?.errors?.[k]?.[0]
+
+  // Les étapes changent sans navigation → on remonte en haut à chaque étape.
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' })
+  }, [step])
 
   // En cas d'erreur de validation serveur, sauter à l'étape de la 1re erreur.
   // Pattern « ajustement pendant le rendu » (sans effet) : on réagit au changement

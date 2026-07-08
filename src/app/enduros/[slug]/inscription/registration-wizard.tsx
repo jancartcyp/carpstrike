@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useActionState, useState } from 'react'
+import { useActionState, useEffect, useState } from 'react'
 import { submitRegistration } from '@/app/actions/registrations'
 import styles from './inscription.module.css'
 
@@ -40,6 +40,11 @@ export function RegistrationWizard({
   }
 
   const err = (k: string) => state?.errors?.[k]?.[0]
+
+  // Les étapes changent sans navigation → on remonte en haut à chaque étape.
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' })
+  }, [step])
 
   return (
     <form action={action} className={styles.formMain}>

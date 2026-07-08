@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState, useState } from 'react'
+import { useActionState, useEffect, useState } from 'react'
 import { logoutCommissaire } from '@/app/actions/commissaire-auth'
 import { submitCatch } from '@/app/actions/catches'
 import styles from '../commissaire.module.css'
@@ -56,6 +56,11 @@ export function CommissaireApp({
     setSeen(state)
     if (state?.ok) setScreen('success')
   }
+
+  // Les écrans changent sans navigation → on remonte en haut à chaque écran.
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' })
+  }, [screen])
 
   const filtered = teams.filter(
     (t) =>
