@@ -93,9 +93,6 @@ export default async function Home() {
             <Link href="/inscription" className="btn btn-primary btn-block organize-btn">
               Organiser un enduro
             </Link>
-            <div className="organize-foot">
-              Plus de <strong>240 enduros</strong> organisés avec CarpStrike
-            </div>
           </div>
         </div>
       </section>
