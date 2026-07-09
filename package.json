@@ -9,6 +9,8 @@
     "lint": "eslint",
     "format": "prettier --write .",
     "test": "vitest",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
     "postinstall": "prisma generate"
   },
   "dependencies": {
@@ -28,6 +30,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@tailwindcss/postcss": "^4",
     "@testing-library/react": "^16.3.2",
     "@types/node": "^20",
