@@ -36,7 +36,7 @@ export default async function ClassementPage({ params }: { params: Promise<{ slu
 
   return (
     <div className={styles.wrap}>
-      <LiveRefresh active={isLive} />
+      <LiveRefresh active={isLive} enduroId={enduro.id} />
 
       <div className={styles.head}>
         <div>

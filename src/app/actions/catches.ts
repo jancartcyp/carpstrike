@@ -8,6 +8,7 @@ import { requireOwnedEnduro } from '@/lib/auth/owner'
 import { getCommissaire } from '@/lib/commissaire/dal'
 import { notifyTeamMembers } from '@/lib/notifications'
 import { prisma } from '@/lib/prisma'
+import { broadcastEnduroUpdate } from '@/lib/realtime'
 import { CATCHES_BUCKET, createAdminClient } from '@/lib/supabase/admin'
 import { catchSchema } from '@/lib/validations/catch'
 
@@ -107,6 +108,9 @@ export async function submitCatch(
     // Une erreur de notification ne doit pas faire échouer la saisie de la prise.
   }
 
+  // Realtime : signale le classement live (instantané, best-effort).
+  await broadcastEnduroUpdate(enduro.id)
+
   revalidatePath('/commissaire/app')
   revalidatePath(`/dashboard/enduros/${enduro.id}/validations`)
   revalidatePath(`/dashboard/enduros/${enduro.id}`)
@@ -124,6 +128,7 @@ async function setCatchStatus(formData: FormData, status: 'CONTESTED' | 'CANCELL
   if (!c) redirect('/dashboard')
   const enduro = await requireOwnedEnduro(c.enduroId, user.id)
   await prisma.catch.update({ where: { id: c.id }, data: { status } })
+  await broadcastEnduroUpdate(enduro.id)
   revalidatePath(`/dashboard/enduros/${enduro.id}/validations`)
   revalidatePath(`/dashboard/enduros/${enduro.id}`)
   revalidatePath(`/enduros/${enduro.slug}`)
