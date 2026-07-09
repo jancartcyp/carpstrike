@@ -13,6 +13,7 @@ export function SubNav({ enduroId, mode }: { enduroId: string; mode: string }) {
     { href: `${base}/equipes`, label: 'Équipes' },
     ...(mode === 'WITH_REGISTRATION' ? [{ href: `${base}/demandes`, label: 'Demandes' }] : []),
     { href: `${base}/secteurs`, label: 'Secteurs' },
+    { href: `${base}/lancer`, label: 'Lancer' },
     { href: `${base}/commissaires`, label: 'Commissaires' },
     { href: `${base}/validations`, label: 'Validations' },
     { href: `${base}/communication`, label: 'Communication' },

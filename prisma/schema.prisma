@@ -183,6 +183,8 @@ model Team {
   pegNumber     Int? // numéro de poste, nullable jusqu'à attribution
   status        TeamStatus        @default(PENDING)
   paymentStatus TeamPaymentStatus @default(NONE)
+  throw1Cm      Int? // lancer de précision : 1er lancer (distance à la cible, en cm)
+  throw2Cm      Int? // lancer de précision : 2e lancer (distance à la cible, en cm)
   createdAt     DateTime          @default(now())
 
   members  TeamMember[]
