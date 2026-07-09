@@ -2,6 +2,7 @@
 
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { isPasswordPwned } from '@/lib/auth/pwned-password'
 import { createClient } from '@/lib/supabase/server'
 import { type AuthFormState, loginSchema, signupSchema } from '@/lib/validations/auth'
 
@@ -54,6 +55,18 @@ export async function signup(
   }
 
   const { firstName, lastName, email, password } = parsed.data
+
+  // Protection anti-mots de passe fuités (équivalent gratuit de l'option Supabase Pro).
+  if (await isPasswordPwned(password)) {
+    return {
+      errors: {
+        password: [
+          'Ce mot de passe a déjà été exposé dans une fuite de données connue. Choisis-en un autre, plus robuste.',
+        ],
+      },
+    }
+  }
+
   const supabase = await createClient()
 
   const { data, error } = await supabase.auth.signUp({
