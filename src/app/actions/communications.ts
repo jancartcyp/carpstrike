@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { requireRole } from '@/lib/auth/dal'
 import { requireOwnedEnduro } from '@/lib/auth/owner'
+import { notifyEnduroMembers } from '@/lib/notifications'
 import { prisma } from '@/lib/prisma'
 import { communicationSchema } from '@/lib/validations/communication'
 
@@ -42,6 +43,18 @@ export async function sendCommunication(
       sentAt: new Date(),
     },
   })
+
+  // Notification in-app aux membres ciblés (comptes liés). Non bloquant.
+  try {
+    await notifyEnduroMembers(enduro.id, d.recipients, {
+      type: 'ANNOUNCEMENT',
+      title: d.subject,
+      body: d.body,
+      linkUrl: `/enduros/${enduro.slug}`,
+    })
+  } catch {
+    // Une erreur de notification ne doit pas faire échouer l'envoi de la communication.
+  }
 
   revalidatePath(`/dashboard/enduros/${enduro.id}/communication`)
   revalidatePath(`/enduros/${enduro.slug}`)

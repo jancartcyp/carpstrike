@@ -1,9 +1,11 @@
 import Link from 'next/link'
 import { logout } from '@/app/actions/auth'
 import { getCurrentUser } from '@/lib/auth/dal'
+import { getUnreadNotificationCount } from '@/lib/notifications'
 
 export async function Header() {
   const user = await getCurrentUser()
+  const unread = user ? await getUnreadNotificationCount(user.id) : 0
 
   return (
     <header
@@ -117,6 +119,35 @@ export async function Header() {
             <>
               <Link href="/dashboard" className="btn btn-ghost" style={{ fontSize: '0.85rem' }}>
                 Organiser
+              </Link>
+              <Link
+                href="/notifications"
+                aria-label={`Notifications${unread > 0 ? ` (${unread} non lues)` : ''}`}
+                style={{ position: 'relative', display: 'inline-flex', textDecoration: 'none', fontSize: '1.2rem', lineHeight: 1 }}
+              >
+                <span aria-hidden>🔔</span>
+                {unread > 0 && (
+                  <span
+                    style={{
+                      position: 'absolute',
+                      top: -6,
+                      right: -8,
+                      minWidth: 16,
+                      height: 16,
+                      padding: '0 4px',
+                      borderRadius: 8,
+                      background: 'var(--red)',
+                      color: '#fff',
+                      fontSize: '0.65rem',
+                      fontWeight: 700,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    {unread > 9 ? '9+' : unread}
+                  </span>
+                )}
               </Link>
               <Link
                 href="/profil"

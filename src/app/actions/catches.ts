@@ -6,6 +6,7 @@ import { redirect } from 'next/navigation'
 import { requireRole } from '@/lib/auth/dal'
 import { requireOwnedEnduro } from '@/lib/auth/owner'
 import { getCommissaire } from '@/lib/commissaire/dal'
+import { notifyTeamMembers } from '@/lib/notifications'
 import { prisma } from '@/lib/prisma'
 import { CATCHES_BUCKET, createAdminClient } from '@/lib/supabase/admin'
 import { catchSchema } from '@/lib/validations/catch'
@@ -92,6 +93,18 @@ export async function submitCatch(
       await admin.storage.from(CATCHES_BUCKET).remove([uploadedPath])
     }
     throw e
+  }
+
+  // Notifie les membres de l'équipe (comptes liés). Non bloquant.
+  try {
+    await notifyTeamMembers(teamId, enduro.id, {
+      type: 'CATCH_VALIDATED',
+      title: 'Nouvelle prise enregistrée',
+      body: `Une prise de ${weightKg} kg (${species.toLowerCase()}) a été validée pour votre équipe.`,
+      linkUrl: `/enduros/${enduro.slug}/classement`,
+    })
+  } catch {
+    // Une erreur de notification ne doit pas faire échouer la saisie de la prise.
   }
 
   revalidatePath('/commissaire/app')

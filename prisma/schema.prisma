@@ -99,6 +99,12 @@ enum CommunicationChannel {
   SMS
 }
 
+enum NotificationType {
+  GENERIC
+  ANNOUNCEMENT
+  CATCH_VALIDATED
+}
+
 // ─────────────────────────────────────────────
 // Modèles
 // ─────────────────────────────────────────────
@@ -118,6 +124,7 @@ model User {
   teamMemberships     TeamMember[]
   payments            Payment[]
   communicationsSent  Communication[] @relation("CommunicationSentBy")
+  notifications       Notification[]
 
   @@index([role])
 }
@@ -297,4 +304,20 @@ model Communication {
   createdAt  DateTime                @default(now())
 
   @@index([enduroId])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  enduroId  String?
+  type      NotificationType @default(GENERIC)
+  title     String
+  body      String
+  linkUrl   String?
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  @@index([userId, read])
+  @@index([userId, createdAt])
 }
