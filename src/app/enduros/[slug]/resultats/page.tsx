@@ -202,14 +202,37 @@ export default async function ResultatsPage({ params }: { params: Promise<{ slug
             </>
           )}
 
-          {/* Certificat (placeholder) */}
-          <div className={styles.certBlock}>
-            <span style={{ fontSize: '1.4rem' }}>📜</span>
-            <span>
-              <strong>Certificats PDF — bientôt.</strong> La génération des certificats de
-              participation et de podium arrivera dans une prochaine mise à jour.
-            </span>
-          </div>
+          {/* Certificats PDF */}
+          {general.length > 0 && (
+            <>
+              <h2 className={styles.sectionTitle}>
+                <span className={styles.bar} />
+                Certificats
+              </h2>
+              <div className={styles.certBlock} style={{ marginBottom: 14 }}>
+                <span style={{ fontSize: '1.4rem' }}>📜</span>
+                <span>
+                  <strong>Téléchargez votre certificat.</strong> Chaque équipe dispose d’un certificat
+                  de participation (ou de podium pour le top 3), généré en PDF.
+                </span>
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+                {general.map((t) => (
+                  <a
+                    key={t.id}
+                    href={`/enduros/${enduro.slug}/certificat/${t.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-ghost"
+                    style={{ fontSize: '0.82rem' }}
+                  >
+                    {t.rank <= 3 ? '🏆 ' : '📄 '}
+                    {t.rank}. {t.name}
+                  </a>
+                ))}
+              </div>
+            </>
+          )}
 
           <div style={{ marginTop: 22 }}>
             <Link href={`/enduros/${enduro.slug}`} className="btn btn-ghost">
