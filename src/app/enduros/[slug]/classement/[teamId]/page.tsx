@@ -36,7 +36,6 @@ export default async function TeamCatchesPage({
   if (!data) notFound()
 
   const { enduro, team, rank, validCount, totalKg, biggestKg, catches } = data
-  const membersLabel = team.members.map((m) => `${m.firstName} ${m.lastName}`.trim()).join(' & ')
 
   return (
     <main style={{ maxWidth: 860, margin: '0 auto', padding: '32px 20px 80px' }}>
@@ -86,8 +85,49 @@ export default async function TeamCatchesPage({
           <div style={{ color: 'var(--dim)', fontSize: '0.9rem', marginTop: 2 }}>
             {team.sectorName ? `Secteur ${team.sectorName}` : 'Sans secteur'}
             {team.pegNumber ? ` · Poste ${team.pegNumber}` : ''}
-            {membersLabel ? ` · ${membersLabel}` : ''}
           </div>
+          {team.members.length > 0 && (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 8 }}>
+              {team.members.map((m, i) => {
+                const label = `${m.firstName} ${m.lastName}`.trim() || 'Pêcheur'
+                const content = (
+                  <>
+                    {m.isCaptain && <span title="Capitaine">👑 </span>}
+                    {label}
+                  </>
+                )
+                return m.userId ? (
+                  <Link
+                    key={i}
+                    href={`/pecheurs/${m.userId}`}
+                    style={{
+                      fontSize: '0.82rem',
+                      color: 'var(--green)',
+                      textDecoration: 'none',
+                      border: '1px solid var(--line)',
+                      borderRadius: 20,
+                      padding: '3px 12px',
+                    }}
+                  >
+                    {content} ›
+                  </Link>
+                ) : (
+                  <span
+                    key={i}
+                    style={{
+                      fontSize: '0.82rem',
+                      color: 'var(--dim)',
+                      border: '1px solid var(--line)',
+                      borderRadius: 20,
+                      padding: '3px 12px',
+                    }}
+                  >
+                    {content}
+                  </span>
+                )
+              })}
+            </div>
+          )}
         </div>
       </div>
 

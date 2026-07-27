@@ -255,7 +255,7 @@ export async function getTeamCatchDetail(slug: string, teamId: string) {
       sector: { select: { name: true } },
       members: {
         orderBy: { isCaptain: 'desc' },
-        select: { firstName: true, lastName: true, isCaptain: true },
+        select: { firstName: true, lastName: true, isCaptain: true, userId: true },
       },
       catches: {
         orderBy: { caughtAt: 'desc' },
