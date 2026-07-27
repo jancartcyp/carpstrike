@@ -152,6 +152,9 @@ export async function Header() {
               <Link
                 href="/profil"
                 style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
                   fontFamily: 'var(--font-rajdhani), sans-serif',
                   fontWeight: 600,
                   fontSize: '0.85rem',
@@ -160,6 +163,14 @@ export async function Header() {
                   textDecoration: 'none',
                 }}
               >
+                {user.avatarUrl && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={user.avatarUrl}
+                    alt=""
+                    style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--line)' }}
+                  />
+                )}
                 {user.firstName}
               </Link>
               <form action={logout}>

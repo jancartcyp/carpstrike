@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { requireRole } from '@/lib/auth/dal'
 import { getFishermanProfile } from '@/lib/fisherman'
+import { AvatarUploader } from './avatar-uploader'
 import styles from './profil.module.css'
 
 export const metadata: Metadata = {
@@ -31,7 +32,7 @@ export default async function ProfilPage() {
   return (
     <div className={styles.wrap}>
       <div className={styles.header}>
-        <div className={styles.avatar}>{initials}</div>
+        <AvatarUploader avatarUrl={user.avatarUrl} initials={initials} />
         <div>
           <div className={styles.eyebrow}>Profil pêcheur</div>
           <div className={styles.name}>

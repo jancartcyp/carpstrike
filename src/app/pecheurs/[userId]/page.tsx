@@ -33,7 +33,7 @@ export default async function PecheurPage({ params }: { params: Promise<{ userId
   const { userId } = await params
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { firstName: true, lastName: true, createdAt: true },
+    select: { firstName: true, lastName: true, createdAt: true, avatarUrl: true },
   })
   if (!user) notFound()
 
@@ -51,25 +51,34 @@ export default async function PecheurPage({ params }: { params: Promise<{ userId
     <main style={{ maxWidth: 820, margin: '0 auto', padding: '40px 20px 80px' }}>
       {/* En-tête */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
-        <div
-          style={{
-            width: 64,
-            height: 64,
-            borderRadius: '50%',
-            background: 'rgba(46,160,90,0.15)',
-            border: '1px solid var(--line)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontFamily: 'var(--font-barlow-condensed), sans-serif',
-            fontWeight: 800,
-            fontSize: '1.6rem',
-            color: 'var(--green)',
-          }}
-        >
-          {(user.firstName[0] ?? '').toUpperCase()}
-          {(user.lastName[0] ?? '').toUpperCase()}
-        </div>
+        {user.avatarUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={user.avatarUrl}
+            alt={`${fullName}`}
+            style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--line)' }}
+          />
+        ) : (
+          <div
+            style={{
+              width: 64,
+              height: 64,
+              borderRadius: '50%',
+              background: 'rgba(46,160,90,0.15)',
+              border: '1px solid var(--line)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontFamily: 'var(--font-barlow-condensed), sans-serif',
+              fontWeight: 800,
+              fontSize: '1.6rem',
+              color: 'var(--green)',
+            }}
+          >
+            {(user.firstName[0] ?? '').toUpperCase()}
+            {(user.lastName[0] ?? '').toUpperCase()}
+          </div>
+        )}
         <div>
           <h1
             style={{
