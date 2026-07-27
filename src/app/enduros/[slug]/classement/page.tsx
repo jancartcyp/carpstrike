@@ -66,7 +66,12 @@ export default async function ClassementPage({ params }: { params: Promise<{ slu
           <div className={styles.podium}>
             {podium.map((t, i) =>
               t ? (
-                <div key={t.id} className={`${styles.podiumCard} ${styles[PODIUM_CLASS[i]]}`}>
+                <Link
+                  key={t.id}
+                  href={`/enduros/${enduro.slug}/classement/${t.id}`}
+                  className={`${styles.podiumCard} ${styles[PODIUM_CLASS[i]]}`}
+                  style={{ textDecoration: 'none', color: 'inherit', cursor: 'pointer' }}
+                >
                   <div className={styles.podiumRank}>{t.rank}</div>
                   <div className={styles.podiumTeam}>{t.name}</div>
                   <div className={styles.podiumTotal}>
@@ -77,7 +82,7 @@ export default async function ClassementPage({ params }: { params: Promise<{ slu
                     {t.catches} prise{t.catches > 1 ? 's' : ''}
                     {t.sectorName ? ` · Secteur ${t.sectorName}` : ''}
                   </div>
-                </div>
+                </Link>
               ) : (
                 <div key={i} />
               )
@@ -133,9 +138,11 @@ export default async function ClassementPage({ params }: { params: Promise<{ slu
               <span style={{ textAlign: 'right' }}>Total</span>
             </div>
             {general.map((t) => (
-              <div
+              <Link
                 key={t.id}
+                href={`/enduros/${enduro.slug}/classement/${t.id}`}
                 className={`${styles.row} ${t.rank === 1 ? styles.top1 : ''} ${t.rank <= 3 ? styles.top3 : ''}`}
+                style={{ textDecoration: 'none', color: 'inherit', cursor: 'pointer' }}
               >
                 <span className={styles.rankNum}>{String(t.rank).padStart(2, '0')}</span>
                 <span>
@@ -152,7 +159,7 @@ export default async function ClassementPage({ params }: { params: Promise<{ slu
                   {t.total.toFixed(1)}
                   <span className="unit"> kg</span>
                 </span>
-              </div>
+              </Link>
             ))}
           </div>
 

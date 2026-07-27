@@ -240,3 +240,70 @@ export async function getEnduroResults(slug: string) {
 }
 
 export type EnduroResults = NonNullable<Awaited<ReturnType<typeof getEnduroResults>>>
+
+/** Détail d'une équipe pour la page publique : toutes ses prises (photos incluses) + son rang. */
+export async function getTeamCatchDetail(slug: string, teamId: string) {
+  const ranking = await getEnduroRanking(slug)
+  if (!ranking) return null
+
+  const team = await prisma.team.findFirst({
+    where: { id: teamId, enduro: { slug } },
+    select: {
+      id: true,
+      name: true,
+      pegNumber: true,
+      sector: { select: { name: true } },
+      members: {
+        orderBy: { isCaptain: 'desc' },
+        select: { firstName: true, lastName: true, isCaptain: true },
+      },
+      catches: {
+        orderBy: { caughtAt: 'desc' },
+        select: {
+          id: true,
+          weightKg: true,
+          species: true,
+          photoUrl: true,
+          caughtAt: true,
+          status: true,
+          note: true,
+          commissaire: { select: { displayName: true } },
+        },
+      },
+    },
+  })
+  if (!team) return null
+
+  const rankEntry = ranking.general.find((t) => t.id === teamId)
+  const valid = team.catches.filter((c) => c.status === 'VALID')
+  const totalKg = valid.reduce((s, c) => s + c.weightKg, 0)
+  const biggestKg = valid.reduce((m, c) => Math.max(m, c.weightKg), 0)
+
+  return {
+    enduro: ranking.enduro,
+    team: {
+      id: team.id,
+      name: team.name,
+      pegNumber: team.pegNumber,
+      sectorName: team.sector?.name ?? null,
+      members: team.members,
+    },
+    rank: rankEntry?.rank ?? null,
+    validCount: valid.length,
+    totalKg,
+    biggestKg,
+    catches: team.catches.map((c) => ({
+      id: c.id,
+      weightKg: c.weightKg,
+      species: c.species,
+      speciesLabel: SPECIES_LABELS[c.species] ?? c.species,
+      photoUrl: c.photoUrl,
+      caughtAt: c.caughtAt,
+      status: c.status,
+      note: c.note,
+      commissaire: c.commissaire?.displayName ?? null,
+    })),
+  }
+}
+
+export type TeamCatchDetail = NonNullable<Awaited<ReturnType<typeof getTeamCatchDetail>>>
