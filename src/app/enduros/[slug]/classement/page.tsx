@@ -34,6 +34,18 @@ export default async function ClassementPage({ params }: { params: Promise<{ slu
   // Podium réordonné visuellement : 2e, 1er, 3e.
   const podium = [stats.podium[1], stats.podium[0], stats.podium[2]]
 
+  // Équipes groupées par secteur (pour le classement détaillé par secteur), triées par rang de secteur.
+  const teamsBySector = new Map<string, typeof general>()
+  for (const t of general) {
+    const key = t.sectorName ?? 'Sans secteur'
+    const arr = teamsBySector.get(key)
+    if (arr) arr.push(t)
+    else teamsBySector.set(key, [t])
+  }
+  for (const arr of teamsBySector.values()) arr.sort((a, b) => a.sectorRank - b.sectorRank)
+  // On propose le détail par secteur seulement s'il existe au moins un vrai secteur nommé.
+  const hasNamedSectors = sectors.some((s) => s.name !== 'Sans secteur')
+
   return (
     <div className={styles.wrap}>
       <LiveRefresh active={isLive} enduroId={enduro.id} />
@@ -194,6 +206,100 @@ export default async function ClassementPage({ params }: { params: Promise<{ slu
                   </div>
                 ))}
               </div>
+
+              {/* Classement détaillé par secteur */}
+              {hasNamedSectors && (
+                <>
+                  <h2 className={styles.sectionTitle}>
+                    <span className={styles.bar} />
+                    Classement par secteur
+                  </h2>
+                  {sectors.map((s) => {
+                    const teams = teamsBySector.get(s.name) ?? []
+                    if (teams.length === 0) return null
+                    const color = SECTOR_COLORS[s.name] ?? 'var(--red)'
+                    return (
+                      <div key={s.name} style={{ marginBottom: 22 }}>
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 10,
+                            margin: '0 0 10px',
+                            fontFamily: 'var(--font-barlow-condensed), sans-serif',
+                            fontWeight: 700,
+                            fontSize: '1.05rem',
+                            color: 'var(--white)',
+                          }}
+                        >
+                          <span
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              width: 28,
+                              height: 28,
+                              borderRadius: 8,
+                              background: color,
+                              color: '#06210f',
+                              fontWeight: 800,
+                            }}
+                          >
+                            {s.name === 'Sans secteur' ? '—' : s.name}
+                          </span>
+                          {s.name === 'Sans secteur' ? 'Sans secteur' : `Secteur ${s.name}`}
+                          <span style={{ color: 'var(--dim)', fontWeight: 400, fontSize: '0.85rem' }}>
+                            · {teams.length} équipe{teams.length > 1 ? 's' : ''}
+                          </span>
+                        </div>
+                        <div className={styles.table}>
+                          <div className={`${styles.row} ${styles.rowHead}`}>
+                            <span>#</span>
+                            <span>Équipe</span>
+                            <span className={styles.hideSm} style={{ textAlign: 'center' }}>
+                              Poste
+                            </span>
+                            <span className={styles.hideSm} style={{ textAlign: 'center' }}>
+                              Prises
+                            </span>
+                            <span className={styles.hideSm} style={{ textAlign: 'center' }}>
+                              + grosse
+                            </span>
+                            <span style={{ textAlign: 'right' }}>Total</span>
+                          </div>
+                          {teams.map((t) => (
+                            <Link
+                              key={t.id}
+                              href={`/enduros/${enduro.slug}/classement/${t.id}`}
+                              className={`${styles.row} ${t.sectorRank === 1 ? styles.top1 : ''}`}
+                              style={{ textDecoration: 'none', color: 'inherit', cursor: 'pointer' }}
+                            >
+                              <span className={styles.rankNum}>
+                                {String(t.sectorRank).padStart(2, '0')}
+                              </span>
+                              <span>
+                                <div className={styles.rowTeam}>{t.name}</div>
+                                <div className={styles.rowSub}>Rang général {t.rank}</div>
+                              </span>
+                              <span className={`${styles.cell} ${styles.hideSm}`}>
+                                {t.pegNumber ?? '—'}
+                              </span>
+                              <span className={`${styles.cell} ${styles.hideSm}`}>{t.catches}</span>
+                              <span className={`${styles.cell} ${styles.hideSm}`}>
+                                {t.biggest.toFixed(1)} kg
+                              </span>
+                              <span className={styles.score}>
+                                {t.total.toFixed(1)}
+                                <span className="unit"> kg</span>
+                              </span>
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </>
+              )}
             </>
           )}
         </>
