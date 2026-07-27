@@ -60,6 +60,12 @@ export default async function EnduroPage({ params }: { params: Promise<{ slug: s
   const mapsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
     `${enduro.locationName} ${enduro.postalCode ?? ''}`.trim()
   )}`
+  // Carte interactive (iframe, sans clé API) : coordonnées si dispo, sinon recherche par lieu.
+  const mapQuery =
+    enduro.lat != null && enduro.lng != null
+      ? `${enduro.lat},${enduro.lng}`
+      : `${enduro.locationName} ${enduro.postalCode ?? ''}`.trim()
+  const mapEmbedSrc = `https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&z=13&hl=fr&output=embed`
 
   return (
     <div className={styles.page}>
@@ -376,13 +382,15 @@ export default async function EnduroPage({ params }: { params: Promise<{ slug: s
         </h2>
 
         <div className={styles.locationGrid}>
-          <div className={styles.mapPlaceholder}>
-            <div className={styles.mapMarker} />
-            {enduro.lat != null && enduro.lng != null && (
-              <div className={styles.mapCoords}>
-                {enduro.lat.toFixed(4)}° N · {enduro.lng.toFixed(4)}° E
-              </div>
-            )}
+          <div className={styles.mapPlaceholder} style={{ position: 'relative' }}>
+            <iframe
+              src={mapEmbedSrc}
+              title={`Carte — ${enduro.locationName}`}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              allowFullScreen
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0 }}
+            />
           </div>
           <div>
             <h3 className={styles.locationName}>{enduro.locationName}</h3>
