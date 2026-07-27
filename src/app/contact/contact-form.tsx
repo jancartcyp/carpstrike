@@ -1,56 +1,63 @@
 'use client'
 
-import { useState } from 'react'
+import { useActionState } from 'react'
+import { sendContactMessage } from '@/app/actions/contact'
 import styles from '../marketing.module.css'
 
-/**
- * Formulaire de contact (placeholder).
- * TODO Phase 9 : brancher l'envoi réel (server action + Resend).
- * Pour l'instant, affiche une confirmation locale sans persistance.
- */
 export function ContactForm() {
-  const [sent, setSent] = useState(false)
+  const [state, action, pending] = useActionState(sendContactMessage, undefined)
 
-  if (sent) {
+  if (state?.ok) {
     return (
       <div className={styles.card}>
         <div className={styles.cardTitle}>Message envoyé ✓</div>
         <div className={styles.cardSub}>
           Merci ! Nous avons bien reçu votre message et vous répondrons sous 24h ouvrées.
         </div>
-        <button type="button" className="btn btn-ghost" onClick={() => setSent(false)}>
-          Envoyer un autre message
-        </button>
       </div>
     )
   }
 
+  const err = (k: string) => state?.errors?.[k]?.[0]
+
   return (
-    <form
-      className={styles.card}
-      onSubmit={(e) => {
-        e.preventDefault()
-        setSent(true)
-      }}
-    >
+    <form action={action} className={styles.card}>
       <div className={styles.cardTitle}>Envoyez-nous un message</div>
       <div className={styles.cardSub}>
         Remplissez le formulaire, nous revenons vers vous très vite.
       </div>
 
+      {state?.message && (
+        <div
+          style={{
+            margin: '10px 0',
+            padding: '10px 12px',
+            borderRadius: 8,
+            border: '1px solid var(--red)',
+            color: 'var(--red)',
+            fontSize: '0.85rem',
+          }}
+        >
+          {state.message}
+        </div>
+      )}
+
       <div className={styles.fieldRow}>
         <div className={styles.field}>
           <label htmlFor="firstName">Prénom</label>
           <input id="firstName" name="firstName" type="text" placeholder="Jean" required />
+          {err('firstName') && <small style={{ color: 'var(--red)' }}>{err('firstName')}</small>}
         </div>
         <div className={styles.field}>
           <label htmlFor="lastName">Nom</label>
           <input id="lastName" name="lastName" type="text" placeholder="Dupont" required />
+          {err('lastName') && <small style={{ color: 'var(--red)' }}>{err('lastName')}</small>}
         </div>
       </div>
       <div className={styles.field}>
         <label htmlFor="email">Email</label>
         <input id="email" name="email" type="email" placeholder="jean.dupont@email.fr" required />
+        {err('email') && <small style={{ color: 'var(--red)' }}>{err('email')}</small>}
       </div>
       <div className={styles.field}>
         <label htmlFor="profile">Je suis</label>
@@ -76,9 +83,10 @@ export function ContactForm() {
       <div className={styles.field}>
         <label htmlFor="message">Votre message</label>
         <textarea id="message" name="message" placeholder="Décrivez votre demande..." required />
+        {err('message') && <small style={{ color: 'var(--red)' }}>{err('message')}</small>}
       </div>
-      <button type="submit" className={`btn btn-primary ${styles.btnFull}`}>
-        Envoyer le message
+      <button type="submit" className={`btn btn-primary ${styles.btnFull}`} disabled={pending}>
+        {pending ? 'Envoi…' : 'Envoyer le message'}
       </button>
     </form>
   )
