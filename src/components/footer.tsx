@@ -35,10 +35,10 @@ export function Footer() {
           <h4>Espace Pro</h4>
           <ul>
             <li>
-              <Link href="/organisateurs">Organisateurs</Link>
+              <Link href="/dashboard">Organisateurs</Link>
             </li>
             <li>
-              <Link href="/organisateurs">Commissaires</Link>
+              <Link href="/commissaire">Commissaires</Link>
             </li>
             <li>
               <Link href="/tarifs">Tarifs</Link>
