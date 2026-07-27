@@ -2,10 +2,10 @@ import { cache } from 'react'
 import type { Prisma } from '@/generated/prisma/client'
 import { prisma } from '@/lib/prisma'
 
-/** Enduros en cours (status LIVE) avec stats calculées pour les cartes. */
+/** Enduros réellement en cours (status LIVE et pas encore terminés d'après la date de fin). */
 export async function getLiveEnduros() {
   const enduros = await prisma.enduro.findMany({
-    where: { status: 'LIVE' },
+    where: { status: 'LIVE', endAt: { gte: new Date() } },
     orderBy: { endAt: 'asc' },
     include: {
       _count: { select: { teams: true } },

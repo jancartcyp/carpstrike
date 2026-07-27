@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { temporalState } from '@/lib/enduro-status'
 import {
   type EnduroSortKey,
   type SearchEnduro,
@@ -46,9 +47,11 @@ function hoursRemaining(end: Date) {
 }
 
 function EnduroCard({ e }: { e: SearchEnduro }) {
-  const isLive = e.status === 'LIVE'
+  const state = temporalState(e.startAt, e.endAt)
+  const isLive = state === 'live'
+  const isFinished = state === 'finished'
   const spotsLeft = Math.max(0, e.maxTeams - e.inscritsCount)
-  const warn = !isLive && spotsLeft > 0 && spotsLeft <= 3
+  const warn = state === 'upcoming' && spotsLeft > 0 && spotsLeft <= 3
 
   return (
     <Link
@@ -68,10 +71,15 @@ function EnduroCard({ e }: { e: SearchEnduro }) {
               <span className={styles.dot} />
               En cours
             </span>
+          ) : isFinished ? (
+            <span className={styles.statusTag}>
+              <span className={styles.dot} />
+              Terminé
+            </span>
           ) : (
             <span className={`${styles.statusTag} ${styles.open}`}>
               <span className={styles.dot} />
-              Inscriptions ouvertes
+              À venir
             </span>
           )}
           {e.postalCode && <span className={styles.cardRegion}>{e.postalCode}</span>}
@@ -102,6 +110,8 @@ function EnduroCard({ e }: { e: SearchEnduro }) {
       <div className={styles.cardSidebar}>
         {isLive ? (
           <div className={styles.cardPlaces}>{hoursRemaining(e.endAt)}h restantes</div>
+        ) : isFinished ? (
+          <div className={styles.cardPlaces}>Terminé</div>
         ) : spotsLeft > 0 ? (
           <div className={`${styles.cardPlaces} ${warn ? styles.warn : ''}`}>
             {warn ? (
