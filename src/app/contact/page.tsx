@@ -11,29 +11,10 @@ export const metadata: Metadata = {
 const CONTACTS = [
   {
     icon: '✉️',
-    label: 'Email général',
-    email: 'contact@carpstrike.fr',
-    sub: 'Réponse sous 24h ouvrées',
+    label: 'Email',
+    email: 'contact@carp-strike.com',
+    sub: 'Organisateurs, pêcheurs, partenariats — on répond sous 24h ouvrées',
   },
-  {
-    icon: '🛠️',
-    label: 'Support technique',
-    email: 'support@carpstrike.fr',
-    sub: 'Réponse sous 24h pour tous les organisateurs',
-  },
-  {
-    icon: '🤝',
-    label: 'Partenariats',
-    email: 'pro@carpstrike.fr',
-    sub: 'Fédérations, clubs, sponsors',
-  },
-]
-
-const STATS = [
-  { val: '247', lbl: 'Enduros référencés' },
-  { val: '5 800+', lbl: 'Pêcheurs inscrits' },
-  { val: '0 %', lbl: 'Commission' },
-  { val: '24h', lbl: 'Délai de réponse' },
 ]
 
 export default function ContactPage() {
@@ -68,7 +49,7 @@ export default function ContactPage() {
             <div className={styles.contactItem}>
               <div className={styles.contactItemIcon}>📍</div>
               <div className={styles.contactItemLabel}>Basés en France</div>
-              <div className={styles.contactItemValue}>Sud-Ouest</div>
+              <div className={styles.contactItemValue}>Nord-Est</div>
               <div className={styles.contactItemSub}>Au cœur des spots à carpes</div>
             </div>
           </div>
@@ -97,15 +78,6 @@ export default function ContactPage() {
               <strong>la passion et la convivialité</strong>, pas sur la paperasse. Et que chaque
               pêcheur vive son enduro à fond, en sachant exactement où il en est.
             </p>
-          </div>
-
-          <div className={styles.statsRow}>
-            {STATS.map((s) => (
-              <div key={s.lbl} className={styles.stat}>
-                <div className={styles.statVal}>{s.val}</div>
-                <div className={styles.statLbl}>{s.lbl}</div>
-              </div>
-            ))}
           </div>
         </div>
       </div>
