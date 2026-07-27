@@ -87,7 +87,6 @@ export async function Header() {
           {[
             { label: 'Enduros', href: '/enduros' },
             { label: 'Classements', href: '/classements' },
-            { label: 'Tarifs', href: '/tarifs' },
             { label: 'FAQ', href: '/faq' },
             { label: 'Contact', href: '/contact' },
           ].map(({ label, href }) => (
