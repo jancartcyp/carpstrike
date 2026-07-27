@@ -1,9 +1,13 @@
 'use client'
 
-import { useActionState, useEffect, useState } from 'react'
+import { useActionState, useEffect, useState, useTransition } from 'react'
 import { logoutCommissaire } from '@/app/actions/commissaire-auth'
-import { submitCatch } from '@/app/actions/catches'
+import { createCatchPhotoUpload, submitCatch } from '@/app/actions/catches'
+import { createClient } from '@/lib/supabase/client'
 import styles from '../commissaire.module.css'
+
+const CATCHES_BUCKET = 'catches'
+const MAX_PHOTO_BYTES = 8 * 1024 * 1024 // 8 Mo
 
 type Team = {
   id: string
@@ -47,8 +51,56 @@ export function CommissaireApp({
   const [weight, setWeight] = useState('')
   const [species, setSpecies] = useState<string>('COMMUNE')
   const [photoName, setPhotoName] = useState('')
+  const [photoFile, setPhotoFile] = useState<File | null>(null)
+  const [uploading, setUploading] = useState(false)
+  const [uploadError, setUploadError] = useState('')
 
   const [state, action, pending] = useActionState(submitCatch, undefined)
+  const [, startTransition] = useTransition()
+
+  // Upload de la photo côté navigateur (URL signée) puis envoi de l'URL à la Server Action.
+  async function handleCatchSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setUploadError('')
+    const fd = new FormData(e.currentTarget)
+    fd.delete('photo')
+
+    if (photoFile) {
+      if (!photoFile.type.startsWith('image/')) {
+        setUploadError('Le fichier doit être une image.')
+        return
+      }
+      if (photoFile.size > MAX_PHOTO_BYTES) {
+        setUploadError('Photo trop volumineuse (8 Mo maximum).')
+        return
+      }
+      setUploading(true)
+      try {
+        const prep = await createCatchPhotoUpload()
+        if (!prep.ok) {
+          setUploadError(prep.message)
+          return
+        }
+        const supabase = createClient()
+        const { error } = await supabase.storage
+          .from(CATCHES_BUCKET)
+          .uploadToSignedUrl(prep.path, prep.token, photoFile, { contentType: photoFile.type })
+        if (error) {
+          setUploadError("Échec de l'envoi de la photo. Réessayez.")
+          return
+        }
+        const publicUrl = supabase.storage.from(CATCHES_BUCKET).getPublicUrl(prep.path).data.publicUrl
+        fd.set('photoUrl', publicUrl)
+      } catch {
+        setUploadError("Échec de l'envoi de la photo. Réessayez.")
+        return
+      } finally {
+        setUploading(false)
+      }
+    }
+
+    startTransition(() => action(fd))
+  }
 
   // Succès → écran de confirmation (ajustement pendant le rendu, sans effet).
   const [seen, setSeen] = useState(state)
@@ -74,6 +126,8 @@ export function CommissaireApp({
     setWeight('')
     setSpecies('COMMUNE')
     setPhotoName('')
+    setPhotoFile(null)
+    setUploadError('')
     setTeam(null)
   }
 
@@ -174,7 +228,7 @@ export function CommissaireApp({
             </button>
             <div className={styles.screenTitle}>Saisir la prise</div>
           </div>
-          <form action={action} className={styles.catchForm}>
+          <form onSubmit={handleCatchSubmit} className={styles.catchForm}>
             <input type="hidden" name="teamId" value={team.id} />
             <input type="hidden" name="species" value={species} />
 
@@ -187,6 +241,7 @@ export function CommissaireApp({
             </div>
 
             {state?.message && <div className={styles.statusMsg}>{state.message}</div>}
+            {uploadError && <div className={styles.statusMsg}>{uploadError}</div>}
 
             <div className={styles.weightCard}>
               <div className={styles.weightLabel}>Poids de la prise</div>
@@ -248,7 +303,12 @@ export function CommissaireApp({
                   name="photo"
                   accept="image/*"
                   capture="environment"
-                  onChange={(e) => setPhotoName(e.target.files?.[0]?.name ?? '')}
+                  onChange={(e) => {
+                    const f = e.target.files?.[0] ?? null
+                    setPhotoFile(f)
+                    setPhotoName(f?.name ?? '')
+                    setUploadError('')
+                  }}
                 />
                 <div className={styles.photoIcon}>📷</div>
                 <div className={styles.photoTitle}>
@@ -265,8 +325,8 @@ export function CommissaireApp({
             </div>
 
             <div className={styles.submitActions}>
-              <button type="submit" className="btn btn-primary" disabled={pending}>
-                {pending ? 'Enregistrement…' : '✓ Valider la prise'}
+              <button type="submit" className="btn btn-primary" disabled={pending || uploading}>
+                {uploading ? 'Envoi de la photo…' : pending ? 'Enregistrement…' : '✓ Valider la prise'}
               </button>
               <button type="button" className="btn btn-ghost" onClick={() => setScreen('teams')}>
                 Annuler

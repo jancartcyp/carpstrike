@@ -46,55 +46,33 @@ export async function submitCatch(
     return { message: `Sous la maille minimum (${enduro.minWeightKg} kg) — prise non enregistrée.` }
   }
 
-  // Photo : upload si fournie ; obligatoire si l'organisateur l'exige.
-  const MAX_PHOTO_BYTES = 8 * 1024 * 1024 // 8 Mo
+  // La photo est envoyée directement du navigateur vers Supabase Storage (URL signée),
+  // ce qui contourne les limites de taille des Server Actions / fonctions serverless.
+  // Ici on ne reçoit que l'URL publique résultante — on la valide (doit venir de notre bucket).
+  const rawPhotoUrl = (formData.get('photoUrl') as string | null)?.trim() || null
   let photoUrl: string | null = null
-  let uploadedPath: string | null = null
-  let admin: ReturnType<typeof createAdminClient> | null = null
-  const photo = formData.get('photo')
-  if (photo instanceof File && photo.size > 0) {
-    if (!photo.type.startsWith('image/')) {
-      return { message: 'Le fichier doit être une image.' }
+  if (rawPhotoUrl) {
+    const prefix = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${CATCHES_BUCKET}/`
+    if (!rawPhotoUrl.startsWith(prefix)) {
+      return { message: 'Photo invalide. Réessayez.' }
     }
-    if (photo.size > MAX_PHOTO_BYTES) {
-      return { message: 'Photo trop volumineuse (8 Mo maximum).' }
-    }
-    const ext = (photo.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '')
-    const path = `${enduro.id}/${randomUUID()}.${ext || 'jpg'}`
-    admin = createAdminClient()
-    const buffer = Buffer.from(await photo.arrayBuffer())
-    const { error } = await admin.storage
-      .from(CATCHES_BUCKET)
-      .upload(path, buffer, { contentType: photo.type, upsert: false })
-    if (error) {
-      return { message: 'Échec de l’upload de la photo. Réessayez.' }
-    }
-    uploadedPath = path
-    photoUrl = admin.storage.from(CATCHES_BUCKET).getPublicUrl(path).data.publicUrl
+    photoUrl = rawPhotoUrl
   } else if (enduro.requirePhoto) {
     return { message: 'La photo est obligatoire pour cet enduro.' }
   }
 
-  try {
-    await prisma.catch.create({
-      data: {
-        enduroId: enduro.id,
-        teamId,
-        commissaireId: commissaire.id,
-        weightKg,
-        species,
-        photoUrl,
-        status: 'VALID',
-        note: note ?? null,
-      },
-    })
-  } catch (e) {
-    // Évite la photo orpheline si l'insertion échoue après l'upload.
-    if (admin && uploadedPath) {
-      await admin.storage.from(CATCHES_BUCKET).remove([uploadedPath])
-    }
-    throw e
-  }
+  await prisma.catch.create({
+    data: {
+      enduroId: enduro.id,
+      teamId,
+      commissaireId: commissaire.id,
+      weightKg,
+      species,
+      photoUrl,
+      status: 'VALID',
+      note: note ?? null,
+    },
+  })
 
   // Notifie les membres de l'équipe (comptes liés). Non bloquant.
   try {
@@ -117,6 +95,28 @@ export async function submitCatch(
   revalidatePath(`/enduros/${enduro.slug}`)
   revalidatePath('/enduros')
   return { ok: true }
+}
+
+// ── Upload photo : URL signée (le navigateur envoie le fichier directement à Storage) ──
+
+export type CatchUploadPrep =
+  | { ok: true; path: string; token: string }
+  | { ok: false; message: string }
+
+/**
+ * Prépare un envoi de photo : renvoie un chemin + token d'upload signé (usage unique).
+ * Le navigateur uploade ensuite directement vers Supabase Storage via ce token
+ * (`uploadToSignedUrl`), sans passer par la Server Action → aucune limite de taille.
+ */
+export async function createCatchPhotoUpload(): Promise<CatchUploadPrep> {
+  const commissaire = await getCommissaire()
+  if (!commissaire) return { ok: false, message: 'Session expirée. Reconnectez-vous.' }
+
+  const path = `${commissaire.enduro.id}/${randomUUID()}.jpg`
+  const admin = createAdminClient()
+  const { data, error } = await admin.storage.from(CATCHES_BUCKET).createSignedUploadUrl(path)
+  if (error || !data) return { ok: false, message: "Impossible de préparer l'envoi de la photo." }
+  return { ok: true, path: data.path, token: data.token }
 }
 
 // ── Organisateur : contester / annuler une prise ──
