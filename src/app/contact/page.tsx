@@ -12,7 +12,7 @@ const CONTACTS = [
   {
     icon: '✉️',
     label: 'Email',
-    email: 'contact@carp-strike.com',
+    email: 'carp.strike.contact@gmail.com',
     sub: 'Organisateurs, pêcheurs, partenariats — on répond sous 24h ouvrées',
   },
 ]
