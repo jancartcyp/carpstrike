@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useActionState } from 'react'
 import { signup } from '@/app/actions/auth'
+import { SpaceChoice } from '../space-choice'
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
@@ -52,9 +53,11 @@ export function SignupForm() {
         </p>
       )}
 
+      <SpaceChoice label="Je crée un compte en tant que" />
+
       <p style={{ fontSize: '0.85rem', color: 'var(--dim)', lineHeight: 1.5 }}>
-        Un seul compte pour tout faire : <strong style={{ color: 'var(--white)' }}>participer</strong>{' '}
-        aux enduros et en <strong style={{ color: 'var(--white)' }}>organiser</strong>.
+        Une même adresse email peut servir aux deux espaces : tu choisis simplement lequel utiliser
+        à la connexion.
       </p>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>

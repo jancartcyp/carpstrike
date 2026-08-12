@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useActionState } from 'react'
 import { login } from '@/app/actions/auth'
+import { SpaceChoice } from '../space-choice'
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
@@ -44,6 +45,8 @@ export function LoginForm() {
           {state.message}
         </p>
       )}
+
+      <SpaceChoice />
 
       <div>
         <label htmlFor="email" style={labelStyle}>

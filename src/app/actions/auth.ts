@@ -2,9 +2,16 @@
 
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { clearSpace, setSpace } from '@/lib/auth/mode'
+import { parseSpace, type SpaceMode, spaceHome } from '@/lib/auth/space'
 import { isPasswordPwned } from '@/lib/auth/pwned-password'
 import { createClient } from '@/lib/supabase/server'
 import { type AuthFormState, loginSchema, signupSchema } from '@/lib/validations/auth'
+
+/** Espace demandé par le formulaire (organisateur / pêcheur), pêcheur par défaut. */
+function requestedSpace(formData: FormData): SpaceMode {
+  return parseSpace(formData.get('space') as string | null) ?? 'fisherman'
+}
 
 async function siteOrigin() {
   if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL
@@ -85,9 +92,13 @@ export async function signup(
   // La ligne applicative `User` est créée à la volée par getCurrentUser (auth/dal)
   // à la première requête authentifiée — évite tout conflit d'unicité ici.
 
+  // L'espace choisi à l'inscription devient l'espace actif.
+  const space = requestedSpace(formData)
+  await setSpace(space)
+
   // Si confirmation email désactivée → session immédiate, on redirige.
   if (data.session) {
-    redirect('/dashboard')
+    redirect(spaceHome(space))
   }
 
   // Sinon, confirmation requise.
@@ -118,11 +129,25 @@ export async function login(
     return { message: 'Email ou mot de passe incorrect.' }
   }
 
-  redirect('/dashboard')
+  // L'espace choisi à la connexion détermine où l'on arrive et ce à quoi on accède.
+  const space = requestedSpace(formData)
+  await setSpace(space)
+
+  redirect(spaceHome(space))
+}
+
+/** Bascule l'espace actif (organisateur ↔ pêcheur) sans se reconnecter. */
+export async function switchSpace(formData: FormData) {
+  const target = parseSpace(formData.get('space') as string | null)
+  if (!target) redirect('/')
+  await setSpace(target)
+  redirect(spaceHome(target))
 }
 
 export async function logout() {
   const supabase = await createClient()
   await supabase.auth.signOut()
+  // L'espace actif est propre à la session : on le réinitialise.
+  await clearSpace()
   redirect('/')
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { SpaceNotice } from '@/components/space-notice'
 import { requireRole } from '@/lib/auth/dal'
 import { getFishermanProfile } from '@/lib/fisherman'
 import { AvatarUploader } from './avatar-uploader'
@@ -17,10 +18,15 @@ function rankLabel(p: { status: string; rank: number | null }) {
   return `${p.rank}${suffix}${p.status === 'FINISHED' ? ' (final)' : ''}`
 }
 
-export default async function ProfilPage() {
+export default async function ProfilPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ espace?: string }>
+}) {
   const user = await requireRole('FISHERMAN')
   const { participations, stats } = await getFishermanProfile(user.id)
   const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase()
+  const { espace } = await searchParams
 
   const STAT_CARDS = [
     { val: String(stats.enduros), unit: '', lbl: 'Enduros', accent: 'var(--red)' },
@@ -31,6 +37,7 @@ export default async function ProfilPage() {
 
   return (
     <div className={styles.wrap}>
+      {espace === 'fisherman' && <SpaceNotice space="fisherman" />}
       <div className={styles.header}>
         <AvatarUploader avatarUrl={user.avatarUrl} initials={initials} />
         <div>

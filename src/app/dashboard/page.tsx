@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { SpaceNotice } from '@/components/space-notice'
 import { requireRole } from '@/lib/auth/dal'
 import { getOrganizerEnduros } from '@/lib/organizer'
 import styles from './dashboard.module.css'
@@ -11,12 +12,18 @@ export const metadata: Metadata = {
 
 const dayMonth = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short' })
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ espace?: string }>
+}) {
   const user = await requireRole('ORGANIZER')
   const enduros = await getOrganizerEnduros(user.id)
+  const { espace } = await searchParams
 
   return (
     <div className={styles.wrap}>
+      {espace === 'organizer' && <SpaceNotice space="organizer" />}
       <div className={styles.pageHead}>
         <div>
           <div className={styles.pageEyebrow}>Espace organisateur</div>

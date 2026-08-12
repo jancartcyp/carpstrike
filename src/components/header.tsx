@@ -1,11 +1,14 @@
 import Link from 'next/link'
-import { logout } from '@/app/actions/auth'
+import { logout, switchSpace } from '@/app/actions/auth'
 import { getCurrentUser } from '@/lib/auth/dal'
+import { getSpace } from '@/lib/auth/mode'
+import { spaceHome } from '@/lib/auth/space'
 import { getUnreadNotificationCount } from '@/lib/notifications'
 
 export async function Header() {
   const user = await getCurrentUser()
   const unread = user ? await getUnreadNotificationCount(user.id) : 0
+  const space = await getSpace()
 
   return (
     <header
@@ -116,9 +119,25 @@ export async function Header() {
         <div className="app-header-cta" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           {user ? (
             <>
-              <Link href="/dashboard" className="btn btn-ghost" style={{ fontSize: '0.85rem' }}>
-                Organiser
+              <Link href={spaceHome(space)} className="btn btn-ghost" style={{ fontSize: '0.85rem' }}>
+                {space === 'organizer' ? 'Mon espace orga' : 'Mon espace'}
               </Link>
+              {/* Bascule d'espace : même compte, accès différent */}
+              <form action={switchSpace}>
+                <input
+                  type="hidden"
+                  name="space"
+                  value={space === 'organizer' ? 'fisherman' : 'organizer'}
+                />
+                <button
+                  type="submit"
+                  className="btn btn-ghost"
+                  style={{ fontSize: '0.8rem' }}
+                  title={`Basculer vers l'espace ${space === 'organizer' ? 'pêcheur' : 'organisateur'}`}
+                >
+                  ⇄ {space === 'organizer' ? 'Pêcheur' : 'Organisateur'}
+                </button>
+              </form>
               <Link
                 href="/notifications"
                 aria-label={`Notifications${unread > 0 ? ` (${unread} non lues)` : ''}`}
@@ -149,7 +168,7 @@ export async function Header() {
                 )}
               </Link>
               <Link
-                href="/profil"
+                href={spaceHome(space)}
                 style={{
                   display: 'flex',
                   alignItems: 'center',

@@ -1,6 +1,8 @@
 import { cache } from 'react'
 import { redirect } from 'next/navigation'
 import type { Role } from '@/generated/prisma/enums'
+import { getSpace } from '@/lib/auth/mode'
+import { type SpaceMode, spaceHome } from '@/lib/auth/space'
 import { prisma } from '@/lib/prisma'
 import { createClient } from '@/lib/supabase/server'
 
@@ -73,11 +75,20 @@ export async function requireUser() {
 }
 
 /**
- * Rôles fusionnés : tout utilisateur connecté peut organiser ET participer.
- * `requireRole` ne fait plus que vérifier l'authentification (le paramètre de rôle
- * est conservé pour compat des appels existants, mais ignoré).
+ * Exige un utilisateur connecté **dans le bon espace de session**.
+ *
+ * Un même compte (même email) peut servir aux deux espaces, mais l'accès dépend de
+ * celui choisi à la connexion : l'espace organisateur et l'espace pêcheur sont cloisonnés.
+ * Ce contrôle double celui du proxy (qui ne couvre pas les Server Actions).
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export async function requireRole(_role?: Role) {
-  return requireUser()
+export async function requireRole(role?: Role) {
+  const user = await requireUser()
+  if (!role) return user
+
+  const space = await getSpace()
+  const needed: SpaceMode = role === 'ORGANIZER' ? 'organizer' : 'fisherman'
+  if (space !== needed) {
+    redirect(`${spaceHome(space)}?espace=${space}`)
+  }
+  return user
 }
