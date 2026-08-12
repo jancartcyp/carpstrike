@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { getCommissaireContext } from '@/lib/commissaire/dal'
+import { catchWindow } from '@/lib/enduro-status'
 import { CommissaireApp } from './commissaire-app'
 
 export const metadata: Metadata = {
@@ -21,6 +22,9 @@ export default async function CommissaireAppPage() {
   if (!ctx) redirect('/commissaire')
 
   const { commissaire, teams, recentCatches, validCount } = ctx
+  // Saisie fermée hors période (pas commencé / terminé / clôturé) — l'UI le signale,
+  // et `submitCatch` refuse de toute façon côté serveur.
+  const window = catchWindow(commissaire.enduro)
 
   return (
     <CommissaireApp
@@ -28,6 +32,7 @@ export default async function CommissaireAppPage() {
       enduroName={commissaire.enduro.name}
       minWeightKg={commissaire.enduro.minWeightKg}
       requirePhoto={commissaire.enduro.requirePhoto}
+      closedReason={window.open ? null : (window.reason ?? null)}
       validCount={validCount}
       teams={teams.map((t) => ({
         id: t.id,

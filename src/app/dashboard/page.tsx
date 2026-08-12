@@ -45,7 +45,7 @@ export default async function DashboardPage({
           {enduros.map((e) => (
             <Link key={e.id} href={`/dashboard/enduros/${e.id}`} className={styles.enduroCard}>
               <div className={styles.enduroCardTop}>
-                <StatusPill status={e.status} />
+                <StatusPill status={e.status} startAt={e.startAt} endAt={e.endAt} />
                 <span style={{ fontSize: '0.7rem', color: 'var(--dim)' }}>{e.durationHours}h</span>
               </div>
               <div className={styles.enduroCardName}>{e.name}</div>

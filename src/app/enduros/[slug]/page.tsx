@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { temporalState } from '@/lib/enduro-status'
 import { type EnduroDetail, getEnduroBySlug, getPublicAnnouncements } from '@/lib/enduros'
 import { Countdown } from './countdown'
 import styles from './enduro.module.css'
@@ -52,7 +53,13 @@ export default async function EnduroPage({ params }: { params: Promise<{ slug: s
   if (!enduro) notFound()
 
   const announcements = await getPublicAnnouncements(enduro.id)
-  const isLive = enduro.status === 'LIVE'
+  // État réel d'après les dates (le statut manuel peut être en retard : LIVE non clôturé…).
+  const state = temporalState(enduro.startAt, enduro.endAt)
+  const isLive = state === 'live'
+  const isFinished = state === 'finished'
+  // Les inscriptions ne concernent que les enduros pas encore commencés.
+  const canRegister =
+    state === 'upcoming' && enduro.status === 'PUBLISHED' && enduro.mode === 'WITH_REGISTRATION'
   const priceEuros = formatEuros(enduro.registrationFee)
   const prizeEuros = formatEuros(enduro.prizePool)
   const fillPct = enduro.maxTeams > 0 ? Math.round((enduro.confirmedTeams / enduro.maxTeams) * 100) : 0
@@ -78,17 +85,10 @@ export default async function EnduroPage({ params }: { params: Promise<{ slug: s
         <div className={styles.heroContent}>
           <div>
             <div className={styles.heroMeta}>
-              {isLive ? (
-                <span className={styles.metaPill}>
-                  <span className={styles.dot} />
-                  En direct
-                </span>
-              ) : (
-                <span className={styles.metaPill}>
-                  <span className={styles.dot} />
-                  Inscriptions ouvertes
-                </span>
-              )}
+              <span className={styles.metaPill}>
+                <span className={styles.dot} />
+                {isLive ? 'En direct' : isFinished ? 'Terminé' : canRegister ? 'Inscriptions ouvertes' : 'À venir'}
+              </span>
               <span className={styles.metaTag}>{enduro.durationHours}h</span>
               <span className={styles.metaTag}>Édition {enduro.startAt.getFullYear()}</span>
             </div>
@@ -103,7 +103,7 @@ export default async function EnduroPage({ params }: { params: Promise<{ slug: s
             {enduro.description && <p className={styles.heroSubtitle}>{enduro.description}</p>}
 
             <div className={styles.heroActions}>
-              {enduro.status === 'PUBLISHED' && enduro.mode === 'WITH_REGISTRATION' && (
+              {canRegister && (
                 <Link href={`/enduros/${enduro.slug}/inscription`} className="btn btn-primary btn-large">
                   S’inscrire{priceEuros ? ` — ${priceEuros} €` : ''}
                 </Link>
@@ -128,6 +128,8 @@ export default async function EnduroPage({ params }: { params: Promise<{ slug: s
           <aside className={styles.infoCard}>
             {isLive ? (
               <div className={styles.countdownStarted}>Enduro en cours</div>
+            ) : isFinished ? (
+              <div className={styles.countdownStarted}>Enduro terminé</div>
             ) : (
               <>
                 <div className={styles.countdownLabel}>Début de l’enduro dans</div>
@@ -184,7 +186,7 @@ export default async function EnduroPage({ params }: { params: Promise<{ slug: s
               </div>
             </div>
 
-            {enduro.status === 'PUBLISHED' && enduro.mode === 'WITH_REGISTRATION' ? (
+            {canRegister ? (
               <Link href={`/enduros/${enduro.slug}/inscription`} className={`btn btn-primary ${styles.infoCta}`}>
                 Réserver mon binôme →
               </Link>
@@ -334,7 +336,7 @@ export default async function EnduroPage({ params }: { params: Promise<{ slug: s
                   <span className={styles.check}>✓</span> Trophée pour les podiums
                 </li>
               </ul>
-              {!isLive && enduro.mode === 'WITH_REGISTRATION' ? (
+              {canRegister ? (
                 <Link href={`/enduros/${enduro.slug}/inscription`} className={`btn btn-primary ${styles.priceCta}`}>
                   Réserver maintenant →
                 </Link>
@@ -425,19 +427,22 @@ export default async function EnduroPage({ params }: { params: Promise<{ slug: s
           <div className={styles.sectionEyebrow} style={{ justifyContent: 'center' }}>
             {isLive
               ? 'Compétition en cours'
-              : enduro.spotsLeft > 0
+              : isFinished
+                ? 'Compétition terminée'
+                : enduro.spotsLeft > 0
                 ? `Plus que ${enduro.spotsLeft} place${enduro.spotsLeft > 1 ? 's' : ''} disponible${enduro.spotsLeft > 1 ? 's' : ''}`
                 : 'Complet'}
           </div>
           <h2>
-            Rejoignez l’enduro <span className="accent">{enduro.startAt.getFullYear()}</span>
+            {isFinished ? 'Édition' : 'Rejoignez l’enduro'}{' '}
+            <span className="accent">{enduro.startAt.getFullYear()}</span>
           </h2>
           <p>
             {enduro.confirmedTeams} équipe{enduro.confirmedTeams > 1 ? 's' : ''} déjà confirmée
             {enduro.confirmedTeams > 1 ? 's' : ''} sur {enduro.maxTeams}.
           </p>
           <div className={styles.finalCtaActions}>
-            {!isLive && enduro.mode === 'WITH_REGISTRATION' && enduro.spotsLeft > 0 ? (
+            {canRegister && enduro.spotsLeft > 0 ? (
               <Link href={`/enduros/${enduro.slug}/inscription`} className="btn btn-primary btn-large">
                 S’inscrire{priceEuros ? ` — ${priceEuros} €` : ''}
               </Link>

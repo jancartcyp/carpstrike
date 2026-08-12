@@ -6,6 +6,7 @@ import { redirect } from 'next/navigation'
 import { requireRole } from '@/lib/auth/dal'
 import { requireOwnedEnduro } from '@/lib/auth/owner'
 import { getCommissaire } from '@/lib/commissaire/dal'
+import { catchWindow } from '@/lib/enduro-status'
 import { notifyTeamMembers } from '@/lib/notifications'
 import { prisma } from '@/lib/prisma'
 import { broadcastEnduroUpdate } from '@/lib/realtime'
@@ -33,6 +34,12 @@ export async function submitCatch(
 
   const { teamId, weightKg, species, note } = parsed.data
   const enduro = commissaire.enduro
+
+  // Saisie fermée hors période : avant le départ, après la fin (+ tampon), ou enduro clôturé/annulé.
+  const window = catchWindow(enduro)
+  if (!window.open) {
+    return { message: window.reason }
+  }
 
   // L'équipe doit appartenir à cet enduro.
   const team = await prisma.team.findFirst({
@@ -111,6 +118,10 @@ export type CatchUploadPrep =
 export async function createCatchPhotoUpload(): Promise<CatchUploadPrep> {
   const commissaire = await getCommissaire()
   if (!commissaire) return { ok: false, message: 'Session expirée. Reconnectez-vous.' }
+
+  // Inutile d'accepter des fichiers si la saisie est fermée.
+  const window = catchWindow(commissaire.enduro)
+  if (!window.open) return { ok: false, message: window.reason! }
 
   const path = `${commissaire.enduro.id}/${randomUUID()}.jpg`
   const admin = createAdminClient()

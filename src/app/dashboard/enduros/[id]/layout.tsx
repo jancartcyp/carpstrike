@@ -31,7 +31,7 @@ export default async function EnduroLayout({
 
       <div className={styles.enduroHeader}>
         <div className={styles.enduroHeaderTop}>
-          <StatusPill status={enduro.status} />
+          <StatusPill status={enduro.status} startAt={enduro.startAt} endAt={enduro.endAt} />
           <span className={styles.lockedTag}>{enduro.durationHours}h</span>
         </div>
         <h1 className={styles.enduroHeaderName}>{enduro.name}</h1>

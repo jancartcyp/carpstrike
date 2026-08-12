@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { temporalState } from '@/lib/enduro-status'
 import { getEnduroRanking } from '@/lib/ranking'
 import styles from './classement.module.css'
 import { LiveRefresh } from './live-refresh'
@@ -30,7 +31,9 @@ export default async function ClassementPage({ params }: { params: Promise<{ slu
   if (!data) notFound()
 
   const { enduro, general, sectors, stats } = data
-  const isLive = enduro.status === 'LIVE'
+  // Le direct dépend des dates réelles, pas du statut manuel.
+  const state = temporalState(enduro.startAt, enduro.endAt)
+  const isLive = state === 'live'
   // Podium réordonné visuellement : 2e, 1er, 3e.
   const podium = [stats.podium[1], stats.podium[0], stats.podium[2]]
 
@@ -54,7 +57,7 @@ export default async function ClassementPage({ params }: { params: Promise<{ slu
         <div>
           <div className={styles.eyebrow}>
             {isLive && <span className={styles.liveDot} />}
-            {isLive ? 'Classement en direct' : 'Classement'}
+            {isLive ? 'Classement en direct' : state === 'finished' ? 'Classement — terminé' : 'Classement — à venir'}
           </div>
           <h1 className={styles.title}>{enduro.name}</h1>
           <div className={styles.sub}>

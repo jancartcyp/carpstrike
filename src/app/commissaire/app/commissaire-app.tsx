@@ -36,6 +36,7 @@ export function CommissaireApp({
   teams,
   recent,
   validCount,
+  closedReason,
 }: {
   commissaireName: string
   enduroName: string
@@ -44,6 +45,8 @@ export function CommissaireApp({
   teams: Team[]
   recent: Recent[]
   validCount: number
+  /** Non nul si la saisie est fermée (enduro pas commencé, terminé ou clôturé). */
+  closedReason?: string | null
 }) {
   const [screen, setScreen] = useState<Screen>('home')
   const [team, setTeam] = useState<Team | null>(null)
@@ -168,11 +171,30 @@ export function CommissaireApp({
               <div className={styles.quickStatLbl}>Maille kg</div>
             </div>
           </div>
-          <button type="button" className={styles.ctaMain} onClick={() => setScreen('teams')}>
-            <div className={styles.ctaMainEyebrow}>Action principale</div>
-            <div className={styles.ctaMainTitle}>Enregistrer une prise</div>
-            <div className={styles.ctaMainSub}>Sélectionner une équipe →</div>
-          </button>
+          {closedReason ? (
+            <div
+              style={{
+                margin: '0 18px',
+                padding: '16px 18px',
+                borderRadius: 12,
+                border: '1px solid var(--line-bright)',
+                background: 'rgba(255,255,255,0.03)',
+                color: 'var(--dim)',
+                fontSize: '0.9rem',
+                lineHeight: 1.5,
+              }}
+            >
+              🔒 <strong style={{ color: 'var(--white)' }}>Saisie fermée</strong>
+              <br />
+              {closedReason}
+            </div>
+          ) : (
+            <button type="button" className={styles.ctaMain} onClick={() => setScreen('teams')}>
+              <div className={styles.ctaMainEyebrow}>Action principale</div>
+              <div className={styles.ctaMainTitle}>Enregistrer une prise</div>
+              <div className={styles.ctaMainSub}>Sélectionner une équipe →</div>
+            </button>
+          )}
         </>
       )}
 
@@ -185,14 +207,21 @@ export function CommissaireApp({
             </button>
             <div className={styles.screenTitle}>Sélectionner l’équipe</div>
           </div>
-          <div className={styles.searchBar}>
+          {closedReason && (
+            <p style={{ padding: '20px 18px', color: 'var(--dim)', fontSize: '0.9rem', lineHeight: 1.5 }}>
+              🔒 <strong style={{ color: 'var(--white)' }}>Saisie fermée</strong>
+              <br />
+              {closedReason}
+            </p>
+          )}
+          <div className={styles.searchBar} style={closedReason ? { display: 'none' } : undefined}>
             <input
               placeholder="Rechercher équipe ou poste…"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
           </div>
-          {filtered.length === 0 ? (
+          {closedReason ? null : filtered.length === 0 ? (
             <p style={{ padding: '24px 18px', color: 'var(--dim)' }}>Aucune équipe confirmée.</p>
           ) : (
             filtered.map((t) => (

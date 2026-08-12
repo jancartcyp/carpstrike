@@ -26,6 +26,9 @@ export const getCommissaire = cache(async () => {
           minWeightKg: true,
           requirePhoto: true,
           durationHours: true,
+          // Nécessaires pour savoir si la saisie de prises est ouverte (dates réelles).
+          startAt: true,
+          endAt: true,
         },
       },
     },
