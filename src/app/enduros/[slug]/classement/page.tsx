@@ -132,53 +132,6 @@ export default async function ClassementPage({ params }: { params: Promise<{ slu
             </div>
           </div>
 
-          {/* Tableau général */}
-          <h2 className={styles.sectionTitle}>
-            <span className={styles.bar} />
-            Classement général
-          </h2>
-          <div className={styles.table}>
-            <div className={`${styles.row} ${styles.rowHead}`}>
-              <span>#</span>
-              <span>Équipe</span>
-              <span className={styles.hideSm} style={{ textAlign: 'center' }}>
-                Secteur
-              </span>
-              <span className={styles.hideSm} style={{ textAlign: 'center' }}>
-                Poste
-              </span>
-              <span className={styles.hideSm} style={{ textAlign: 'center' }}>
-                Prises
-              </span>
-              <span className={styles.hideSm} style={{ textAlign: 'center' }}>
-                + grosse
-              </span>
-              <span style={{ textAlign: 'right' }}>Total</span>
-            </div>
-            {general.map((t) => (
-              <Link
-                key={t.id}
-                href={`/enduros/${enduro.slug}/classement/${t.id}`}
-                className={`${styles.row} ${t.rank === 1 ? styles.top1 : ''} ${t.rank <= 3 ? styles.top3 : ''}`}
-                style={{ textDecoration: 'none', color: 'inherit', cursor: 'pointer' }}
-              >
-                <span className={styles.rankNum}>{String(t.rank).padStart(2, '0')}</span>
-                <span>
-                  <div className={styles.rowTeam}>{t.name}</div>
-                  <div className={styles.rowSub}>{t.membersLabel || '—'}</div>
-                </span>
-                <span className={`${styles.cell} ${styles.hideSm}`}>{t.sectorName ?? '—'}</span>
-                <span className={`${styles.cell} ${styles.hideSm}`}>{t.pegNumber ?? '—'}</span>
-                <span className={`${styles.cell} ${styles.hideSm}`}>{t.catches}</span>
-                <span className={`${styles.cell} ${styles.hideSm}`}>{t.biggest.toFixed(1)} kg</span>
-                <span className={styles.score}>
-                  {t.total.toFixed(1)}
-                  <span className="unit"> kg</span>
-                </span>
-              </Link>
-            ))}
-          </div>
-
           {/* Stats par secteur */}
           {sectors.length > 0 && (
             <>
@@ -306,6 +259,53 @@ export default async function ClassementPage({ params }: { params: Promise<{ slu
               )}
             </>
           )}
+
+          {/* Tableau général */}
+          <h2 className={styles.sectionTitle}>
+            <span className={styles.bar} />
+            Classement général
+          </h2>
+          <div className={styles.table}>
+            <div className={`${styles.row} ${styles.rowHead}`}>
+              <span>#</span>
+              <span>Équipe</span>
+              <span className={styles.hideSm} style={{ textAlign: 'center' }}>
+                Secteur
+              </span>
+              <span className={styles.hideSm} style={{ textAlign: 'center' }}>
+                Poste
+              </span>
+              <span className={styles.hideSm} style={{ textAlign: 'center' }}>
+                Prises
+              </span>
+              <span className={styles.hideSm} style={{ textAlign: 'center' }}>
+                + grosse
+              </span>
+              <span style={{ textAlign: 'right' }}>Total</span>
+            </div>
+            {general.map((t) => (
+              <Link
+                key={t.id}
+                href={`/enduros/${enduro.slug}/classement/${t.id}`}
+                className={`${styles.row} ${t.rank === 1 ? styles.top1 : ''} ${t.rank <= 3 ? styles.top3 : ''}`}
+                style={{ textDecoration: 'none', color: 'inherit', cursor: 'pointer' }}
+              >
+                <span className={styles.rankNum}>{String(t.rank).padStart(2, '0')}</span>
+                <span>
+                  <div className={styles.rowTeam}>{t.name}</div>
+                  <div className={styles.rowSub}>{t.membersLabel || '—'}</div>
+                </span>
+                <span className={`${styles.cell} ${styles.hideSm}`}>{t.sectorName ?? '—'}</span>
+                <span className={`${styles.cell} ${styles.hideSm}`}>{t.pegNumber ?? '—'}</span>
+                <span className={`${styles.cell} ${styles.hideSm}`}>{t.catches}</span>
+                <span className={`${styles.cell} ${styles.hideSm}`}>{t.biggest.toFixed(1)} kg</span>
+                <span className={styles.score}>
+                  {t.total.toFixed(1)}
+                  <span className="unit"> kg</span>
+                </span>
+              </Link>
+            ))}
+          </div>
         </>
       )}
     </div>
