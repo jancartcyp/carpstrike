@@ -64,27 +64,23 @@ export function AddTeamForm({
         </div>
       </div>
 
-      <div className={styles.fieldRow}>
-        <div className={styles.field}>
-          <label htmlFor="sectorId">
-            Secteur <span className="optional">facultatif</span>
-          </label>
-          <select id="sectorId" name="sectorId" defaultValue="">
-            <option value="">— Non attribué —</option>
-            {sectors.map((s) => (
-              <option key={s.id} value={s.id}>
-                Secteur {s.name}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className={styles.field}>
-          <label htmlFor="pegNumber">
-            N° de poste <span className="optional">facultatif</span>
-          </label>
-          <input id="pegNumber" name="pegNumber" type="number" min={1} />
-        </div>
+      <div className={styles.field}>
+        <label htmlFor="sectorId">
+          Secteur <span className="optional">facultatif</span>
+        </label>
+        <select id="sectorId" name="sectorId" defaultValue="">
+          <option value="">— Non attribué —</option>
+          {sectors.map((s) => (
+            <option key={s.id} value={s.id}>
+              Secteur {s.name}
+            </option>
+          ))}
+        </select>
       </div>
+      <p style={{ fontSize: '0.78rem', color: 'var(--dim)', margin: '-6px 0 4px' }}>
+        Le numéro de poste s’attribue ensuite, dans la liste ci-dessous (ou via le lancer de
+        précision).
+      </p>
 
       {errorText && (
         <div className={`${styles.statusMsg} ${styles.statusError}`}>{errorText}</div>

@@ -41,7 +41,6 @@ export async function addTeam(
     partnerFirstName: formData.get('partnerFirstName'),
     partnerLastName: formData.get('partnerLastName'),
     sectorId: formData.get('sectorId'),
-    pegNumber: formData.get('pegNumber'),
   })
   if (!parsed.success) {
     return { errors: parsed.error.flatten().fieldErrors }
@@ -61,6 +60,7 @@ export async function addTeam(
     })
   }
 
+  // Pas de numéro de poste à la création : attribué ensuite (lancer de précision ou saisie groupée).
   await prisma.team.create({
     data: {
       enduroId: enduro.id,
@@ -68,7 +68,6 @@ export async function addTeam(
       status: 'CONFIRMED',
       paymentStatus: 'NONE',
       sectorId,
-      pegNumber: d.pegNumber ?? null,
       members: { create: members },
     },
   })
@@ -90,21 +89,37 @@ export async function deleteTeam(formData: FormData) {
   redirect(`/dashboard/enduros/${enduro.id}/equipes`)
 }
 
-export async function assignTeamSector(formData: FormData) {
+/**
+ * Enregistre en une seule fois le secteur + numéro de poste de toutes les équipes d'un enduro.
+ * Champs attendus par équipe : `sector_<teamId>` et `peg_<teamId>`.
+ */
+export async function assignTeamPegs(
+  _prev: EnduroFormState,
+  formData: FormData
+): Promise<EnduroFormState> {
   const user = await requireRole('ORGANIZER')
   const enduroId = String(formData.get('enduroId') ?? '')
-  const teamId = String(formData.get('teamId') ?? '')
   const enduro = await requireOwnedEnduro(enduroId, user.id)
 
-  const sectorId = await resolveSectorId(String(formData.get('sectorId') ?? '') || undefined, enduro.id)
-  const pegRaw = String(formData.get('pegNumber') ?? '').trim()
-  const pegNumber = pegRaw && Number.isFinite(Number(pegRaw)) ? Number(pegRaw) : null
+  const [teams, sectors] = await Promise.all([
+    prisma.team.findMany({ where: { enduroId: enduro.id }, select: { id: true } }),
+    prisma.sector.findMany({ where: { enduroId: enduro.id }, select: { id: true } }),
+  ])
+  const validSectorIds = new Set(sectors.map((s) => s.id))
 
-  await prisma.team.updateMany({
-    where: { id: teamId, enduroId: enduro.id },
-    data: { sectorId, pegNumber },
-  })
+  await prisma.$transaction(
+    teams.map((t) => {
+      const sectorRaw = String(formData.get(`sector_${t.id}`) ?? '')
+      const sectorId = validSectorIds.has(sectorRaw) ? sectorRaw : null
+      const pegRaw = String(formData.get(`peg_${t.id}`) ?? '').trim()
+      const pegNumber =
+        pegRaw !== '' && Number.isFinite(Number(pegRaw)) && Number(pegRaw) > 0
+          ? Math.trunc(Number(pegRaw))
+          : null
+      return prisma.team.update({ where: { id: t.id }, data: { sectorId, pegNumber } })
+    })
+  )
 
   revalidateTeams(enduro.id, enduro.slug)
-  redirect(`/dashboard/enduros/${enduro.id}/equipes`)
+  return { ok: true, message: 'Postes enregistrés.' }
 }

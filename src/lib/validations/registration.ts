@@ -11,11 +11,6 @@ const optionalEmail = z
   .optional()
   .transform((v) => (v && v.length > 0 ? v : undefined))
 
-const optionalInt = z
-  .union([z.literal(''), z.coerce.number().int().min(1, { error: 'Numéro invalide' })])
-  .optional()
-  .transform((v) => (v === '' || v === undefined ? undefined : Number(v)))
-
 // ── Membre d'équipe ──
 export const memberSchema = z.object({
   firstName: z.string().trim().min(1, { error: 'Prénom requis' }).max(60),
@@ -39,6 +34,8 @@ export const registrationSchema = z.object({
 export type RegistrationInput = z.infer<typeof registrationSchema>
 
 // ── Ajout manuel d'équipe (organisateur) ──
+// Pas de numéro de poste à la création : les postes sont attribués ensuite (lancer de
+// précision ou saisie manuelle groupée dans l'onglet Équipes), jamais pré-assignés.
 export const addTeamSchema = z.object({
   name: z.string().trim().min(2, { error: 'Nom d’équipe trop court' }).max(80),
   captainFirstName: z.string().trim().min(1, { error: 'Prénom du capitaine requis' }).max(60),
@@ -46,7 +43,6 @@ export const addTeamSchema = z.object({
   partnerFirstName: optionalText,
   partnerLastName: optionalText,
   sectorId: optionalText,
-  pegNumber: optionalInt,
 })
 export type AddTeamInput = z.infer<typeof addTeamSchema>
 
