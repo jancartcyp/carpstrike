@@ -177,10 +177,14 @@
 }
 .row {
   display: grid;
-  grid-template-columns: 48px 1fr 110px 70px 90px 90px;
+  grid-template-columns: 48px 1fr 90px 70px 70px 90px 90px;
   align-items: center;
   padding: 12px 18px;
   border-bottom: 1px solid var(--line);
+}
+/* Tableau par secteur : pas de colonne Secteur (déjà groupé) → une colonne de moins. */
+.row.rowSix {
+  grid-template-columns: 48px 1fr 70px 70px 90px 90px;
 }
 .row:last-child {
   border-bottom: none;
@@ -312,7 +316,8 @@
   .podium {
     grid-template-columns: 1fr;
   }
-  .row {
+  .row,
+  .row.rowSix {
     grid-template-columns: 36px 1fr 70px;
   }
   .row .hideSm {

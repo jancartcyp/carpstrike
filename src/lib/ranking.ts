@@ -5,6 +5,7 @@ export type RankingTeam = {
   name: string
   sectorName: string | null
   pegNumber: number | null
+  membersLabel: string
   catches: number
   biggest: number
   total: number
@@ -85,6 +86,7 @@ export async function getEnduroRanking(slug: string) {
       name: true,
       pegNumber: true,
       sector: { select: { name: true } },
+      members: { orderBy: { isCaptain: 'desc' }, select: { firstName: true, lastName: true } },
       catches: { where: { status: 'VALID' }, select: { weightKg: true } },
     },
   })
@@ -96,6 +98,7 @@ export async function getEnduroRanking(slug: string) {
       name: t.name,
       sectorName: t.sector?.name ?? null,
       pegNumber: t.pegNumber,
+      membersLabel: t.members.map((m) => `${m.firstName} ${m.lastName}`.trim()).join(' & '),
       catches: weights.length,
       biggest: weights.length ? Math.max(...weights) : 0,
       total: weights.reduce((s, w) => s + w, 0),
@@ -219,7 +222,7 @@ export async function getEnduroResults(slug: string) {
 
   const totalKg = general.reduce((s, t) => s + t.total, 0)
   const totalCatches = general.reduce((s, t) => s + t.catches, 0)
-  const biggestTeam = general.reduce<RankingTeam | null>(
+  const biggestTeam = general.reduce<(typeof general)[number] | null>(
     (max, t) => (t.biggest > (max?.biggest ?? 0) ? t : max),
     null
   )

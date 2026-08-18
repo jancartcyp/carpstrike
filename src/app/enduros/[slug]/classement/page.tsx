@@ -145,6 +145,9 @@ export default async function ClassementPage({ params }: { params: Promise<{ slu
                 Secteur
               </span>
               <span className={styles.hideSm} style={{ textAlign: 'center' }}>
+                Poste
+              </span>
+              <span className={styles.hideSm} style={{ textAlign: 'center' }}>
                 Prises
               </span>
               <span className={styles.hideSm} style={{ textAlign: 'center' }}>
@@ -162,12 +165,10 @@ export default async function ClassementPage({ params }: { params: Promise<{ slu
                 <span className={styles.rankNum}>{String(t.rank).padStart(2, '0')}</span>
                 <span>
                   <div className={styles.rowTeam}>{t.name}</div>
-                  <div className={styles.rowSub}>
-                    {t.sectorName ? `Secteur ${t.sectorName}` : 'Sans secteur'}
-                    {t.pegNumber ? ` · Poste ${t.pegNumber}` : ''}
-                  </div>
+                  <div className={styles.rowSub}>{t.membersLabel || '—'}</div>
                 </span>
                 <span className={`${styles.cell} ${styles.hideSm}`}>{t.sectorName ?? '—'}</span>
+                <span className={`${styles.cell} ${styles.hideSm}`}>{t.pegNumber ?? '—'}</span>
                 <span className={`${styles.cell} ${styles.hideSm}`}>{t.catches}</span>
                 <span className={`${styles.cell} ${styles.hideSm}`}>{t.biggest.toFixed(1)} kg</span>
                 <span className={styles.score}>
@@ -256,7 +257,7 @@ export default async function ClassementPage({ params }: { params: Promise<{ slu
                           </span>
                         </div>
                         <div className={styles.table}>
-                          <div className={`${styles.row} ${styles.rowHead}`}>
+                          <div className={`${styles.row} ${styles.rowSix} ${styles.rowHead}`}>
                             <span>#</span>
                             <span>Équipe</span>
                             <span className={styles.hideSm} style={{ textAlign: 'center' }}>
@@ -274,7 +275,7 @@ export default async function ClassementPage({ params }: { params: Promise<{ slu
                             <Link
                               key={t.id}
                               href={`/enduros/${enduro.slug}/classement/${t.id}`}
-                              className={`${styles.row} ${t.sectorRank === 1 ? styles.top1 : ''}`}
+                              className={`${styles.row} ${styles.rowSix} ${t.sectorRank === 1 ? styles.top1 : ''}`}
                               style={{ textDecoration: 'none', color: 'inherit', cursor: 'pointer' }}
                             >
                               <span className={styles.rankNum}>
@@ -282,7 +283,7 @@ export default async function ClassementPage({ params }: { params: Promise<{ slu
                               </span>
                               <span>
                                 <div className={styles.rowTeam}>{t.name}</div>
-                                <div className={styles.rowSub}>Rang général {t.rank}</div>
+                                <div className={styles.rowSub}>{t.membersLabel || '—'}</div>
                               </span>
                               <span className={`${styles.cell} ${styles.hideSm}`}>
                                 {t.pegNumber ?? '—'}
