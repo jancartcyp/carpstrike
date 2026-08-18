@@ -49,6 +49,11 @@ export async function saveTeamThrows(
   const { enduroId, teamId, throw1Cm, throw2Cm } = parsed.data
   const enduro = await requireOwnedEnduro(enduroId, user.id)
 
+  // Verrou aligné sur l'UI (lancer/page.tsx) : plus de saisie une fois clôturé ou annulé.
+  if (enduro.status === 'FINISHED' || enduro.status === 'CANCELLED') {
+    return { message: 'Impossible de modifier les lancers : l’enduro est clôturé ou annulé.' }
+  }
+
   // L'équipe doit appartenir à cet enduro.
   const team = await prisma.team.findFirst({
     where: { id: teamId, enduroId: enduro.id },

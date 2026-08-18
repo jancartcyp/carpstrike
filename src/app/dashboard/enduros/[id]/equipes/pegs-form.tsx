@@ -57,6 +57,7 @@ export function PegsForm({
                   name={`sector_${t.id}`}
                   defaultValue={t.sectorId ?? ''}
                   className={styles.teamSector}
+                  disabled={locked}
                   style={{
                     background: 'rgba(0,0,0,0.4)',
                     border: '1px solid var(--line)',
@@ -79,6 +80,7 @@ export function PegsForm({
                   defaultValue={t.pegNumber ?? ''}
                   placeholder="Poste"
                   aria-label={`Numéro de poste de ${t.name}`}
+                  disabled={locked}
                   style={{
                     width: 70,
                     background: 'rgba(0,0,0,0.4)',
@@ -109,11 +111,13 @@ export function PegsForm({
         </div>
       )}
 
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 16 }}>
-        <button type="submit" className="btn btn-primary" disabled={pending}>
-          {pending ? 'Enregistrement…' : 'Enregistrer les postes'}
-        </button>
-      </div>
+      {!locked && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 16 }}>
+          <button type="submit" className="btn btn-primary" disabled={pending}>
+            {pending ? 'Enregistrement…' : 'Enregistrer les postes'}
+          </button>
+        </div>
+      )}
     </form>
   )
 }

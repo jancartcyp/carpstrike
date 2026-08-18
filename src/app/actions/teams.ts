@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation'
 import { requireRole } from '@/lib/auth/dal'
 import { requireOwnedEnduro } from '@/lib/auth/owner'
 import { prisma } from '@/lib/prisma'
-import type { EnduroFormState } from '@/lib/validations/enduro'
+import { isStructurallyLocked, type EnduroFormState } from '@/lib/validations/enduro'
 import { addTeamSchema } from '@/lib/validations/registration'
 
 function revalidateTeams(enduroId: string, slug: string) {
@@ -33,6 +33,10 @@ export async function addTeam(
   const user = await requireRole('ORGANIZER')
   const enduroId = String(formData.get('enduroId') ?? '')
   const enduro = await requireOwnedEnduro(enduroId, user.id)
+
+  if (isStructurallyLocked(enduro.status)) {
+    return { message: 'Impossible d’ajouter une équipe : l’enduro est en direct ou clôturé.' }
+  }
 
   const parsed = addTeamSchema.safeParse({
     name: formData.get('name'),
@@ -82,7 +86,7 @@ export async function deleteTeam(formData: FormData) {
   const teamId = String(formData.get('teamId') ?? '')
   const enduro = await requireOwnedEnduro(enduroId, user.id)
 
-  if (enduro.status !== 'LIVE') {
+  if (!isStructurallyLocked(enduro.status)) {
     await prisma.team.deleteMany({ where: { id: teamId, enduroId: enduro.id } })
     revalidateTeams(enduro.id, enduro.slug)
   }
@@ -100,6 +104,10 @@ export async function assignTeamPegs(
   const user = await requireRole('ORGANIZER')
   const enduroId = String(formData.get('enduroId') ?? '')
   const enduro = await requireOwnedEnduro(enduroId, user.id)
+
+  if (isStructurallyLocked(enduro.status)) {
+    return { message: 'Impossible de modifier les postes : l’enduro est en direct ou clôturé.' }
+  }
 
   const [teams, sectors] = await Promise.all([
     prisma.team.findMany({ where: { enduroId: enduro.id }, select: { id: true } }),

@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import { requireRole } from '@/lib/auth/dal'
+import { isStructurallyLocked } from '@/lib/validations/enduro'
 import { type EnduroTeam, getEnduroTeams, getOrganizerEnduro } from '@/lib/organizer'
 import styles from '../../../dashboard.module.css'
 import { AddTeamForm } from './add-team-form'
@@ -19,7 +20,8 @@ export default async function EquipesPage({ params }: { params: Promise<{ id: st
   const teams = await getEnduroTeams(enduro.id)
   const confirmed = teams.filter((t) => t.status === 'CONFIRMED').length
   const pct = enduro.maxTeams > 0 ? Math.min(100, Math.round((confirmed / enduro.maxTeams) * 100)) : 0
-  const locked = enduro.status === 'LIVE'
+  // Aligné sur le verrou serveur (addTeam/assignTeamPegs) : LIVE ou FINISHED.
+  const locked = isStructurallyLocked(enduro.status)
 
   return (
     <>
