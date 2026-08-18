@@ -7,7 +7,6 @@ import styles from '../../../dashboard.module.css'
 type TeamRow = {
   id: string
   name: string
-  sectorName: string | null
   throw1Cm: number | null
   throw2Cm: number | null
 }
@@ -29,7 +28,6 @@ function TeamThrowRow({ enduroId, team, locked }: { enduroId: string; team: Team
       <input type="hidden" name="teamId" value={team.id} />
       <div>
         <div className={styles.teamName}>{team.name}</div>
-        <div className={styles.teamMembers}>{team.sectorName ? `Secteur ${team.sectorName}` : 'Sans secteur'}</div>
       </div>
 
       <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>

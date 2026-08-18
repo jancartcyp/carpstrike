@@ -17,7 +17,6 @@ export default async function LancerPage({ params }: { params: Promise<{ id: str
     .map((t) => ({
       id: t.id,
       name: t.name,
-      sectorName: t.sector?.name ?? null,
       throw1Cm: t.throw1Cm,
       throw2Cm: t.throw2Cm,
     }))
@@ -55,9 +54,6 @@ export default async function LancerPage({ params }: { params: Promise<{ id: str
                     <span className={styles.rankBadge}>{r.rank}</span>
                     <div>
                       <div className={styles.teamName}>{r.name}</div>
-                      <div className={styles.teamMembers}>
-                        {r.sectorName ? `Secteur ${r.sectorName}` : 'Sans secteur'}
-                      </div>
                     </div>
                   </div>
                   <div style={{ textAlign: 'right', fontSize: '0.8rem' }}>
