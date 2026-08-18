@@ -50,12 +50,14 @@ export async function sendContactMessage(
   }
 
   const d = parsed.data
+  // Neutralise tout retour à la ligne dans les champs repris en en-tête (sujet).
+  const oneLine = (s: string) => s.replace(/[\r\n]+/g, ' ').slice(0, 120)
   const resend = new Resend(process.env.RESEND_API_KEY)
   const { error } = await resend.emails.send({
     from: FROM,
     to: CONTACT_TO,
     replyTo: d.email,
-    subject: `[Contact CarpStrike] ${d.subject ?? 'Message'} — ${d.firstName} ${d.lastName}`,
+    subject: oneLine(`[Contact CarpStrike] ${d.subject ?? 'Message'} — ${d.firstName} ${d.lastName}`),
     text: [
       `De : ${d.firstName} ${d.lastName} <${d.email}>`,
       `Profil : ${d.profile ?? '—'}`,

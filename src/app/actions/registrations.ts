@@ -51,9 +51,14 @@ export async function submitRegistration(
     return { errors: parsed.error.flatten().fieldErrors }
   }
 
-  // L'enduro doit accepter les inscriptions en ligne.
+  // L'enduro doit accepter les inscriptions en ligne ET ne pas avoir commencé.
   const enduro = await prisma.enduro.findFirst({
-    where: { id: enduroId, status: 'PUBLISHED', mode: 'WITH_REGISTRATION' },
+    where: {
+      id: enduroId,
+      status: 'PUBLISHED',
+      mode: 'WITH_REGISTRATION',
+      startAt: { gt: new Date() },
+    },
     select: { id: true },
   })
   if (!enduro) {

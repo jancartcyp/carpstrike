@@ -30,7 +30,8 @@ export async function updateAvatar(_prev: AvatarState, formData: FormData): Prom
   const url = (formData.get('avatarUrl') as string | null)?.trim() || null
   if (!url) return { message: 'Aucune image reçue.' }
 
-  const prefix = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${AVATARS_BUCKET}/`
+  // Doit venir de notre bucket ET du dossier de CET utilisateur (pas l'image d'un autre compte).
+  const prefix = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${AVATARS_BUCKET}/${user.id}/`
   if (!url.startsWith(prefix)) return { message: 'Image invalide.' }
 
   await prisma.user.update({ where: { id: user.id }, data: { avatarUrl: url } })

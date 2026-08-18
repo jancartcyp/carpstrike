@@ -187,7 +187,8 @@ export type EnduroDetail = NonNullable<Awaited<ReturnType<typeof getEnduroBySlug
  */
 export const getEnduroForRegistration = cache(async (slug: string) => {
   const enduro = await prisma.enduro.findFirst({
-    where: { slug, status: 'PUBLISHED', mode: 'WITH_REGISTRATION' },
+    // Inscriptions réservées aux enduros pas encore commencés (date de départ future).
+    where: { slug, status: 'PUBLISHED', mode: 'WITH_REGISTRATION', startAt: { gt: new Date() } },
     select: {
       id: true,
       slug: true,

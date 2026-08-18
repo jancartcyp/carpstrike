@@ -55,11 +55,12 @@ export async function submitCatch(
 
   // La photo est envoyée directement du navigateur vers Supabase Storage (URL signée),
   // ce qui contourne les limites de taille des Server Actions / fonctions serverless.
-  // Ici on ne reçoit que l'URL publique résultante — on la valide (doit venir de notre bucket).
+  // Ici on ne reçoit que l'URL publique résultante — elle doit venir de notre bucket ET du
+  // dossier de CET enduro (interdit une URL arbitraire ou empruntée à un autre enduro).
   const rawPhotoUrl = (formData.get('photoUrl') as string | null)?.trim() || null
   let photoUrl: string | null = null
   if (rawPhotoUrl) {
-    const prefix = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${CATCHES_BUCKET}/`
+    const prefix = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${CATCHES_BUCKET}/${enduro.id}/`
     if (!rawPhotoUrl.startsWith(prefix)) {
       return { message: 'Photo invalide. Réessayez.' }
     }
