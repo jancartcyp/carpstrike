@@ -43,6 +43,7 @@ async function ensureAppUser(authUser: { id: string; email?: string; user_metada
 
   return prisma.$transaction(async (tx) => {
     const orphan = await tx.user.findUnique({ where: { email } })
+    let created
 
     if (orphan && orphan.id !== authUser.id) {
       // Libère l'email, crée le nouveau compte, puis repointe les relations.
@@ -50,7 +51,7 @@ async function ensureAppUser(authUser: { id: string; email?: string; user_metada
         where: { id: orphan.id },
         data: { email: `ancien-${orphan.id}@carpstrike.invalid` },
       })
-      const created = await tx.user.create({
+      created = await tx.user.create({
         data: { id: authUser.id, email, firstName, lastName, role: 'FISHERMAN' },
       })
       await tx.enduro.updateMany({ where: { organizerId: orphan.id }, data: { organizerId: authUser.id } })
@@ -58,12 +59,23 @@ async function ensureAppUser(authUser: { id: string; email?: string; user_metada
       await tx.payment.updateMany({ where: { userId: orphan.id }, data: { userId: authUser.id } })
       await tx.communication.updateMany({ where: { sentById: orphan.id }, data: { sentById: authUser.id } })
       await tx.user.delete({ where: { id: orphan.id } })
-      return created
+    } else {
+      created = await tx.user.create({
+        data: { id: authUser.id, email, firstName, lastName, role: 'FISHERMAN' },
+      })
     }
 
-    return tx.user.create({
-      data: { id: authUser.id, email, firstName, lastName, role: 'FISHERMAN' },
-    })
+    // Rapproche les équipes déjà inscrites avec cette adresse email (formulaire public
+    // rempli avant la création du compte) : le pêcheur retrouve sa participation dans son
+    // profil et reçoit désormais les notifications de son équipe.
+    if (authUser.email) {
+      await tx.teamMember.updateMany({
+        where: { userId: null, email: { equals: authUser.email, mode: 'insensitive' } },
+        data: { userId: authUser.id },
+      })
+    }
+
+    return created
   })
 }
 

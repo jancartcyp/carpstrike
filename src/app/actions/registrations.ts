@@ -127,6 +127,17 @@ export async function approveRegistration(formData: FormData) {
     const full = confirmed >= enduro.maxTeams
     const members = Array.isArray(request.members) ? (request.members as unknown as MemberInput[]) : []
 
+    // Rapproche chaque membre d'un compte CarpStrike existant, par email (insensible à la casse).
+    const memberEmails = members.map((m) => m.email).filter((e): e is string => !!e)
+    const matchedUsers =
+      memberEmails.length > 0
+        ? await prisma.user.findMany({
+            where: { OR: memberEmails.map((e) => ({ email: { equals: e, mode: 'insensitive' } })) },
+            select: { id: true, email: true },
+          })
+        : []
+    const userIdByEmail = new Map(matchedUsers.map((u) => [u.email.toLowerCase(), u.id]))
+
     await prisma.$transaction([
       prisma.team.create({
         data: {
@@ -140,6 +151,7 @@ export async function approveRegistration(formData: FormData) {
               lastName: m.lastName,
               email: m.email ?? null,
               isCaptain: idx === 0,
+              userId: m.email ? (userIdByEmail.get(m.email.toLowerCase()) ?? null) : null,
             })),
           },
         },
