@@ -40,8 +40,12 @@ export const addTeamSchema = z.object({
   name: z.string().trim().min(2, { error: 'Nom d’équipe trop court' }).max(80),
   captainFirstName: z.string().trim().min(1, { error: 'Prénom du capitaine requis' }).max(60),
   captainLastName: z.string().trim().min(1, { error: 'Nom du capitaine requis' }).max(60),
+  // Facultatifs : servent uniquement à rattacher automatiquement un compte CarpStrike existant
+  // (ou futur) du pêcheur — jamais requis pour créer l'équipe.
+  captainEmail: optionalEmail,
   partnerFirstName: optionalText,
   partnerLastName: optionalText,
+  partnerEmail: optionalEmail,
   sectorId: optionalText,
 })
 export type AddTeamInput = z.infer<typeof addTeamSchema>

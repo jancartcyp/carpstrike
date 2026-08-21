@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { requireRole } from '@/lib/auth/dal'
 import { requireOwnedEnduro } from '@/lib/auth/owner'
 import { prisma } from '@/lib/prisma'
+import { findUserIdsByEmails } from '@/lib/team-linking'
 import { isStructurallyLocked, type EnduroFormState } from '@/lib/validations/enduro'
 import { addTeamSchema } from '@/lib/validations/registration'
 
@@ -42,8 +43,10 @@ export async function addTeam(
     name: formData.get('name'),
     captainFirstName: formData.get('captainFirstName'),
     captainLastName: formData.get('captainLastName'),
+    captainEmail: formData.get('captainEmail'),
     partnerFirstName: formData.get('partnerFirstName'),
     partnerLastName: formData.get('partnerLastName'),
+    partnerEmail: formData.get('partnerEmail'),
     sectorId: formData.get('sectorId'),
   })
   if (!parsed.success) {
@@ -53,14 +56,26 @@ export async function addTeam(
   const d = parsed.data
   const sectorId = await resolveSectorId(d.sectorId, enduro.id)
 
+  // Emails facultatifs : s'ils correspondent à un compte CarpStrike existant, le membre y est
+  // rattaché automatiquement (même mécanisme que pour les inscriptions en ligne).
+  const userIdByEmail = await findUserIdsByEmails([d.captainEmail, d.partnerEmail])
+
   const members = [
-    { firstName: d.captainFirstName, lastName: d.captainLastName, isCaptain: true },
+    {
+      firstName: d.captainFirstName,
+      lastName: d.captainLastName,
+      email: d.captainEmail ?? null,
+      isCaptain: true,
+      userId: d.captainEmail ? (userIdByEmail.get(d.captainEmail.toLowerCase()) ?? null) : null,
+    },
   ]
   if (d.partnerFirstName && d.partnerLastName) {
     members.push({
       firstName: d.partnerFirstName,
       lastName: d.partnerLastName,
+      email: d.partnerEmail ?? null,
       isCaptain: false,
+      userId: d.partnerEmail ? (userIdByEmail.get(d.partnerEmail.toLowerCase()) ?? null) : null,
     })
   }
 

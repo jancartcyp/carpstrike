@@ -7,6 +7,7 @@ import { requireRole } from '@/lib/auth/dal'
 import { requireOwnedEnduro } from '@/lib/auth/owner'
 import { prisma } from '@/lib/prisma'
 import { clientIp, rateLimit } from '@/lib/rate-limit'
+import { findUserIdsByEmails } from '@/lib/team-linking'
 import type { EnduroFormState } from '@/lib/validations/enduro'
 import { type MemberInput, registrationSchema, rejectSchema } from '@/lib/validations/registration'
 
@@ -128,15 +129,7 @@ export async function approveRegistration(formData: FormData) {
     const members = Array.isArray(request.members) ? (request.members as unknown as MemberInput[]) : []
 
     // Rapproche chaque membre d'un compte CarpStrike existant, par email (insensible à la casse).
-    const memberEmails = members.map((m) => m.email).filter((e): e is string => !!e)
-    const matchedUsers =
-      memberEmails.length > 0
-        ? await prisma.user.findMany({
-            where: { OR: memberEmails.map((e) => ({ email: { equals: e, mode: 'insensitive' } })) },
-            select: { id: true, email: true },
-          })
-        : []
-    const userIdByEmail = new Map(matchedUsers.map((u) => [u.email.toLowerCase(), u.id]))
+    const userIdByEmail = await findUserIdsByEmails(members.map((m) => m.email))
 
     await prisma.$transaction([
       prisma.team.create({

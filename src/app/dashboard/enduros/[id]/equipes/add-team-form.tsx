@@ -48,6 +48,12 @@ export function AddTeamForm({
           <input id="captainLastName" name="captainLastName" />
         </div>
       </div>
+      <div className={styles.field}>
+        <label htmlFor="captainEmail">
+          Capitaine — email <span className="optional">facultatif</span>
+        </label>
+        <input id="captainEmail" name="captainEmail" type="email" placeholder="jean.dupont@email.fr" />
+      </div>
 
       <div className={styles.fieldRow}>
         <div className={styles.field}>
@@ -63,6 +69,17 @@ export function AddTeamForm({
           <input id="partnerLastName" name="partnerLastName" />
         </div>
       </div>
+      <div className={styles.field}>
+        <label htmlFor="partnerEmail">
+          Co-équipier — email <span className="optional">facultatif</span>
+        </label>
+        <input id="partnerEmail" name="partnerEmail" type="email" placeholder="jean.dupont@email.fr" />
+      </div>
+      <p style={{ fontSize: '0.78rem', color: 'var(--dim)', margin: '-6px 0 4px' }}>
+        📧 Les emails sont facultatifs — inutile de les chercher si vous ne les avez pas sous la
+        main. Renseignés, ils permettent au pêcheur de retrouver son équipe et ses notifications
+        s’il a (ou crée un jour) un compte CarpStrike avec cette adresse.
+      </p>
 
       <div className={styles.field}>
         <label htmlFor="sectorId">
