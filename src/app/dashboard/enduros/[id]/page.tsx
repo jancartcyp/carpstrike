@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { publishEnduro, setEnduroLive } from '@/app/actions/enduros'
+import { publishEnduro, setEnduroLive, toggleRankingVisibility } from '@/app/actions/enduros'
 import { requireRole } from '@/lib/auth/dal'
 import { getOrganizerEnduro } from '@/lib/organizer'
 import styles from '../../dashboard.module.css'
@@ -81,6 +81,12 @@ export default async function EnduroOverviewPage({
               Cet enduro est <strong>terminé</strong>. Le classement est figé.
             </div>
           )}
+          {(enduro.status === 'LIVE' || enduro.status === 'FINISHED') && enduro.rankingHidden && (
+            <div className={styles.infoBox}>
+              🤫 Le classement live est actuellement <strong>masqué au public</strong> — vous seul le
+              voyez. Les visiteurs voient un message « classement désactivé pour plus de suspense ».
+            </div>
+          )}
 
           <div className={styles.headerActions} style={{ marginTop: 0 }}>
             {enduro.status === 'DRAFT' && (
@@ -105,9 +111,17 @@ export default async function EnduroOverviewPage({
               </Link>
             )}
             {(enduro.status === 'LIVE' || enduro.status === 'FINISHED') && (
-              <Link href={`/enduros/${enduro.slug}/classement`} className="btn btn-ghost">
-                Classement
-              </Link>
+              <>
+                <Link href={`/enduros/${enduro.slug}/classement`} className="btn btn-ghost">
+                  Classement
+                </Link>
+                <form action={toggleRankingVisibility}>
+                  <input type="hidden" name="enduroId" value={enduro.id} />
+                  <button type="submit" className="btn btn-ghost">
+                    {enduro.rankingHidden ? '👁️ Réafficher le classement' : '🤫 Masquer le classement'}
+                  </button>
+                </form>
+              </>
             )}
             {enduro.status === 'FINISHED' && (
               <Link href={`/enduros/${enduro.slug}/resultats`} className="btn btn-ghost">

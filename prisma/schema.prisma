@@ -154,6 +154,7 @@ model Enduro {
   rulesText         String?
   minWeightKg       Float        @default(3.0) // maille minimum
   requirePhoto      Boolean      @default(true) // photo obligatoire à la saisie d'une prise
+  rankingHidden     Boolean      @default(false) // classement live masqué au public (suspense) — l'organisateur le voit toujours
   createdAt         DateTime     @default(now())
 
   sectors              Sector[]

@@ -211,6 +211,22 @@ export async function setEnduroLive(formData: FormData) {
   redirect(`/dashboard/enduros/${enduro.id}`)
 }
 
+/**
+ * Bascule la visibilité publique du classement live (suspense) : l'organisateur continue
+ * de le voir en permanence via son dashboard, seule la page publique est masquée.
+ */
+export async function toggleRankingVisibility(formData: FormData) {
+  const user = await requireRole('ORGANIZER')
+  const enduro = await requireOwnedEnduro(String(formData.get('enduroId') ?? ''), user.id)
+  await prisma.enduro.update({
+    where: { id: enduro.id },
+    data: { rankingHidden: !enduro.rankingHidden },
+  })
+  revalidateEnduro(enduro.slug)
+  revalidatePath(`/enduros/${enduro.slug}/classement`)
+  redirect(`/dashboard/enduros/${enduro.id}`)
+}
+
 export async function closeEnduro(formData: FormData) {
   const user = await requireRole('ORGANIZER')
   const enduro = await requireOwnedEnduro(String(formData.get('enduroId') ?? ''), user.id)

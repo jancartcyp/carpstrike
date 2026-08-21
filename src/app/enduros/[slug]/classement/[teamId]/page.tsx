@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { getCurrentUser } from '@/lib/auth/dal'
 import { getTeamCatchDetail } from '@/lib/ranking'
 
 export async function generateMetadata({
@@ -36,6 +37,35 @@ export default async function TeamCatchesPage({
   if (!data) notFound()
 
   const { enduro, team, rank, validCount, totalKg, biggestKg, catches } = data
+
+  // Même règle que la page classement : masqué au public si l'organisateur l'a désactivé.
+  const currentUser = await getCurrentUser()
+  const isOwner = currentUser?.id === enduro.organizerId
+  if (enduro.rankingHidden && !isOwner) {
+    return (
+      <main style={{ maxWidth: 480, margin: '0 auto', padding: '80px 20px', textAlign: 'center' }}>
+        <div style={{ fontSize: '2.6rem', marginBottom: 14 }}>🤫</div>
+        <h1
+          style={{
+            fontFamily: 'var(--font-barlow-condensed), sans-serif',
+            fontWeight: 800,
+            fontSize: '1.8rem',
+            color: 'var(--white)',
+            margin: '0 0 10px',
+          }}
+        >
+          Classement désactivé
+        </h1>
+        <p style={{ color: 'var(--dim)', fontSize: '0.95rem', lineHeight: 1.6, margin: '0 0 26px' }}>
+          L’organisateur a désactivé l’affichage du classement en direct pour{' '}
+          <strong style={{ color: 'var(--white)' }}>plus de suspense</strong>. Revenez plus tard !
+        </p>
+        <Link href={`/enduros/${enduro.slug}`} className="btn btn-primary">
+          ← Retour à l’enduro
+        </Link>
+      </main>
+    )
+  }
 
   return (
     <main style={{ maxWidth: 860, margin: '0 auto', padding: '32px 20px 80px' }}>

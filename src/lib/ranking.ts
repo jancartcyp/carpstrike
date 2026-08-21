@@ -75,6 +75,8 @@ export async function getEnduroRanking(slug: string) {
       startAt: true,
       endAt: true,
       durationHours: true,
+      organizerId: true,
+      rankingHidden: true,
     },
   })
   if (!enduro) return null

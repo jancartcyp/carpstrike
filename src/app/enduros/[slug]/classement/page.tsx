@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { getCurrentUser } from '@/lib/auth/dal'
 import { temporalState } from '@/lib/enduro-status'
 import { getEnduroRanking } from '@/lib/ranking'
 import styles from './classement.module.css'
@@ -31,6 +32,46 @@ export default async function ClassementPage({ params }: { params: Promise<{ slu
   if (!data) notFound()
 
   const { enduro, general, sectors, stats } = data
+
+  // L'organisateur peut masquer le classement au public (suspense) — lui seul continue à le voir.
+  const currentUser = await getCurrentUser()
+  const isOwner = currentUser?.id === enduro.organizerId
+  if (enduro.rankingHidden && !isOwner) {
+    return (
+      <div className={styles.wrap}>
+        <div
+          style={{
+            textAlign: 'center',
+            padding: '80px 24px',
+            maxWidth: 480,
+            margin: '0 auto',
+          }}
+        >
+          <div style={{ fontSize: '2.6rem', marginBottom: 14 }}>🤫</div>
+          <h1
+            style={{
+              fontFamily: 'var(--font-barlow-condensed), sans-serif',
+              fontWeight: 800,
+              fontSize: '1.8rem',
+              color: 'var(--white)',
+              margin: '0 0 10px',
+            }}
+          >
+            Classement désactivé
+          </h1>
+          <p style={{ color: 'var(--dim)', fontSize: '0.95rem', lineHeight: 1.6, margin: '0 0 26px' }}>
+            L’organisateur a désactivé l’affichage du classement en direct pour{' '}
+            <strong style={{ color: 'var(--white)' }}>plus de suspense</strong>. Revenez plus tard
+            pour découvrir qui est en tête !
+          </p>
+          <Link href={`/enduros/${enduro.slug}`} className="btn btn-primary">
+            ← Retour à l’enduro
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
   // Le direct dépend des dates réelles, pas du statut manuel.
   const state = temporalState(enduro.startAt, enduro.endAt)
   const isLive = state === 'live'
@@ -52,6 +93,22 @@ export default async function ClassementPage({ params }: { params: Promise<{ slu
   return (
     <div className={styles.wrap}>
       <LiveRefresh active={isLive} enduroId={enduro.id} />
+
+      {enduro.rankingHidden && isOwner && (
+        <div
+          style={{
+            marginBottom: 18,
+            padding: '10px 16px',
+            borderRadius: 8,
+            border: '1px solid var(--line-bright)',
+            background: 'rgba(255,255,255,0.03)',
+            color: 'var(--dim)',
+            fontSize: '0.85rem',
+          }}
+        >
+          🤫 Masqué au public — vous seul (organisateur) voyez ce classement en ce moment.
+        </div>
+      )}
 
       <div className={styles.head}>
         <div>
