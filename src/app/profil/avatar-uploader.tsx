@@ -2,6 +2,7 @@
 
 import { useActionState, useRef, useState, useTransition } from 'react'
 import { createAvatarUpload, updateAvatar } from '@/app/actions/profile'
+import { compressAvatar } from '@/lib/image-compress'
 import { createClient } from '@/lib/supabase/client'
 import styles from './profil.module.css'
 
@@ -29,6 +30,9 @@ export function AvatarUploader({ avatarUrl, initials }: { avatarUrl: string | nu
     }
     setBusy(true)
     try {
+      // Un avatar n'est jamais affiché au-delà de ~128 px : on le compresse avant l'envoi.
+      const compressed = await compressAvatar(file)
+
       const prep = await createAvatarUpload()
       if (!prep.ok) {
         setError(prep.message)
@@ -37,7 +41,7 @@ export function AvatarUploader({ avatarUrl, initials }: { avatarUrl: string | nu
       const supabase = createClient()
       const { error: upErr } = await supabase.storage
         .from(AVATARS_BUCKET)
-        .uploadToSignedUrl(prep.path, prep.token, file, { contentType: file.type })
+        .uploadToSignedUrl(prep.path, prep.token, compressed, { contentType: 'image/jpeg' })
       if (upErr) {
         setError("Échec de l'envoi. Réessaie.")
         return

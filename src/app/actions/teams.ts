@@ -105,11 +105,15 @@ export async function deleteTeam(formData: FormData) {
   if (!isStructurallyLocked(enduro.status)) {
     // Photos récupérées avant la cascade, pour ne pas laisser de fichiers orphelins.
     const photos = await prisma.catch.findMany({
-      where: { teamId, enduroId: enduro.id, photoUrl: { not: null } },
-      select: { photoUrl: true },
+      where: {
+        teamId,
+        enduroId: enduro.id,
+        OR: [{ photoUrl: { not: null } }, { photoThumbUrl: { not: null } }],
+      },
+      select: { photoUrl: true, photoThumbUrl: true },
     })
     await prisma.team.deleteMany({ where: { id: teamId, enduroId: enduro.id } })
-    await removeCatchPhotos(photos.map((p) => p.photoUrl))
+    await removeCatchPhotos(photos.flatMap((p) => [p.photoUrl, p.photoThumbUrl]))
     revalidateTeams(enduro.id, enduro.slug)
   }
   redirect(`/dashboard/enduros/${enduro.id}/equipes`)

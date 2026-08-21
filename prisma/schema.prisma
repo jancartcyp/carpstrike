@@ -245,6 +245,7 @@ model Catch {
   weightKg      Float
   species       Species
   photoUrl      String? // facultatif si l'organisateur n'exige pas la photo
+  photoThumbUrl String? // miniature (listes/galeries) ; null pour les photos d'avant la compression
   caughtAt      DateTime    @default(now())
   status        CatchStatus @default(VALID)
   note          String?

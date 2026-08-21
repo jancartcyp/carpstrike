@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useState, useTransition } from 'react'
 import { logoutCommissaire } from '@/app/actions/commissaire-auth'
 import { createCatchPhotoUpload, submitCatch } from '@/app/actions/catches'
+import { compressCatchPhoto } from '@/lib/image-compress'
 import { createClient } from '@/lib/supabase/client'
 import styles from '../commissaire.module.css'
 
@@ -79,21 +80,31 @@ export function CommissaireApp({
       }
       setUploading(true)
       try {
+        // Compression avant envoi : ~14× plus léger, donc upload d'autant plus rapide
+        // au bord de l'eau (et stockage/bande passante préservés).
+        const { full, thumb } = await compressCatchPhoto(photoFile)
+
         const prep = await createCatchPhotoUpload()
         if (!prep.ok) {
           setUploadError(prep.message)
           return
         }
         const supabase = createClient()
-        const { error } = await supabase.storage
-          .from(CATCHES_BUCKET)
-          .uploadToSignedUrl(prep.path, prep.token, photoFile, { contentType: photoFile.type })
-        if (error) {
+        const bucket = supabase.storage.from(CATCHES_BUCKET)
+
+        const [fullRes, thumbRes] = await Promise.all([
+          bucket.uploadToSignedUrl(prep.full.path, prep.full.token, full, { contentType: 'image/jpeg' }),
+          bucket.uploadToSignedUrl(prep.thumb.path, prep.thumb.token, thumb, { contentType: 'image/jpeg' }),
+        ])
+        if (fullRes.error) {
           setUploadError("Échec de l'envoi de la photo. Réessayez.")
           return
         }
-        const publicUrl = supabase.storage.from(CATCHES_BUCKET).getPublicUrl(prep.path).data.publicUrl
-        fd.set('photoUrl', publicUrl)
+        fd.set('photoUrl', bucket.getPublicUrl(prep.full.path).data.publicUrl)
+        // La miniature est un confort d'affichage : si elle échoue, on continue sans.
+        if (!thumbRes.error) {
+          fd.set('photoThumbUrl', bucket.getPublicUrl(prep.thumb.path).data.publicUrl)
+        }
       } catch {
         setUploadError("Échec de l'envoi de la photo. Réessayez.")
         return

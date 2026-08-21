@@ -57,14 +57,22 @@ export async function submitCatch(
   // ce qui contourne les limites de taille des Server Actions / fonctions serverless.
   // Ici on ne reçoit que l'URL publique résultante — elle doit venir de notre bucket ET du
   // dossier de CET enduro (interdit une URL arbitraire ou empruntée à un autre enduro).
+  const prefix = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${CATCHES_BUCKET}/${enduro.id}/`
   const rawPhotoUrl = (formData.get('photoUrl') as string | null)?.trim() || null
+  const rawThumbUrl = (formData.get('photoThumbUrl') as string | null)?.trim() || null
+
   let photoUrl: string | null = null
+  let photoThumbUrl: string | null = null
   if (rawPhotoUrl) {
-    const prefix = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${CATCHES_BUCKET}/${enduro.id}/`
     if (!rawPhotoUrl.startsWith(prefix)) {
       return { message: 'Photo invalide. Réessayez.' }
     }
     photoUrl = rawPhotoUrl
+    // La miniature est facultative : si elle manque ou n'est pas valide, l'affichage
+    // retombe simplement sur la version pleine.
+    if (rawThumbUrl && rawThumbUrl.startsWith(prefix)) {
+      photoThumbUrl = rawThumbUrl
+    }
   } else if (enduro.requirePhoto) {
     return { message: 'La photo est obligatoire pour cet enduro.' }
   }
@@ -77,6 +85,7 @@ export async function submitCatch(
       weightKg,
       species,
       photoUrl,
+      photoThumbUrl,
       status: 'VALID',
       note: note ?? null,
     },
@@ -108,12 +117,17 @@ export async function submitCatch(
 // ── Upload photo : URL signée (le navigateur envoie le fichier directement à Storage) ──
 
 export type CatchUploadPrep =
-  | { ok: true; path: string; token: string }
+  | {
+      ok: true
+      full: { path: string; token: string }
+      thumb: { path: string; token: string }
+    }
   | { ok: false; message: string }
 
 /**
- * Prépare un envoi de photo : renvoie un chemin + token d'upload signé (usage unique).
- * Le navigateur uploade ensuite directement vers Supabase Storage via ce token
+ * Prépare l'envoi d'une photo : deux chemins + tokens d'upload signés (usage unique),
+ * un pour la version pleine et un pour la miniature.
+ * Le navigateur compresse puis uploade directement vers Supabase Storage via ces tokens
  * (`uploadToSignedUrl`), sans passer par la Server Action → aucune limite de taille.
  */
 export async function createCatchPhotoUpload(): Promise<CatchUploadPrep> {
@@ -124,11 +138,23 @@ export async function createCatchPhotoUpload(): Promise<CatchUploadPrep> {
   const window = catchWindow(commissaire.enduro)
   if (!window.open) return { ok: false, message: window.reason! }
 
-  const path = `${commissaire.enduro.id}/${randomUUID()}.jpg`
+  const id = randomUUID()
+  const fullPath = `${commissaire.enduro.id}/${id}.jpg`
+  const thumbPath = `${commissaire.enduro.id}/${id}-thumb.jpg`
+
   const admin = createAdminClient()
-  const { data, error } = await admin.storage.from(CATCHES_BUCKET).createSignedUploadUrl(path)
-  if (error || !data) return { ok: false, message: "Impossible de préparer l'envoi de la photo." }
-  return { ok: true, path: data.path, token: data.token }
+  const [full, thumb] = await Promise.all([
+    admin.storage.from(CATCHES_BUCKET).createSignedUploadUrl(fullPath),
+    admin.storage.from(CATCHES_BUCKET).createSignedUploadUrl(thumbPath),
+  ])
+  if (full.error || !full.data || thumb.error || !thumb.data) {
+    return { ok: false, message: "Impossible de préparer l'envoi de la photo." }
+  }
+  return {
+    ok: true,
+    full: { path: full.data.path, token: full.data.token },
+    thumb: { path: thumb.data.path, token: thumb.data.token },
+  }
 }
 
 // ── Organisateur : contester / annuler une prise ──

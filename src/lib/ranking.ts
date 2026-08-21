@@ -188,7 +188,7 @@ export async function getEnduroResults(slug: string) {
       sector: { select: { name: true } },
       catches: {
         where: { status: 'VALID' },
-        select: { weightKg: true, species: true, photoUrl: true },
+        select: { weightKg: true, species: true, photoUrl: true, photoThumbUrl: true },
       },
     },
   })
@@ -209,11 +209,19 @@ export async function getEnduroResults(slug: string) {
 
   // Répartition par espèce + galerie (prises avec photo).
   const speciesCount = new Map<string, number>()
-  const gallery: { url: string; weightKg: number; team: string }[] = []
+  // `thumbUrl` sert à l'affichage en grille ; `url` à l'ouverture en grand.
+  const gallery: { url: string; thumbUrl: string; weightKg: number; team: string }[] = []
   for (const t of teams) {
     for (const c of t.catches) {
       speciesCount.set(c.species, (speciesCount.get(c.species) ?? 0) + 1)
-      if (c.photoUrl) gallery.push({ url: c.photoUrl, weightKg: c.weightKg, team: t.name })
+      if (c.photoUrl) {
+        gallery.push({
+          url: c.photoUrl,
+          thumbUrl: c.photoThumbUrl ?? c.photoUrl,
+          weightKg: c.weightKg,
+          team: t.name,
+        })
+      }
     }
   }
   const species = [...speciesCount.entries()]
@@ -269,6 +277,7 @@ export async function getTeamCatchDetail(slug: string, teamId: string) {
           weightKg: true,
           species: true,
           photoUrl: true,
+          photoThumbUrl: true,
           caughtAt: true,
           status: true,
           note: true,
@@ -303,6 +312,7 @@ export async function getTeamCatchDetail(slug: string, teamId: string) {
       species: c.species,
       speciesLabel: SPECIES_LABELS[c.species] ?? c.species,
       photoUrl: c.photoUrl,
+      photoThumbUrl: c.photoThumbUrl ?? c.photoUrl,
       caughtAt: c.caughtAt,
       status: c.status,
       note: c.note,

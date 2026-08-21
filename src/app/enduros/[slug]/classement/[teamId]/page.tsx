@@ -244,9 +244,10 @@ export default async function TeamCatchesPage({
                     style={{ flexShrink: 0 }}
                     aria-label="Voir la photo en grand"
                   >
+                    {/* Miniature en liste ; le lien ouvre la version pleine. */}
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={c.photoUrl}
+                      src={c.photoThumbUrl ?? c.photoUrl}
                       alt={`Prise de ${c.weightKg.toFixed(1)} kg`}
                       loading="lazy"
                       style={{ width: 96, height: 96, objectFit: 'cover', borderRadius: 10, display: 'block' }}

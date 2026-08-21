@@ -194,7 +194,7 @@ export default async function ResultatsPage({ params }: { params: Promise<{ slug
                     className={styles.galleryItem}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={g.url} alt={`Prise ${g.team}`} loading="lazy" />
+                    <img src={g.thumbUrl} alt={`Prise ${g.team}`} loading="lazy" />
                     <span className={styles.galleryCap}>{g.weightKg.toFixed(1)} kg</span>
                   </a>
                 ))}
