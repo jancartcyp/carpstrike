@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { requireRole } from '@/lib/auth/dal'
 import { requireOwnedEnduro } from '@/lib/auth/owner'
 import { prisma } from '@/lib/prisma'
+import { removeCatchPhotos } from '@/lib/storage-cleanup'
 import { findUserIdsByEmails } from '@/lib/team-linking'
 import { isStructurallyLocked, type EnduroFormState } from '@/lib/validations/enduro'
 import { addTeamSchema } from '@/lib/validations/registration'
@@ -102,7 +103,13 @@ export async function deleteTeam(formData: FormData) {
   const enduro = await requireOwnedEnduro(enduroId, user.id)
 
   if (!isStructurallyLocked(enduro.status)) {
+    // Photos récupérées avant la cascade, pour ne pas laisser de fichiers orphelins.
+    const photos = await prisma.catch.findMany({
+      where: { teamId, enduroId: enduro.id, photoUrl: { not: null } },
+      select: { photoUrl: true },
+    })
     await prisma.team.deleteMany({ where: { id: teamId, enduroId: enduro.id } })
+    await removeCatchPhotos(photos.map((p) => p.photoUrl))
     revalidateTeams(enduro.id, enduro.slug)
   }
   redirect(`/dashboard/enduros/${enduro.id}/equipes`)

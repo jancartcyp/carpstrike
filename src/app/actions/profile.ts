@@ -4,9 +4,8 @@ import { randomUUID } from 'node:crypto'
 import { revalidatePath } from 'next/cache'
 import { requireUser } from '@/lib/auth/dal'
 import { prisma } from '@/lib/prisma'
-import { createAdminClient } from '@/lib/supabase/admin'
-
-const AVATARS_BUCKET = 'avatars'
+import { removeAvatar } from '@/lib/storage-cleanup'
+import { AVATARS_BUCKET, createAdminClient } from '@/lib/supabase/admin'
 
 export type AvatarUploadPrep =
   | { ok: true; path: string; token: string }
@@ -34,7 +33,15 @@ export async function updateAvatar(_prev: AvatarState, formData: FormData): Prom
   const prefix = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${AVATARS_BUCKET}/${user.id}/`
   if (!url.startsWith(prefix)) return { message: 'Image invalide.' }
 
+  const previousUrl = user.avatarUrl
   await prisma.user.update({ where: { id: user.id }, data: { avatarUrl: url } })
+
+  // Supprime l'ancienne photo du Storage : sans ça, chaque changement d'avatar laisse
+  // un fichier orphelin qui consomme du stockage pour rien.
+  if (previousUrl && previousUrl !== url) {
+    await removeAvatar(previousUrl)
+  }
+
   revalidatePath('/profil')
   revalidatePath('/', 'layout')
   return { ok: true }

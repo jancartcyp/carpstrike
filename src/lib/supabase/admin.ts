@@ -14,3 +14,4 @@ export function createAdminClient() {
 }
 
 export const CATCHES_BUCKET = 'catches'
+export const AVATARS_BUCKET = 'avatars'

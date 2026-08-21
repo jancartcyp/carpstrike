@@ -6,6 +6,7 @@ import { requireRole } from '@/lib/auth/dal'
 import { requireOwnedEnduro } from '@/lib/auth/owner'
 import { prisma } from '@/lib/prisma'
 import { uniqueEnduroSlug } from '@/lib/slug'
+import { removeCatchPhotos } from '@/lib/storage-cleanup'
 import {
   type EnduroFormState,
   type SectionKey,
@@ -256,7 +257,16 @@ export async function deleteEnduro(formData: FormData) {
     redirect(`/dashboard/enduros/${enduro.id}/parametres?delete=mismatch`)
   }
 
+  // Récupère les photos AVANT la suppression : la cascade efface les lignes `Catch`,
+  // mais pas les fichiers dans le Storage (qui resteraient orphelins).
+  const photos = await prisma.catch.findMany({
+    where: { enduroId: enduro.id, photoUrl: { not: null } },
+    select: { photoUrl: true },
+  })
+
   await prisma.enduro.delete({ where: { id: enduro.id } })
+  await removeCatchPhotos(photos.map((p) => p.photoUrl))
+
   revalidateEnduro(enduro.slug)
   redirect('/dashboard')
 }
