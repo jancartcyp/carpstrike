@@ -37,6 +37,63 @@ function FieldError({ messages }: { messages?: string[] }) {
 export function SignupForm() {
   const [state, action, pending] = useActionState(signup, undefined)
 
+  // Inscription réussie : on remplace le formulaire par une confirmation qui rappelle
+  // l'adresse saisie — la faute de frappe est la première cause d'email jamais reçu.
+  if (state?.ok) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div style={{ fontSize: '2.4rem', textAlign: 'center' }}>✉️</div>
+        <h2
+          style={{
+            fontFamily: 'var(--font-barlow-condensed), sans-serif',
+            fontWeight: 800,
+            fontSize: '1.5rem',
+            color: 'var(--white)',
+            textAlign: 'center',
+            margin: 0,
+          }}
+        >
+          Compte créé !
+        </h2>
+
+        <p style={{ color: 'var(--dim)', fontSize: '0.95rem', lineHeight: 1.6, textAlign: 'center' }}>
+          Un email de confirmation vient d’être envoyé à
+          <br />
+          <strong style={{ color: 'var(--white)', wordBreak: 'break-all' }}>{state.email}</strong>
+        </p>
+        <p style={{ color: 'var(--dim)', fontSize: '0.9rem', lineHeight: 1.6, textAlign: 'center' }}>
+          Clique sur le lien qu’il contient pour activer ton compte, puis connecte-toi.
+        </p>
+
+        <div
+          style={{
+            padding: '14px 16px',
+            border: '1px solid var(--line-bright)',
+            background: 'rgba(255,255,255,0.03)',
+            fontSize: '0.85rem',
+            color: 'var(--dim)',
+            lineHeight: 1.6,
+          }}
+        >
+          <strong style={{ color: 'var(--white)' }}>Tu ne reçois rien ?</strong>
+          <br />
+          Regarde d’abord dans tes <strong style={{ color: 'var(--white)' }}>spams</strong>. Si
+          l’email n’arrive toujours pas au bout de quelques minutes, l’adresse ci-dessus comporte
+          peut-être une faute de frappe — dans ce cas, refais une inscription avec la bonne adresse.
+        </div>
+
+        <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <Link href="/connexion" className="btn btn-primary">
+            Aller à la connexion
+          </Link>
+          <Link href="/inscription" className="btn btn-ghost">
+            Corriger mon adresse
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <form action={action} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
       {state?.message && (
@@ -89,8 +146,31 @@ export function SignupForm() {
         <label htmlFor="password" style={labelStyle}>
           Mot de passe
         </label>
-        <input id="password" name="password" type="password" required style={inputStyle} />
+        <input
+          id="password"
+          name="password"
+          type="password"
+          required
+          minLength={8}
+          autoComplete="new-password"
+          style={inputStyle}
+        />
         <FieldError messages={state?.errors?.password} />
+      </div>
+
+      <div>
+        <label htmlFor="confirmPassword" style={labelStyle}>
+          Confirme le mot de passe
+        </label>
+        <input
+          id="confirmPassword"
+          name="confirmPassword"
+          type="password"
+          required
+          autoComplete="new-password"
+          style={inputStyle}
+        />
+        <FieldError messages={state?.errors?.confirmPassword} />
       </div>
 
       <button type="submit" disabled={pending} className="btn btn-primary" style={{ marginTop: 8 }}>

@@ -55,6 +55,7 @@ export async function signup(
     lastName: formData.get('lastName'),
     email: formData.get('email'),
     password: formData.get('password'),
+    confirmPassword: formData.get('confirmPassword'),
   })
 
   if (!parsed.success) {
@@ -101,10 +102,9 @@ export async function signup(
     redirect(spaceHome(space))
   }
 
-  // Sinon, confirmation requise.
-  return {
-    message: 'Compte créé ! Vérifie ta boîte mail pour confirmer ton adresse avant de te connecter.',
-  }
+  // Sinon, confirmation requise : le formulaire affiche un écran de confirmation qui
+  // rappelle l'adresse saisie (une faute de frappe est la cause n°1 d'email jamais reçu).
+  return { ok: true, email }
 }
 
 export async function login(
