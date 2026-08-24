@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation'
+import { PegMapUploader } from '@/components/peg-map-uploader'
 import { requireRole } from '@/lib/auth/dal'
 import { getOrganizerEnduro } from '@/lib/organizer'
 import { isStructurallyLocked, PEG_ASSIGNMENTS } from '@/lib/validations/enduro'
@@ -145,6 +146,12 @@ export default async function ParametresPage({
             </label>
             <input id="postalCode" name="postalCode" defaultValue={enduro.postalCode ?? ''} />
           </div>
+        </div>
+        <div className={styles.field} style={{ marginTop: 14 }}>
+          <label>
+            Plan des postes <span className="optional">facultatif</span>
+          </label>
+          <PegMapUploader currentUrl={enduro.pegMapUrl} />
         </div>
       </SectionForm>
 

@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useState } from 'react'
 import { createEnduro } from '@/app/actions/enduros'
+import { PegMapUploader } from '@/components/peg-map-uploader'
 import { PEG_ASSIGNMENTS } from '@/lib/validations/enduro'
 import styles from '../dashboard.module.css'
 
@@ -276,6 +277,13 @@ export function CreateWizard() {
               onChange={(e) => set('postalCode', e.target.value)}
             />
           </div>
+        </div>
+
+        <div className={styles.field} style={{ marginTop: 16 }}>
+          <label>
+            Plan des postes <span className="optional">facultatif</span>
+          </label>
+          <PegMapUploader />
         </div>
       </div>
 

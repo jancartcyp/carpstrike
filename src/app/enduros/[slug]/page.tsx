@@ -428,6 +428,34 @@ export default async function EnduroPage({ params }: { params: Promise<{ slug: s
             </div>
           </div>
         </div>
+
+        {enduro.pegMapUrl && (
+          <div style={{ marginTop: 26 }}>
+            <h3 className={styles.locationName} style={{ marginBottom: 10 }}>
+              Plan des postes
+            </h3>
+            <a href={enduro.pegMapUrl} target="_blank" rel="noopener noreferrer">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={enduro.pegMapUrl}
+                alt={`Plan des postes — ${enduro.locationName}`}
+                loading="lazy"
+                style={{
+                  width: '100%',
+                  maxHeight: 520,
+                  objectFit: 'contain',
+                  borderRadius: 10,
+                  border: '1px solid var(--line)',
+                  background: 'rgba(0,0,0,0.35)',
+                  display: 'block',
+                }}
+              />
+            </a>
+            <p style={{ fontSize: '0.8rem', color: 'var(--dim)', marginTop: 8 }}>
+              Cliquez sur le plan pour l’agrandir.
+            </p>
+          </div>
+        )}
       </section>
 
       {/* ═══════ CTA FINAL ═══════ */}

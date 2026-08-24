@@ -178,6 +178,8 @@ export type SectionKey = keyof typeof SECTION_SCHEMAS
 export const SECTION_FIELDS: Record<SectionKey, string[]> = {
   infos: ['name', 'description'],
   dates: ['startAt', 'endAt', 'durationHours'],
+  // `pegMapUrl` est lu directement depuis le FormData (image déjà envoyée au Storage),
+  // il n'est donc pas dans `lieuSchema` mais doit être listé pour être transmis.
   lieu: ['locationName', 'address', 'postalCode'],
   equipes: ['maxTeams', 'maxFishersPerTeam'],
   regles: ['minWeightKg', 'requirePhoto', 'pegAssignment', 'pegAssignmentNote'],

@@ -165,6 +165,7 @@ model Enduro {
   rankingHidden     Boolean      @default(false) // classement live masqué au public (suspense) — l'organisateur le voit toujours
   pegAssignment     PegAssignment @default(PRECISION_THROW) // méthode d'attribution des postes
   pegAssignmentNote String? // précision libre (obligatoire si pegAssignment = OTHER)
+  pegMapUrl         String? // plan des postes (image), affiché aux participants
   createdAt         DateTime     @default(now())
 
   sectors              Sector[]

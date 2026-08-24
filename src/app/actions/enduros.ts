@@ -1,12 +1,14 @@
 'use server'
 
+import { randomUUID } from 'node:crypto'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { requireRole } from '@/lib/auth/dal'
 import { requireOwnedEnduro } from '@/lib/auth/owner'
 import { prisma } from '@/lib/prisma'
 import { uniqueEnduroSlug } from '@/lib/slug'
-import { removeCatchPhotos } from '@/lib/storage-cleanup'
+import { removeCatchPhotos, removeStorageFiles, storagePathFromPublicUrl } from '@/lib/storage-cleanup'
+import { createAdminClient, PLANS_BUCKET } from '@/lib/supabase/admin'
 import {
   type EnduroFormState,
   type SectionKey,
@@ -33,6 +35,37 @@ const SECTOR_COLORS = [
 ]
 
 const eurosToCents = (euros: number) => Math.round(euros * 100)
+
+// ─────────────────────────────────────────────
+// Plan des postes (image)
+// ─────────────────────────────────────────────
+
+export type PegMapUploadPrep =
+  | { ok: true; path: string; token: string }
+  | { ok: false; message: string }
+
+/**
+ * Prépare l'envoi du plan des postes : URL d'upload signée, dans un dossier propre à
+ * l'organisateur. Le navigateur envoie ensuite le fichier directement à Storage.
+ */
+export async function createPegMapUpload(): Promise<PegMapUploadPrep> {
+  const user = await requireRole('ORGANIZER')
+  const path = `${user.id}/${randomUUID()}.jpg`
+  const admin = createAdminClient()
+  const { data, error } = await admin.storage.from(PLANS_BUCKET).createSignedUploadUrl(path)
+  if (error || !data) return { ok: false, message: "Impossible de préparer l'envoi du plan." }
+  return { ok: true, path: data.path, token: data.token }
+}
+
+/**
+ * Valide une URL de plan reçue du client : elle doit pointer notre bucket ET le dossier
+ * de cet organisateur (interdit d'enregistrer une image arbitraire ou celle d'un autre).
+ */
+function validPegMapUrl(raw: string | null, userId: string): string | null {
+  if (!raw) return null
+  const prefix = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${PLANS_BUCKET}/${userId}/`
+  return raw.startsWith(prefix) ? raw : null
+}
 
 /** Revalide les pages impactées par une modification d'enduro. */
 function revalidateEnduro(slug?: string) {
@@ -95,6 +128,7 @@ export async function createEnduro(
       locationName: d.locationName,
       address: d.address ?? null,
       postalCode: d.postalCode ?? null,
+      pegMapUrl: validPegMapUrl(String(formData.get('pegMapUrl') ?? '') || null, user.id),
       maxTeams: d.maxTeams,
       maxFishersPerTeam: d.maxFishersPerTeam,
       registrationFee: eurosToCents(d.registrationFee),
@@ -163,11 +197,21 @@ export async function updateEnduroSection(
       update.endAt = data.endAt
       update.durationHours = data.durationHours
       break
-    case 'lieu':
+    case 'lieu': {
       update.locationName = data.locationName
       update.address = data.address ?? null
       update.postalCode = data.postalCode ?? null
+      // Le plan est envoyé séparément (Storage) : on ne reçoit que son URL, à valider.
+      const newMap = validPegMapUrl(String(formData.get('pegMapUrl') ?? '') || null, user.id)
+      update.pegMapUrl = newMap
+      // Remplacement ou retrait → l'ancien fichier ne doit pas rester orphelin.
+      if (enduro.pegMapUrl && enduro.pegMapUrl !== newMap) {
+        await removeStorageFiles(PLANS_BUCKET, [
+          storagePathFromPublicUrl(enduro.pegMapUrl, PLANS_BUCKET),
+        ])
+      }
       break
+    }
     case 'equipes':
       update.maxTeams = data.maxTeams
       update.maxFishersPerTeam = data.maxFishersPerTeam
@@ -272,6 +316,7 @@ export async function deleteEnduro(formData: FormData) {
 
   await prisma.enduro.delete({ where: { id: enduro.id } })
   await removeCatchPhotos(photos.flatMap((p) => [p.photoUrl, p.photoThumbUrl]))
+  await removeStorageFiles(PLANS_BUCKET, [storagePathFromPublicUrl(enduro.pegMapUrl, PLANS_BUCKET)])
 
   revalidateEnduro(enduro.slug)
   redirect('/dashboard')
