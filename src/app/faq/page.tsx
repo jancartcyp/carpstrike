@@ -87,7 +87,7 @@ const GROUPS: Group[] = [
       },
       {
         q: 'Que faire si je me trompe de poids ?',
-        a: 'Signalez-le à l’organisateur : depuis sa page Validations, il peut contester ou corriger une prise. Toutes les saisies sont traçables avec le nom du commissaire.',
+        a: 'Signalez-le à l’organisateur : depuis son onglet Poissons, il peut contester ou annuler une prise. Toutes les saisies sont traçables avec le nom du commissaire.',
       },
     ],
   },

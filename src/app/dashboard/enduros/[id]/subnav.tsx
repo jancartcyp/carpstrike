@@ -24,9 +24,10 @@ export function SubNav({
     // L'onglet « Lancer » n'a de sens que si les postes sont attribués au lancer de précision.
     ...(pegAssignment === 'PRECISION_THROW' ? [{ href: `${base}/lancer`, label: 'Lancer' }] : []),
     { href: `${base}/commissaires`, label: 'Commissaires' },
-    { href: `${base}/validations`, label: 'Validations' },
     { href: `${base}/communication`, label: 'Communication' },
     { href: `${base}/parametres`, label: 'Paramètres' },
+    // Suivi des prises déjà comptabilisées (contester / annuler / rétablir).
+    { href: `${base}/validations`, label: 'Poissons' },
   ]
 
   return (
