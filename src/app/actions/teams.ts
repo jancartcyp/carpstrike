@@ -136,22 +136,55 @@ export async function assignTeamPegs(
   }
 
   const [teams, sectors] = await Promise.all([
-    prisma.team.findMany({ where: { enduroId: enduro.id }, select: { id: true } }),
+    prisma.team.findMany({ where: { enduroId: enduro.id }, select: { id: true, name: true } }),
     prisma.sector.findMany({ where: { enduroId: enduro.id }, select: { id: true } }),
   ])
   const validSectorIds = new Set(sectors.map((s) => s.id))
 
-  await prisma.$transaction(
-    teams.map((t) => {
-      const sectorRaw = String(formData.get(`sector_${t.id}`) ?? '')
-      const sectorId = validSectorIds.has(sectorRaw) ? sectorRaw : null
-      const pegRaw = String(formData.get(`peg_${t.id}`) ?? '').trim()
-      const pegNumber =
+  // Lecture + normalisation de la saisie avant toute écriture.
+  const parsed = teams.map((t) => {
+    const sectorRaw = String(formData.get(`sector_${t.id}`) ?? '')
+    const pegRaw = String(formData.get(`peg_${t.id}`) ?? '').trim()
+    return {
+      id: t.id,
+      name: t.name,
+      sectorId: validSectorIds.has(sectorRaw) ? sectorRaw : null,
+      pegNumber:
         pegRaw !== '' && Number.isFinite(Number(pegRaw)) && Number(pegRaw) > 0
           ? Math.trunc(Number(pegRaw))
-          : null
-      return prisma.team.update({ where: { id: t.id }, data: { sectorId, pegNumber } })
-    })
+          : null,
+    }
+  })
+
+  // Un même poste ne peut pas être attribué à deux équipes : on refuse tout l'enregistrement
+  // (plutôt qu'un enregistrement partiel) et on nomme les équipes concernées.
+  const byPeg = new Map<number, string[]>()
+  for (const t of parsed) {
+    if (t.pegNumber === null) continue
+    const list = byPeg.get(t.pegNumber)
+    if (list) list.push(t.name)
+    else byPeg.set(t.pegNumber, [t.name])
+  }
+  const duplicates = [...byPeg.entries()]
+    .filter(([, names]) => names.length > 1)
+    .sort((a, b) => a[0] - b[0])
+
+  if (duplicates.length > 0) {
+    const details = duplicates
+      .map(([peg, names]) => `poste ${peg} (${names.join(' et ')})`)
+      .join(' · ')
+    return {
+      message: `Doublon détecté — ${details}. Rien n’a été enregistré : corrigez les postes en double puis réessayez.`,
+    }
+  }
+
+  await prisma.$transaction(
+    parsed.map((t) =>
+      prisma.team.update({
+        where: { id: t.id },
+        data: { sectorId: t.sectorId, pegNumber: t.pegNumber },
+      })
+    )
   )
 
   revalidateTeams(enduro.id, enduro.slug)
