@@ -137,9 +137,9 @@ export async function assignTeamPegs(
 
   const [teams, sectors] = await Promise.all([
     prisma.team.findMany({ where: { enduroId: enduro.id }, select: { id: true, name: true } }),
-    prisma.sector.findMany({ where: { enduroId: enduro.id }, select: { id: true } }),
+    prisma.sector.findMany({ where: { enduroId: enduro.id }, select: { id: true, name: true } }),
   ])
-  const validSectorIds = new Set(sectors.map((s) => s.id))
+  const sectorNameById = new Map(sectors.map((s) => [s.id, s.name]))
 
   // Lecture + normalisation de la saisie avant toute écriture.
   const parsed = teams.map((t) => {
@@ -148,7 +148,7 @@ export async function assignTeamPegs(
     return {
       id: t.id,
       name: t.name,
-      sectorId: validSectorIds.has(sectorRaw) ? sectorRaw : null,
+      sectorId: sectorNameById.has(sectorRaw) ? sectorRaw : null,
       pegNumber:
         pegRaw !== '' && Number.isFinite(Number(pegRaw)) && Number(pegRaw) > 0
           ? Math.trunc(Number(pegRaw))
@@ -156,23 +156,25 @@ export async function assignTeamPegs(
     }
   })
 
-  // Un même poste ne peut pas être attribué à deux équipes : on refuse tout l'enregistrement
-  // (plutôt qu'un enregistrement partiel) et on nomme les équipes concernées.
-  const byPeg = new Map<number, string[]>()
+  // Un poste ne peut pas être attribué deux fois **dans un même secteur** : les étangs
+  // numérotent souvent les postes secteur par secteur, donc le poste 1 du secteur A et
+  // le poste 1 du secteur B sont deux emplacements distincts et légitimes.
+  const bySlot = new Map<string, { label: string; names: string[] }>()
   for (const t of parsed) {
     if (t.pegNumber === null) continue
-    const list = byPeg.get(t.pegNumber)
-    if (list) list.push(t.name)
-    else byPeg.set(t.pegNumber, [t.name])
+    const sectorName = t.sectorId ? sectorNameById.get(t.sectorId) : null
+    const key = `${t.sectorId ?? '—'}:${t.pegNumber}`
+    const label = sectorName
+      ? `poste ${t.pegNumber} du secteur ${sectorName}`
+      : `poste ${t.pegNumber} (sans secteur)`
+    const slot = bySlot.get(key)
+    if (slot) slot.names.push(t.name)
+    else bySlot.set(key, { label, names: [t.name] })
   }
-  const duplicates = [...byPeg.entries()]
-    .filter(([, names]) => names.length > 1)
-    .sort((a, b) => a[0] - b[0])
+  const duplicates = [...bySlot.values()].filter((s) => s.names.length > 1)
 
   if (duplicates.length > 0) {
-    const details = duplicates
-      .map(([peg, names]) => `poste ${peg} (${names.join(' et ')})`)
-      .join(' · ')
+    const details = duplicates.map((s) => `${s.label} : ${s.names.join(' et ')}`).join(' · ')
     return {
       message: `Doublon détecté — ${details}. Rien n’a été enregistré : corrigez les postes en double puis réessayez.`,
     }
