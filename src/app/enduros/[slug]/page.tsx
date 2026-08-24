@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { temporalState } from '@/lib/enduro-status'
+import { ImageLightbox } from '@/components/image-lightbox'
 import { type EnduroDetail, getEnduroBySlug, getPublicAnnouncements } from '@/lib/enduros'
 import { PEG_ASSIGNMENTS } from '@/lib/validations/enduro'
 import { Countdown } from './countdown'
@@ -434,7 +435,10 @@ export default async function EnduroPage({ params }: { params: Promise<{ slug: s
             <h3 className={styles.locationName} style={{ marginBottom: 10 }}>
               Plan des postes
             </h3>
-            <a href={enduro.pegMapUrl} target="_blank" rel="noopener noreferrer">
+            <ImageLightbox
+              src={enduro.pegMapUrl}
+              alt={`Plan des postes — ${enduro.locationName}`}
+            >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={enduro.pegMapUrl}
@@ -450,9 +454,9 @@ export default async function EnduroPage({ params }: { params: Promise<{ slug: s
                   display: 'block',
                 }}
               />
-            </a>
+            </ImageLightbox>
             <p style={{ fontSize: '0.8rem', color: 'var(--dim)', marginTop: 8 }}>
-              Cliquez sur le plan pour l’agrandir.
+              Cliquez sur le plan pour l’agrandir et zoomer sur les numéros de postes.
             </p>
           </div>
         )}

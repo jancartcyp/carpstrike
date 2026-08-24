@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { ImageLightbox } from '@/components/image-lightbox'
 import { getEnduroResults } from '@/lib/ranking'
 import styles from './resultats.module.css'
 
@@ -186,17 +187,13 @@ export default async function ResultatsPage({ params }: { params: Promise<{ slug
               </h2>
               <div className={styles.gallery}>
                 {gallery.map((g, i) => (
-                  <a
-                    key={i}
-                    href={g.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={styles.galleryItem}
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={g.thumbUrl} alt={`Prise ${g.team}`} loading="lazy" />
-                    <span className={styles.galleryCap}>{g.weightKg.toFixed(1)} kg</span>
-                  </a>
+                  <ImageLightbox key={i} src={g.url} alt={`Prise de ${g.weightKg.toFixed(1)} kg — ${g.team}`}>
+                    <span className={styles.galleryItem} style={{ display: 'block' }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={g.thumbUrl} alt={`Prise ${g.team}`} loading="lazy" />
+                      <span className={styles.galleryCap}>{g.weightKg.toFixed(1)} kg</span>
+                    </span>
+                  </ImageLightbox>
                 ))}
               </div>
             </>

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { ImageLightbox } from '@/components/image-lightbox'
 import { getCurrentUser } from '@/lib/auth/dal'
 import { getTeamCatchDetail } from '@/lib/ranking'
 
@@ -237,22 +238,21 @@ export default async function TeamCatchesPage({
               >
                 {/* Photo */}
                 {c.photoUrl ? (
-                  <a
-                    href={c.photoUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ flexShrink: 0 }}
-                    aria-label="Voir la photo en grand"
-                  >
-                    {/* Miniature en liste ; le lien ouvre la version pleine. */}
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={c.photoThumbUrl ?? c.photoUrl}
-                      alt={`Prise de ${c.weightKg.toFixed(1)} kg`}
-                      loading="lazy"
-                      style={{ width: 96, height: 96, objectFit: 'cover', borderRadius: 10, display: 'block' }}
-                    />
-                  </a>
+                  <div style={{ flexShrink: 0, width: 96 }}>
+                    {/* Miniature en liste ; la visionneuse affiche la version pleine. */}
+                    <ImageLightbox
+                      src={c.photoUrl}
+                      alt={`Prise de ${c.weightKg.toFixed(1)} kg — ${c.speciesLabel}`}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={c.photoThumbUrl ?? c.photoUrl}
+                        alt={`Prise de ${c.weightKg.toFixed(1)} kg`}
+                        loading="lazy"
+                        style={{ width: 96, height: 96, objectFit: 'cover', borderRadius: 10, display: 'block' }}
+                      />
+                    </ImageLightbox>
+                  </div>
                 ) : (
                   <div
                     style={{
