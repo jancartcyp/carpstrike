@@ -352,10 +352,10 @@ export function CreateWizard() {
           className={styles.field}
           style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}
         >
+          {/* Décochée par défaut : l'organisateur active la photo obligatoire s'il le souhaite. */}
           <input
             type="checkbox"
             name="requirePhoto"
-            defaultChecked
             style={{ width: 18, height: 18, accentColor: 'var(--red)' }}
           />
           <span style={{ fontSize: '0.9rem', color: 'var(--white)' }}>
