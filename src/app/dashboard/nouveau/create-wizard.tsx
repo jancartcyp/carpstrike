@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useState } from 'react'
 import { createEnduro } from '@/app/actions/enduros'
+import { PEG_ASSIGNMENTS } from '@/lib/validations/enduro'
 import styles from '../dashboard.module.css'
 
 type FormValues = {
@@ -18,6 +19,8 @@ type FormValues = {
   maxFishersPerTeam: string
   sectorsCount: string
   minWeightKg: string
+  pegAssignment: string
+  pegAssignmentNote: string
   registrationFee: string
   prizePool: string
   theme: string
@@ -38,6 +41,8 @@ const INITIAL: FormValues = {
   maxFishersPerTeam: '2',
   sectorsCount: '4',
   minWeightKg: '3',
+  pegAssignment: 'PRECISION_THROW',
+  pegAssignmentNote: '',
   registrationFee: '0',
   prizePool: '',
   theme: '',
@@ -70,6 +75,8 @@ const FIELD_STEP: Record<string, number> = {
   maxFishersPerTeam: 3,
   sectorsCount: 3,
   minWeightKg: 4,
+  pegAssignment: 4,
+  pegAssignmentNote: 4,
   registrationFee: 5,
   prizePool: 5,
   theme: 6,
@@ -355,6 +362,43 @@ export function CreateWizard() {
             Photo obligatoire à la saisie d’une prise
           </span>
         </label>
+
+        <div className={styles.field} style={{ marginTop: 18 }}>
+          <label htmlFor="pegAssignment">Attribution des postes</label>
+          <select
+            id="pegAssignment"
+            name="pegAssignment"
+            value={v.pegAssignment}
+            onChange={(e) => set('pegAssignment', e.target.value)}
+          >
+            {PEG_ASSIGNMENTS.map((p) => (
+              <option key={p.value} value={p.value}>
+                {p.label}
+              </option>
+            ))}
+          </select>
+          {err('pegAssignment') && <p className={styles.fieldError}>{err('pegAssignment')}</p>}
+          <p className={styles.fieldHelper}>
+            {PEG_ASSIGNMENTS.find((p) => p.value === v.pegAssignment)?.hint}
+          </p>
+        </div>
+
+        {v.pegAssignment === 'OTHER' && (
+          <div className={styles.field}>
+            <label htmlFor="pegAssignmentNote">Précisez votre méthode</label>
+            <textarea
+              id="pegAssignmentNote"
+              name="pegAssignmentNote"
+              rows={3}
+              value={v.pegAssignmentNote}
+              onChange={(e) => set('pegAssignmentNote', e.target.value)}
+              placeholder="Ex. Attribution par ordre d’inscription, postes réservés aux habitués…"
+            />
+            {err('pegAssignmentNote') && (
+              <p className={styles.fieldError}>{err('pegAssignmentNote')}</p>
+            )}
+          </div>
+        )}
       </div>
 
       {/* ÉTAPE 6 — INSCRIPTIONS */}

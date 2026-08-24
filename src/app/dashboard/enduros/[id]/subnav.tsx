@@ -4,7 +4,15 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import styles from '../../dashboard.module.css'
 
-export function SubNav({ enduroId, mode }: { enduroId: string; mode: string }) {
+export function SubNav({
+  enduroId,
+  mode,
+  pegAssignment,
+}: {
+  enduroId: string
+  mode: string
+  pegAssignment: string
+}) {
   const pathname = usePathname()
   const base = `/dashboard/enduros/${enduroId}`
 
@@ -13,7 +21,8 @@ export function SubNav({ enduroId, mode }: { enduroId: string; mode: string }) {
     { href: `${base}/equipes`, label: 'Équipes' },
     ...(mode === 'WITH_REGISTRATION' ? [{ href: `${base}/demandes`, label: 'Demandes' }] : []),
     { href: `${base}/secteurs`, label: 'Secteurs' },
-    { href: `${base}/lancer`, label: 'Lancer' },
+    // L'onglet « Lancer » n'a de sens que si les postes sont attribués au lancer de précision.
+    ...(pegAssignment === 'PRECISION_THROW' ? [{ href: `${base}/lancer`, label: 'Lancer' }] : []),
     { href: `${base}/commissaires`, label: 'Commissaires' },
     { href: `${base}/validations`, label: 'Validations' },
     { href: `${base}/communication`, label: 'Communication' },

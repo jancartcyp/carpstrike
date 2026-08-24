@@ -77,13 +77,54 @@ const checkbox = z.preprocess(
   z.boolean()
 )
 
-export const reglesSchema = z.object({
+/** Méthodes d'attribution des postes proposées à l'organisateur. */
+export const PEG_ASSIGNMENTS = [
+  {
+    value: 'PRECISION_THROW',
+    label: 'Lancer de précision',
+    hint: '2 lancers par équipe, la moyenne la plus faible choisit en premier.',
+  },
+  {
+    value: 'SINGLE_DRAW',
+    label: 'Tirage au sort simple',
+    hint: 'Chaque équipe tire un poste, attribué directement.',
+  },
+  {
+    value: 'DOUBLE_DRAW',
+    label: 'Tirage au sort double',
+    hint: 'Chaque équipe tire deux postes et choisit celui qu’elle préfère.',
+  },
+  {
+    value: 'OTHER',
+    label: 'Autre méthode',
+    hint: 'À préciser ci-dessous (elle sera affichée aux participants).',
+  },
+] as const
+
+export type PegAssignmentValue = (typeof PEG_ASSIGNMENTS)[number]['value']
+
+/** Objet de base (sans refine) : nécessaire pour le spread dans createEnduroSchema. */
+export const reglesObjectSchema = z.object({
   minWeightKg: z.coerce
     .number({ error: 'Poids invalide' })
     .min(0, { error: 'Poids invalide' })
     .max(100, { error: 'Maille trop élevée' }),
   requirePhoto: checkbox,
+  pegAssignment: z.enum(['PRECISION_THROW', 'SINGLE_DRAW', 'DOUBLE_DRAW', 'OTHER'], {
+    error: 'Méthode d’attribution invalide',
+  }),
+  pegAssignmentNote: optionalText,
 })
+
+/** Si « Autre méthode » est choisie, la précision devient obligatoire. */
+const pegNoteRequired = (d: { pegAssignment: string; pegAssignmentNote?: string }) =>
+  d.pegAssignment !== 'OTHER' || !!d.pegAssignmentNote
+const pegNoteError = {
+  error: 'Précisez la méthode d’attribution des postes',
+  path: ['pegAssignmentNote'] as PropertyKey[],
+}
+
+export const reglesSchema = reglesObjectSchema.refine(pegNoteRequired, pegNoteError)
 
 export const inscriptionsSchema = z.object({
   registrationFee: euros,
@@ -106,7 +147,7 @@ export const createEnduroSchema = z
     ...datesObjectSchema.shape,
     ...lieuSchema.shape,
     ...equipesSchema.shape,
-    ...reglesSchema.shape,
+    ...reglesObjectSchema.shape,
     ...inscriptionsSchema.shape,
     ...presentationSchema.shape,
     sectorsCount: z.coerce
@@ -116,6 +157,7 @@ export const createEnduroSchema = z
       .max(12, { error: '12 secteurs max' }),
   })
   .refine(endAfterStart, endAfterStartError)
+  .refine(pegNoteRequired, pegNoteError)
 
 export type CreateEnduroInput = z.infer<typeof createEnduroSchema>
 
@@ -138,7 +180,7 @@ export const SECTION_FIELDS: Record<SectionKey, string[]> = {
   dates: ['startAt', 'endAt', 'durationHours'],
   lieu: ['locationName', 'address', 'postalCode'],
   equipes: ['maxTeams', 'maxFishersPerTeam'],
-  regles: ['minWeightKg', 'requirePhoto'],
+  regles: ['minWeightKg', 'requirePhoto', 'pegAssignment', 'pegAssignmentNote'],
   inscriptions: ['registrationFee', 'prizePool'],
   presentation: ['theme', 'rulesText'],
 }

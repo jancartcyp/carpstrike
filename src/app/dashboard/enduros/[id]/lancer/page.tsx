@@ -10,6 +10,8 @@ export default async function LancerPage({ params }: { params: Promise<{ id: str
   const user = await requireRole('ORGANIZER')
   const enduro = await getOrganizerEnduro(id, user.id)
   if (!enduro) notFound()
+  // Page réservée aux enduros dont les postes sont attribués au lancer de précision.
+  if (enduro.pegAssignment !== 'PRECISION_THROW') notFound()
 
   // Seules les équipes confirmées participent au lancer de précision.
   const confirmed = (await getEnduroTeams(enduro.id))

@@ -99,6 +99,14 @@ enum CommunicationChannel {
   SMS
 }
 
+/** Méthode d'attribution des postes, annoncée par l'organisateur. */
+enum PegAssignment {
+  PRECISION_THROW // lancer de précision (2 lancers, moyenne la plus faible)
+  SINGLE_DRAW // tirage au sort simple : un poste tiré par équipe
+  DOUBLE_DRAW // tirage double : 2 postes tirés, l'équipe en choisit un
+  OTHER // autre méthode, précisée par l'organisateur
+}
+
 enum NotificationType {
   GENERIC
   ANNOUNCEMENT
@@ -155,6 +163,8 @@ model Enduro {
   minWeightKg       Float        @default(3.0) // maille minimum
   requirePhoto      Boolean      @default(true) // photo obligatoire à la saisie d'une prise
   rankingHidden     Boolean      @default(false) // classement live masqué au public (suspense) — l'organisateur le voit toujours
+  pegAssignment     PegAssignment @default(PRECISION_THROW) // méthode d'attribution des postes
+  pegAssignmentNote String? // précision libre (obligatoire si pegAssignment = OTHER)
   createdAt         DateTime     @default(now())
 
   sectors              Sector[]

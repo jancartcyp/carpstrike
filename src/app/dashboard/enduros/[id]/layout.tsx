@@ -45,7 +45,7 @@ export default async function EnduroLayout({
         </div>
       </div>
 
-      <SubNav enduroId={enduro.id} mode={enduro.mode} />
+      <SubNav enduroId={enduro.id} mode={enduro.mode} pegAssignment={enduro.pegAssignment} />
 
       {children}
     </div>

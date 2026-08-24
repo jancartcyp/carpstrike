@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import { requireRole } from '@/lib/auth/dal'
 import { getOrganizerEnduro } from '@/lib/organizer'
-import { isStructurallyLocked } from '@/lib/validations/enduro'
+import { isStructurallyLocked, PEG_ASSIGNMENTS } from '@/lib/validations/enduro'
 import styles from '../../../dashboard.module.css'
 import { DangerZone } from './danger-zone'
 import { SectionForm } from './section-form'
@@ -194,7 +194,7 @@ export default async function ParametresPage({
         section="regles"
         num={5}
         title="Règles de pesée"
-        subtitle="Maille minimum"
+        subtitle="Maille minimum · attribution des postes"
       >
         <div className={styles.field}>
           <label htmlFor="minWeightKg">Maille minimum (kg)</label>
@@ -224,6 +224,34 @@ export default async function ParametresPage({
             Photo obligatoire pour valider une prise
           </span>
         </label>
+
+        <div className={styles.field} style={{ marginTop: 16 }}>
+          <label htmlFor="pegAssignment">Attribution des postes</label>
+          <select id="pegAssignment" name="pegAssignment" defaultValue={enduro.pegAssignment}>
+            {PEG_ASSIGNMENTS.map((p) => (
+              <option key={p.value} value={p.value}>
+                {p.label}
+              </option>
+            ))}
+          </select>
+          <p className={styles.fieldHelper}>
+            Méthode annoncée aux participants. L’onglet « Lancer » n’apparaît que si vous
+            choisissez le lancer de précision.
+          </p>
+        </div>
+
+        <div className={styles.field}>
+          <label htmlFor="pegAssignmentNote">
+            Précision <span className="optional">obligatoire si « Autre méthode »</span>
+          </label>
+          <textarea
+            id="pegAssignmentNote"
+            name="pegAssignmentNote"
+            rows={3}
+            defaultValue={enduro.pegAssignmentNote ?? ''}
+            placeholder="Ex. Attribution par ordre d’inscription, postes réservés aux habitués…"
+          />
+        </div>
       </SectionForm>
 
       {/* 6 — Inscriptions */}

@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { temporalState } from '@/lib/enduro-status'
 import { type EnduroDetail, getEnduroBySlug, getPublicAnnouncements } from '@/lib/enduros'
+import { PEG_ASSIGNMENTS } from '@/lib/validations/enduro'
 import { Countdown } from './countdown'
 import styles from './enduro.module.css'
 
@@ -296,6 +297,14 @@ export default async function EnduroPage({ params }: { params: Promise<{ slug: s
                 <div className={styles.detailLabel}>Maille mini</div>
                 <div className={styles.detailValue}>
                   <strong>{enduro.minWeightKg} kg</strong> minimum
+                </div>
+              </li>
+              <li className={styles.detailRow}>
+                <div className={styles.detailLabel}>Postes</div>
+                <div className={styles.detailValue}>
+                  {enduro.pegAssignment === 'OTHER' && enduro.pegAssignmentNote
+                    ? enduro.pegAssignmentNote
+                    : (PEG_ASSIGNMENTS.find((p) => p.value === enduro.pegAssignment)?.label ?? '—')}
                 </div>
               </li>
               <li className={styles.detailRow}>
